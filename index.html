@@ -1,0 +1,2217 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<title>KKL Daily Report — Site Capture</title>
+<style>
+  :root{
+    --paper:#f7f6f3; --ink:#26292b; --ink-soft:#5a5f63; --steel:#46606e;
+    --accent:#c85a10; --accent-ink:#a34a0d; --line:#d9d6cf; --line-strong:#b9b5ac;
+    --card:#ffffff; --field:#fbfaf8; --good:#2e7d4f; --bad:#b3402e; --mark:#fdf1e3;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --paper:#1e2022; --ink:#e6e3dc; --ink-soft:#a8aaa9; --steel:#93aebc;
+      --accent:#e8823a; --accent-ink:#e8823a; --line:#3a3d3f; --line-strong:#55585a;
+      --card:#26292b; --field:#2c2f31; --good:#5cb884; --bad:#e07a63; --mark:#3a2f24; }
+  }
+  :root[data-theme="dark"]{ --paper:#1e2022; --ink:#e6e3dc; --ink-soft:#a8aaa9; --steel:#93aebc;
+      --accent:#e8823a; --accent-ink:#e8823a; --line:#3a3d3f; --line-strong:#55585a;
+      --card:#26292b; --field:#2c2f31; --good:#5cb884; --bad:#e07a63; --mark:#3a2f24; }
+  :root[data-theme="light"]{ --paper:#f7f6f3; --ink:#26292b; --ink-soft:#5a5f63; --steel:#46606e;
+      --accent:#c85a10; --accent-ink:#a34a0d; --line:#d9d6cf; --line-strong:#b9b5ac;
+      --card:#ffffff; --field:#fbfaf8; --good:#2e7d4f; --bad:#b3402e; --mark:#fdf1e3; }
+
+  *{box-sizing:border-box;}
+  html{background:var(--paper);}
+  body{font-family:"Segoe UI",system-ui,-apple-system,sans-serif; color:var(--ink); background:var(--paper); margin:0; font-size:16px; line-height:1.45;}
+  .wrap{max-width:680px; margin:0 auto; padding:14px 12px 120px;}
+  .mono{font-family:"Cascadia Mono",Consolas,monospace;}
+
+  header.app{border:2px solid var(--ink); background:var(--card); padding:12px 14px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:baseline; gap:8px;}
+  header.app h1{font-size:17px; margin:0; font-weight:650;}
+  header.app .tag{font-family:"Cascadia Mono",Consolas,monospace; font-size:10px; letter-spacing:.12em; color:var(--ink-soft); text-transform:uppercase;}
+
+  fieldset{border:1px solid var(--line-strong); background:var(--card); margin:0 0 14px; padding:12px; border-radius:4px;}
+  legend{font-family:"Cascadia Mono",Consolas,monospace; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent-ink); font-weight:700; padding:0 6px;}
+  label{display:block; font-size:12.5px; font-weight:600; color:var(--ink-soft); margin:10px 0 3px;}
+  label:first-of-type{margin-top:0;}
+  input,select,textarea{width:100%; font:inherit; font-size:16px; color:var(--ink); background:var(--field); border:1px solid var(--line-strong); border-radius:4px; padding:9px 10px; min-height:42px;}
+  input:focus,select:focus,textarea:focus,button:focus{outline:2px solid var(--accent); outline-offset:1px;}
+  .row{display:flex; gap:10px;} .row>*{flex:1; min-width:0;}
+  .hint{font-size:12px; color:var(--ink-soft); margin-top:3px;}
+  .tick{display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600; color:var(--ink-soft); margin:8px 0 0; cursor:pointer; user-select:none;}
+  .tick input{width:18px; height:18px; min-height:0; padding:0; margin:0; flex:0 0 auto; accent-color:var(--accent);}
+  .tick.on{color:var(--accent-ink);}
+  .hrschip{font-family:"Cascadia Mono",Consolas,monospace; font-size:12px; font-weight:700; color:var(--accent-ink); margin-left:auto;}
+
+  .task{border:1.5px solid var(--ink); background:var(--card); border-radius:4px; margin-bottom:14px; overflow:hidden;}
+  .task .head{display:flex; justify-content:space-between; align-items:center; background:var(--steel); color:#fff; padding:7px 12px;}
+  .task .head .t{font-family:"Cascadia Mono",Consolas,monospace; font-size:12px; font-weight:700; letter-spacing:.06em;}
+  .task .head button{background:none; border:none; color:#fff; font-size:20px; line-height:1; cursor:pointer; padding:4px 8px; min-height:0;}
+  .task .body{padding:12px;}
+  .unitchip{font-family:"Cascadia Mono",Consolas,monospace; font-size:14px; font-weight:700; color:var(--accent-ink); align-self:center; min-width:44px; text-align:center; flex:0 0 auto;}
+
+  .crewgrid{display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin-top:4px;}
+  @media(min-width:520px){.crewgrid{grid-template-columns:repeat(3,1fr);}}
+  .crew{display:flex; align-items:center; justify-content:space-between; border:1px solid var(--line); border-radius:4px; padding:4px 6px; background:var(--field);}
+  .crew span.nm{font-size:12px; font-weight:600; color:var(--ink-soft);}
+  .crew .ctl{display:flex; align-items:center; gap:2px;}
+  .crew button{width:34px; height:34px; min-height:34px; border:1px solid var(--line-strong); background:var(--card); color:var(--ink); font-size:18px; border-radius:4px; cursor:pointer; padding:0;}
+  .crew output{min-width:26px; text-align:center; font-weight:700; font-variant-numeric:tabular-nums;}
+  .crew.on{border-color:var(--accent); background:var(--mark);}
+
+  .machrow{display:grid; grid-template-columns:1.1fr 1fr 54px 34px; gap:6px; margin-top:6px; align-items:center;}
+  .sugwrap{position:relative;}
+  .suggest{position:absolute; top:calc(100% + 2px); left:0; min-width:280px; max-width:min(92vw,420px); background:var(--card); border:1.5px solid var(--steel); border-radius:4px; z-index:6; max-height:200px; overflow-y:auto; box-shadow:0 6px 14px rgba(0,0,0,.18); display:none;}
+  .suggest div{padding:9px 10px; font-size:14px; border-bottom:1px solid var(--line); cursor:pointer; display:flex; justify-content:space-between; gap:10px;}
+  .suggest div:last-child{border-bottom:none;}
+  .suggest div:active{background:var(--mark);}
+  .suggest .no{font-family:"Cascadia Mono",Consolas,monospace; font-weight:700;}
+  .suggest .cl{color:var(--ink-soft); font-size:12px; white-space:nowrap;}
+  .suggest .ds{color:var(--ink-soft); font-size:11px; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .machrow input{min-height:38px; padding:6px 8px; font-size:14px;}
+  .machrow select{min-height:38px; padding:6px 6px; font-size:14px;}
+  .machrow button{width:34px; height:34px; min-height:34px; border:1px solid var(--line-strong); background:var(--card); color:var(--bad); border-radius:4px; font-size:16px; cursor:pointer; padding:0;}
+
+  .addbtn{width:100%; padding:12px; font:inherit; font-weight:650; border:2px dashed var(--line-strong); background:none; color:var(--steel); border-radius:4px; cursor:pointer; margin:2px 0 14px;}
+  .minor{background:none; border:1px solid var(--line-strong); color:var(--steel); font-size:13px; font-weight:600; border-radius:4px; padding:7px 10px; cursor:pointer; margin-top:6px;}
+
+  .footer{position:fixed; left:0; right:0; bottom:0; background:var(--card); border-top:2px solid var(--ink); padding:10px 12px calc(10px + env(safe-area-inset-bottom));}
+  .footer .inner{max-width:680px; margin:0 auto; display:flex; gap:10px; align-items:center;}
+  .footer .sum{flex:1; font-size:12.5px; color:var(--ink-soft); line-height:1.3;}
+  .footer .sum b{color:var(--ink); font-variant-numeric:tabular-nums;}
+  .primary{background:var(--accent); border:none; color:#fff; font:inherit; font-weight:700; padding:12px 18px; border-radius:4px; cursor:pointer;}
+  .ghost{background:none; border:1px solid var(--line-strong); color:var(--ink); font:inherit; font-size:13px; font-weight:600; padding:10px 12px; border-radius:4px; cursor:pointer;}
+
+  .errors{border-left:4px solid var(--bad); background:var(--card); border:1px solid var(--line-strong); border-left:4px solid var(--bad); padding:10px 14px; margin-bottom:14px; font-size:14px; display:none;}
+  .errors ul{margin:4px 0 0; padding-left:18px;}
+  .toast{position:fixed; top:12px; left:50%; transform:translateX(-50%); background:var(--good); color:#fff; font-weight:650; padding:10px 18px; border-radius:4px; display:none; z-index:9; max-width:92%; text-align:center; font-size:14px;}
+
+  .structbox{border:1.5px dashed var(--steel); border-radius:4px; padding:8px 10px 10px; margin-top:10px; background:var(--field);}
+  .structbox .st{font-family:"Cascadia Mono",Consolas,monospace; font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--steel); font-weight:700;}
+  .structbox label{margin-top:8px;}
+  .idlebox{border:1px dashed var(--line-strong); border-radius:4px; padding:8px 10px; margin-top:12px;}
+  .idlebox label{margin-top:6px;}
+  details.adv summary{font-size:13px; font-weight:600; color:var(--steel); cursor:pointer; margin-top:10px;}
+
+  @media print{
+    .footer,.addbtn,.minor,header.app .tag, .task .head button, .errors{display:none!important;}
+    body{background:#fff; color:#000;} fieldset,.task{break-inside:avoid;}
+  }
+</style>
+
+<div class="toast" id="toast"></div>
+<div class="wrap">
+  <header class="app">
+    <h1>KKL Daily Report — Site Capture</h1>
+    <span class="tag">v3.1 · one row per crew × activity</span>
+  </header>
+
+  <fieldset>
+    <legend>Report</legend>
+    <div class="row">
+      <div>
+        <label for="project">Project</label>
+        <input id="project" list="projlist" placeholder="e.g. CR115" autocomplete="off">
+        <datalist id="projlist">
+          <option value="CR108"><option value="CR115"><option value="Belgravia Ace"><option value="N113"><option value="N115">
+          <option value="J109"><option value="P105"><option value="RC210"><option value="T5"><option value="UGSS">
+        </datalist>
+      </div>
+      <div>
+        <label for="date">Date</label>
+        <input id="date" type="date">
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label for="shift">Shift</label>
+        <select id="shift"><option>Day</option><option>Night</option></select>
+      </div>
+      <div>
+        <label for="reporter">Reported by</label>
+        <input id="reporter" placeholder="Name" autocomplete="name">
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label for="weather">Weather</label>
+        <select id="weather"><option>Sunny</option><option>Cloudy</option><option>Rain AM</option><option>Rain PM</option><option>Rain all day</option></select>
+      </div>
+      <div>
+        <label for="genremark">General remarks (optional)</label>
+        <input id="genremark" placeholder="—">
+      </div>
+    </div>
+  </fieldset>
+
+  <div class="errors" id="errors"></div>
+  <div id="tasks"></div>
+  <button class="addbtn" id="addtask" type="button">＋ Add activity row</button>
+
+  <fieldset>
+    <legend>How to file</legend>
+    <p class="hint" style="margin:0">Tap <b>Export</b> when the day is done — it downloads a CSV and a JSON. Then tap <b>Upload ⇪</b> and pick both files from Downloads — they go straight into the office <span class="mono">Site Logs</span> folder (no login needed, one folder for all projects). One activity = one row; if a gang did two things today, add two rows.</p>
+  </fieldset>
+</div>
+
+<div class="footer">
+  <div class="inner">
+    <div class="sum" id="summary">0 rows</div>
+    <button class="ghost" id="newday" type="button">New day</button>
+    <button class="ghost" id="upload" type="button">Upload ⇪</button>
+    <button class="primary" id="export" type="button">Export ⭳</button>
+  </div>
+</div>
+
+<script>
+"use strict";
+// ---- Activity Dictionary v2 (38 codes; pilot=1 shown in ★ group too; el=1 -> Element mandatory)
+const CODES=[
+["EW-EXC","Earthworks","Bulk excavation (open cut) incl. load-out & trimming","m3",1,2],
+["EW-EXCT","Earthworks","Trench excavation (services / non-drain)","m3",1,2],
+["EW-EXCP","Earthworks","Pit excavation (pile caps / chambers / pits)","m3",1,2],
+["EW-EXCTD","Earthworks","Top-down / under-strut excavation","m3",1,0],
+["EW-BF","Earthworks","Backfilling incl. compaction","m3",1,2],
+["EW-DISP","Earthworks","Disposal offsite (all streams)","m3",1,0],
+["EW-STK","Earthworks","Transfer to/from stockpile","m3",0,0],
+["EW-PLAT","Earthworks","Working platform / steel plates (lay)","m2",0,0],
+["EW-HARD","Earthworks","Hardcore laying incl. compaction","m2",1,2],
+["EW-ECB","Earthworks","Concrete canvas / ECB laying","m2",1,0],
+["DM-HACK","Demolition","Hack RC / mass concrete (hack only)","m3",1,0],
+["DM-PAVE","Demolition","Hack pavement / footpath (hack only)","m2",0,0],
+["DM-KERB","Demolition","Hack kerb (hack only)","m",0,0],
+["DM-DRN","Demolition","Hack RC drain / culvert / sump","m",1,0],
+["DM-RAIL","Demolition","Dismantle railing / fence incl. load-out","m",0,0],
+["DR-PIPE","Drainage","RC pipe laying (dia & depth in Spec)","m",1,0],
+["DR-RCU","Drainage","Precast U-drain / RCU-S laying","m",1,0],
+["DR-SCUP","Drainage","Scupper / connection pipe laying","m",0,0],
+["DR-SUMP","Drainage","Sump / DIC / RCS setting (precast) — CIS sumps via RC codes","no",0,0],
+["DR-BC","Drainage","Precast box culvert (RCBC) unit laying","m",0,0],
+["DR-CONN","Drainage","Connection to existing drain","no",0,0],
+["RW-KERB","Roadworks","Supply & lay kerb incl. haunch","m",1,0],
+["RW-SUB","Roadworks","Lay quarry dust sub-base","m2",0,0],
+["RW-BASE","Roadworks","Lay graded stone base","m2",0,0],
+["RW-ACBC","Roadworks","Asphalt base course (subcon)","m2",0,0],
+["RW-ACWC","Roadworks","Asphalt wearing course (subcon)","m2",0,0],
+["RW-PATCH","Roadworks","Premix patching / reinstatement","ton",0,0],
+["RW-FP","Roadworks","Concrete footpath / PCN","m2",0,0],
+["RW-RAIL","Roadworks","Railing / bollard / signs (erection)","m",0,0],
+["RW-MARK","Roadworks","Road marking (subcon)","m",0,0],
+["RC-LEAN","RC Works","Lean concrete blinding","m3",0,1],
+["RC-FW","RC Works","Formwork erect","m2",1,1],
+["RC-FWS","RC Works","Formwork strike & clean","m2",0,1],
+["RC-REB","RC Works","Rebar fix","t",1,1],
+["RC-BRC","RC Works","BRC mesh laying","m2",0,1],
+["RC-CONC","RC Works","Concrete pour","m3",1,1],
+["GN-SOIL","General","Soil disposal support for MC","load",1,0],
+["GN-TC","General","Traffic controller manning","day",0,0],
+["GN-LIFT","General","Lifting operation day","day",0,0],
+["GN-HSK","General","Housekeeping / ECM / washing","day",0,0],
+["GN-IDLE","General","Idle / standdown (reason required)","hr",1,0]];
+const BYCODE=Object.fromEntries(CODES.map(c=>[c[0],c]));
+// WK = merged Gen Worker + Skilled (sites can't split them reliably). Subcon heads are
+// never counted — the subcon tick + company flags the row; crew here is KKL's own only.
+const TRADES=[["SS","Site Sup"],["OP","Operator"],["WK","Worker"],["LS","Lift Sup"],["RG","Rigger"],["SC","Safety"],["TC","Traffic"],["DRV","Driver"]];
+const MACH=["Mini 5.5t","Exc 8t","Exc 14t","Exc 14t+breaker","Exc 20t","Exc 20t+breaker","Exc 25t SA/LA","Exc 30t","Exc 35-40t","Exc 45t+","Exc telescopic (clamshell)","Exc long arm","Exc standard arm","Exc short arm","Exc standby","Lorry crane","Mobile crane","Roller","Compactor","Concrete pump","Water truck","Tipper","Grader","Paver","Dozer","Wheel loader","Dump truck (ADT)","Crusher/Screener","Forklift","Generator/Welder","Lighting tower","Air compressor","Other"];
+const IDLE_REASONS=["","Rain","No work front","Awaiting MC instruction","Machine breakdown","Awaiting materials","Other"];
+// Fleet register - 1417 units: Connie Lim's "Machinery Summary (Recovered)_22.10.2025.xlsx" (live SharePoint,
+// snapshot 16.07.2026 via Excel) + PEMA "All project Overview" exports (01 PnL/RC210/Machinery). Plain register nos
+// carry their operational EX code (EX828 = register 828, PEMA convention); W-plate rows merged into base units.
+// cls from curated model tonnages + keywords; blank cls = pick manually. d = description (searchable).
+// Refresh: run update_machine_list.py, then republish the artifact.
+const MACHINES=[
+ {no:"EX1C",cls:"Crusher/Screener",d:"POWERSCREEN WARRIOR 2400 CRUSHER W/C ACCESSORIES"},
+ {no:"EX2C",cls:"Exc 8t",d:"HITACHI ZX70 SRF HYDRAULIC EXCAVATOR"},
+ {no:"EX3B",cls:"Wheel loader",d:"CATERPILLAR 966F WHEEL LOADER (USED)"},
+ {no:"EX4C",cls:"Wheel loader",d:"CATERPILLAR 920 WHEEL LOADER (USED)"},
+ {no:"EX5B",cls:"Exc 8t",d:"HITACHI ZX70 SRF HYDRAULIC EXCAVATOR"},
+ {no:"EX6B",cls:"Wheel loader",d:"BOBCAT S150 SKID STEEL LOADER C/W COMPLETE 60'' BUCKET "},
+ {no:"EX7B",cls:"Exc 8t",d:"HITACHI ZX70 HYDRAULIC EXCAVATOR"},
+ {no:"EX8B",cls:"Crusher/Screener",d:"POWERSCREEN CHIEFTAIN 1700 2 DECK MOBILE SCREENER"},
+ {no:"EX9",cls:"Wheel loader",d:"BOBCAT S150 SKID STEEL LOADER C/W COMPLETE 60'' BUCKET "},
+ {no:"EX10",cls:"Exc 8t",d:"HITACHI ZX70 HYDRAULIC EXCAVATOR"},
+ {no:"EX10B",cls:"Wheel loader",d:"CATERPILLAR 920 WHEEL LOADER (USED)"},
+ {no:"EX11B",cls:"Crusher/Screener",d:"POWERSCREEN MAXTRAK 1300 MOBILE CONE CRUSHER C/W ACCESS"},
+ {no:"EX12",cls:"Roller",d:"KANTO KV40DS VIBRATION ROLLER"},
+ {no:"EX12B",cls:"Roller",d:"KANTO KV40DS RIDE-ON TANDEM VIBRATION ROLLER (WD9055P)"},
+ {no:"EX13",cls:"Roller",d:"KANTO KV40DS RIDE-ON TANDEM VIBRATION ROLLER (WD9050C)"},
+ {no:"EX17",cls:"Wheel loader",d:"CATERPILLAR 980M WHEEL LOADER USED"},
+ {no:"EX18",cls:"Wheel loader",d:"CATERPILLAR 980M WHEEL LOADER USED"},
+ {no:"EX20",cls:"Wheel loader",d:"CATERPILLAR 980M WHEEL LOADER"},
+ {no:"EX20C",cls:"Wheel loader",d:"CATERPILLAR 980M WHEEL LOADER USED"},
+ {no:"EX21",cls:"Wheel loader",d:"CATERPILLAR 980H WHEEL LOADER USED"},
+ {no:"EX22",cls:"Wheel loader",d:"CATERPILLAR 980K WHEEL LOADER USED"},
+ {no:"EX23C",cls:"Wheel loader",d:"CATERPILLAR 980H WHEEL LOADER USED"},
+ {no:"EX24C",cls:"Wheel loader",d:"USED CATERPILLAR 980H WHEEL LOADER (WD8976M)"},
+ {no:"EX25",cls:"Roller",d:"USED CATERPILLAR CS56B VIBRATORY SOIL COMPACTOR"},
+ {no:"EX26",cls:"Crusher/Screener",d:"SANDVIK QJ341 JAW CRUSHER C/W ACCESSORIES"},
+ {no:"EX27",cls:"Exc 14t",d:"KATO HD513MRIIISR EXCAVATOR"},
+ {no:"EX28",cls:"Exc 14t",d:"HITACHI ZX120 SRF HYDRAULIC EXCAVATOR"},
+ {no:"EX30",cls:"Exc 20t",d:"SUMITOMO SH220LPC-2 HYDRAULIC EXCAVATOR"},
+ {no:"EX31B",cls:"Roller",d:"KANTO KV40DS RIDE-ON STEEL TANDEM VIBRATION ROLLER"},
+ {no:"EX32",cls:"Roller",d:"KANTO KV40DS VIBRATION ROLLER"},
+ {no:"EX32B",cls:"Roller",d:"KANTO KV40DS RIDE-ON STEEL TANDEM VIBRATION ROLLER"},
+ {no:"EX33",cls:"Exc 14t",d:"HITACHI ZX120 SRF HYDRAULIC EXCAVATOR"},
+ {no:"EX34",cls:"",d:"-"},
+ {no:"EX34C",cls:"Roller",d:"KANTO KV40DS RIDE-ON STEEL TANDEM VIBRATION ROLLER"},
+ {no:"EX35",cls:"Roller",d:"KANTO KV40DS RIDE-ON STEEL TANDEM VIBRATION ROLLER"},
+ {no:"EX36B",cls:"Mini 5.5t",d:"HITACHI ZX35U-3F HYDRAULIC EXCAVATOR C/W ACCESSORIES"},
+ {no:"EX37",cls:"Wheel loader",d:"CATERPILLAR 966H WHEEL LOADER USED"},
+ {no:"EX38",cls:"Mini 5.5t",d:"HITACHI ZX35U-3F HYDRAULIC EXCAVATOR C/W ACCESSORIES"},
+ {no:"EX40",cls:"Mini 5.5t",d:"HITACHI ZX35U-3F HYDRAULIC EXCAVATOR C/W ACCESSORIES"},
+ {no:"EX41",cls:"Mini 5.5t",d:"HITACHI ZX35U-3F HYDRAULIC EXCAVATOR C/W ACCESSORIES"},
+ {no:"EX44",cls:"Mini 5.5t",d:"HITACHI ZX35U-3F HYDRAULIC EXCAVATOR C/W ACCESSORIES"},
+ {no:"EX46",cls:"Mini 5.5t",d:"HITACHI ZX35U-3F HYDRAULIC EXCAVATOR C/W ACCESSORIES"},
+ {no:"EX47",cls:"Mini 5.5t",d:"HITACHI ZX35U-3F HYDRAULIC EXCAVATOR C/W ACCESSORIES"},
+ {no:"EX48",cls:"Mini 5.5t",d:"KATO HD35V4 MINI EXCAVATOR SHORT REACH"},
+ {no:"EX50",cls:"Mini 5.5t",d:"KATO HD35V4 MINI EXCAVATOR SHORT REACH"},
+ {no:"EX51B",cls:"Mini 5.5t",d:"KATO HD35V4 MINI EXCAVATOR SHORT REACH"},
+ {no:"EX52",cls:"Mini 5.5t",d:"KATO HD35V4 MINI EXCAVATOR SHORT REACH"},
+ {no:"EX53",cls:"Mini 5.5t",d:"KATO HD35V4 MINI EXCAVATOR SHORT REACH"},
+ {no:"EX54",cls:"Mini 5.5t",d:"KATO HD35V4 MINI EXCAVATOR SHORT REACH"},
+ {no:"EX55",cls:"Mini 5.5t",d:"KATO HD35V4 MINI EXCAVATOR SHORT REACH"},
+ {no:"EX56",cls:"Mini 5.5t",d:"KATO HD35V4 MINI EXCAVATOR SHORT REACH"},
+ {no:"EX57",cls:"Mini 5.5t",d:"HITACHI ZX35U-3F HYDRAULIC EXCAVATOR C/W ACCESSORIES"},
+ {no:"EX64B",cls:"Dozer",d:"CATERPILLAR CHALLENGER 95E AGRICULTURAL CRAWLER TRACTOR"},
+ {no:"EX65B",cls:"Dozer",d:"CATERPILLAR CHALLENGER 95E AGRICULTURAL CRAWLER TRACTOR"},
+ {no:"EX66",cls:"Grader",d:"MODEL GD655-5 / W-plate WD8130L"},
+ {no:"EX66B",cls:"Grader",d:"KOMATSU GD655-5 MOTOR GRADER"},
+ {no:"EX67B",cls:"Exc 8t",d:"KATO HD308US-7 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX68B",cls:"Exc 8t",d:"KATO HD308US-7 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX70",cls:"Exc 8t",d:"KATO HD308US-7 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX71",cls:"Exc 8t",d:"KATO HD308US-7 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX72",cls:"Exc 8t",d:"KATO HD308US-7 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX73",cls:"Exc 8t",d:"KATO HD308US-7 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX74",cls:"Exc 8t",d:"KATO HD308US-7 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX75",cls:"Exc 8t",d:"KATO HD308US-7 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX76",cls:"Exc 8t",d:"KATO HD308US-7 STANDARD ARM HYDRAULIC EXCAVATOR"},
+ {no:"EX77",cls:"Exc 8t",d:"KATO HD308US-7 STANDARD ARM HYDRAULIC EXCAVATOR"},
+ {no:"EX81B",cls:"Dozer",d:"CATERPILLAR D6T LGP BULLDOZER USED"},
+ {no:"EX82B",cls:"Dozer",d:"CATERPILLAR D6T LGP BULLDOZER USED"},
+ {no:"EX83C",cls:"Exc 8t",d:"HITACHI ZX70 SRF HYDRAULIC EXCAVATOR"},
+ {no:"EX84B",cls:"Dozer",d:"CATERPILLAR D6R-III DS LGP BULLDOZER USED"},
+ {no:"EX85",cls:"Dozer",d:"CATERPILLAR D6T LGP BULLDOZER USED"},
+ {no:"EX86",cls:"Dozer",d:"CATERPILLAR D6R LGP BULLDOZER USED"},
+ {no:"EX87B",cls:"Exc 8t",d:"HITACHI ZX70 SRF HYDRAULIC EXCAVATOR"},
+ {no:"EX88",cls:"Dozer",d:"CATERPILLAR D6R LGP BULLDOZER USED"},
+ {no:"EX90B",cls:"Dozer",d:"CATERPILLAR D6T DPS LGP BULLDOZER USED"},
+ {no:"EX91B",cls:"Dozer",d:"CATERPILLAR D6R DPS LGP BULLDOZER USED"},
+ {no:"EX92B",cls:"Dozer",d:"CATERPILLAR D6R-III DS LGP BULLDOZER USED"},
+ {no:"EX93B",cls:"Dozer",d:"CATERPILLAR D6RLGP-3 BULLDOZER USED"},
+ {no:"EX94B",cls:"Dozer",d:"CATERPILLAR D6T LGP BULLDOZER USED"},
+ {no:"EX95B",cls:"Dozer",d:"CATERPILLAR D6RLGP-3 BULLDOZER USED"},
+ {no:"EX96",cls:"Dozer",d:"CATERPILLAR D6R LGP BULLDOZER USED"},
+ {no:"EX97B",cls:"Dozer",d:"CATERPILLAR D6R BULLDOZER USED"},
+ {no:"EX98C",cls:"Dozer",d:"CATERPILLAR D6R-3 BULLDOZER USED"},
+ {no:"EX99",cls:"Dozer",d:"CATERPILLAR D6R BULLDOZER"},
+ {no:"EX100",cls:"Dozer",d:"CATERPILLAR D6R BULLDOZER"},
+ {no:"EX101",cls:"Dozer",d:"CATERPILLAR D8R LGP DOZER USED"},
+ {no:"EX102",cls:"Dozer",d:"CATERPILLAR D8R LGP DOZER USED"},
+ {no:"EX103B",cls:"Exc 14t",d:"CATERPILLAR 314D CR HYDRAULIC EXCAVATOR"},
+ {no:"EX104",cls:"Exc 14t",d:"CATERPILLAR 314D CR HYDRAULIC EXCAVATOR"},
+ {no:"EX105",cls:"Exc 8t",d:"HITACHI ZX70 SRF HYDRAULIC EXCAVATOR"},
+ {no:"EX106B",cls:"Exc 8t",d:"HITACHI ZX70 SRF HYDRAULIC EXCAVATOR"},
+ {no:"EX107B",cls:"Exc 8t",d:"HITACHI ZX70 SRF HYDRAULIC EXCAVATOR"},
+ {no:"EX108",cls:"Exc 14t",d:"CATERPILLAR 314D CR HYDRAULIC EXCAVATOR"},
+ {no:"EX110B",cls:"Exc 8t",d:"HITACHI ZX70 HYDRAULIC EXCAVATOR"},
+ {no:"EX111B",cls:"Crusher/Screener",d:"HG6000TX HORIZONTAL GRINDER WITH 3\"SQHG6000 SCREEN"},
+ {no:"EX112",cls:"Exc 14t",d:"CATERPILLAR 314C CR HYDRAULIC EXCAVATOR"},
+ {no:"EX114",cls:"Exc 14t",d:"HITACHI ZX120 HYDRAULIC EXCAVATOR"},
+ {no:"EX115",cls:"Exc 14t",d:"HITACHI ZX120 HYDRAULIC EXCAVATOR"},
+ {no:"EX116",cls:"Exc 14t",d:"HITACHI ZX120 HYDRAULIC EXCAVATOR"},
+ {no:"EX117",cls:"Exc 14t",d:"HITACHI ZX120 HYDRAULIC EXCAVATOR"},
+ {no:"EX118B",cls:"Exc 8t",d:"HITACHI ZX70-1 SRF HYDRAULIC EXCAVATOR"},
+ {no:"EX120",cls:"Exc 8t",d:"HITACHI ZX70 SRF HYDRAULIC EXCAVATOR"},
+ {no:"EX121B",cls:"Exc 8t",d:"HITACHI ZX70 SRF HYDRAULIC EXCAVATOR"},
+ {no:"EX122B",cls:"Exc 8t",d:"HITACHI ZX70 SRF HYDRAULIC EXCAVATOR"},
+ {no:"EX123",cls:"Exc 14t",d:"HITACHI ZX120 HYDRAULIC EXCAVATOR"},
+ {no:"EX124",cls:"",d:"-"},
+ {no:"EX125",cls:"Exc 14t",d:"HITACHI ZX120 HYDRAULIC EXCAVATOR"},
+ {no:"EX126B",cls:"Exc 8t",d:"HITACHI ZX70 SRF HYDRAULIC EXCAVATOR"},
+ {no:"EX127B",cls:"Exc 8t",d:"HITACHI ZX70 SRF HYDRAULIC EXCAVATOR"},
+ {no:"EX128B",cls:"Exc 8t",d:"HITACHI ZX70 HYDRAULIC EXCAVATOR"},
+ {no:"EX130B",cls:"Exc 14t",d:"VOLVO ECR145CL HYDRAULIC EXCAVATOR"},
+ {no:"EX131B",cls:"Exc 14t",d:"VOLVO ECR145CL HYDRAULIC EXCAVATOR"},
+ {no:"EX132B",cls:"Exc 14t",d:"HITACHI ZX120 SRF HYDRAULIC EXCAVATOR"},
+ {no:"EX133B",cls:"Exc 14t",d:"HITACHI ZX120 SRF HYDRAULIC EXCAVATOR"},
+ {no:"EX134B",cls:"Roller",d:"VOLVO SOIL COMPACTOR (MODEL NO.SD110) C/W ACCESSORIES"},
+ {no:"EX135B",cls:"Roller",d:"CATERPILLAR CS11GC VIBRATORY SOIL COMPACTOR (WD9082K)"},
+ {no:"EX143",cls:"Roller",d:"CATERPILLAR CB-334E ROLLER COMPACTOR"},
+ {no:"EX144",cls:"Roller",d:"CATERPILLAR CB-335E ROLLER COMPACTOR"},
+ {no:"EX145B",cls:"Exc 14t",d:"VOLVO ECR145CL HYDRAULIC EXCAVATOR"},
+ {no:"EX146B",cls:"Exc 14t",d:"VOLVO ECR145CL HYDRAULIC EXCAVATOR"},
+ {no:"EX150B",cls:"Exc 14t",d:"VOLVO ECR145CL HYDRAULIC EXCAVATOR"},
+ {no:"EX153",cls:"Roller",d:"CATERPILLAR CS-323C ROLLER COMPACTOR"},
+ {no:"EX154",cls:"Roller",d:"CATERPILLAR CS-323C ROLLER COMPACTOR"},
+ {no:"EX156",cls:"Exc 14t",d:"CATERPILLAR 312D HYDRAULIC EXCAVATOR"},
+ {no:"EX158",cls:"",d:"-"},
+ {no:"EX160",cls:"",d:"-"},
+ {no:"EX161",cls:"",d:"-"},
+ {no:"EX162",cls:"",d:"-"},
+ {no:"EX163",cls:"Exc 14t",d:"CATERPILLAR 312D HYDRAULIC EXCAVATOR"},
+ {no:"EX164",cls:"Exc 14t",d:"CATERPILLAR 312D HYDRAULIC EXCAVATOR"},
+ {no:"EX166",cls:"Exc 14t",d:"CATERPILLAR 314C CR HYDRAULIC EXCAVATOR"},
+ {no:"EX167",cls:"Exc 14t",d:"CATERPILLAR 314C CR HYDRAULIC EXCAVATOR"},
+ {no:"EX168",cls:"Exc 14t",d:"CATERPILLAR 314C CR HYDRAULIC EXCAVATOR"},
+ {no:"EX170",cls:"Exc 14t",d:"HITACHI ZX120 HYDRAULIC EXCAVATOR"},
+ {no:"EX171",cls:"Exc 14t",d:"HITACHI ZX120 HYDRAULIC EXCAVATOR"},
+ {no:"EX172",cls:"Exc 14t",d:"CATERPILLAR 312D HYDRAULIC EXCAVATOR"},
+ {no:"EX174",cls:"",d:"-"},
+ {no:"EX176",cls:"Exc 35-40t",d:"KOBELCO SK350LC-8 HYDRAULIC EXCAVATOR"},
+ {no:"EX177",cls:"Roller",d:"CATERPILLAR CS-563E ROLLER COMPACTOR"},
+ {no:"EX178",cls:"",d:"-"},
+ {no:"EX181",cls:"Exc 14t",d:"HITACHI ZX120 HYDRAULIC EXCAVATOR"},
+ {no:"EX183",cls:"Exc 14t",d:"HITACHI ZX120 HYDRAULIC EXCAVATOR"},
+ {no:"EX184",cls:"",d:"-"},
+ {no:"EX185",cls:"",d:"-"},
+ {no:"EX186",cls:"Exc 14t",d:"HITACHI ZX120 HYDRAULIC EXCAVATOR"},
+ {no:"EX187",cls:"",d:"-"},
+ {no:"EX188",cls:"",d:"-"},
+ {no:"EX190B",cls:"Exc 14t",d:"HITACHI ZX135US HYDRAULIC EXCAVATOR"},
+ {no:"EX191B",cls:"Exc 14t",d:"HITACHI ZX135US HYDRAULIC EXCAVATOR"},
+ {no:"EX192B",cls:"Exc 14t",d:"HITACHI ZX135US HYDRAULIC EXCAVATOR"},
+ {no:"EX193B",cls:"Exc 14t",d:"HITACHI ZX135US HYDRAULIC EXCAVATOR"},
+ {no:"EX195C",cls:"Exc 14t",d:"VOLVO EC140BLC PRIME EXCAVATOR"},
+ {no:"EX196B",cls:"Exc 14t",d:"VOLVO EC140BLC PRIME EXCAVATOR"},
+ {no:"EX197B",cls:"Exc 14t",d:"VOLVO EC140BLC PRIME EXCAVATOR"},
+ {no:"EX198B",cls:"Exc 14t",d:"VOLVO EC140BLC PRIME EXCAVATOR"},
+ {no:"EX200B",cls:"Exc 14t",d:"VOLVO EC140BLC PRIME EXCAVATOR"},
+ {no:"EX201",cls:"Exc 14t",d:"VOLVO EC140BLC PRIME EXCAVATOR"},
+ {no:"EX202",cls:"Exc 14t",d:"CATERPILLAR 314C CR HYDRAULIC EXCAVATOR"},
+ {no:"EX203",cls:"Exc 14t",d:"CATERPILLAR 314C CR HYDRAULIC EXCAVATOR"},
+ {no:"EX210B",cls:"Exc 20t",d:"VOLVO EC210B PRIME HYDRAULIC EXCAVATOR"},
+ {no:"EX211",cls:"Roller",d:"VOLVO SOIL COMPACTOR (MODEL NO.SD110) C/W ACCESSORIES"},
+ {no:"EX212",cls:"Exc 25t SA/LA",d:"CATERPILLAR 321DL HYDRAULIC EXCAVATOR"},
+ {no:"EX213",cls:"Exc 25t SA/LA",d:"CATERPILLAR 321DL HYDRAULIC EXCAVATOR"},
+ {no:"EX214",cls:"Exc 25t SA/LA",d:"CATERPILLAR 321DL HYDRAULIC EXCAVATOR"},
+ {no:"EX215",cls:"Exc 20t",d:"SUMITOMO SH210-5 EXCAVATOR C/W 600MM SHOE 2.94M ARM & 0"},
+ {no:"EX217B",cls:"Exc 20t",d:"SUMITOMO SH210-5 EXCAVATOR C/W 600MM SHOE, 2.94M ARM & "},
+ {no:"EX221",cls:"Exc 25t SA/LA",d:"CATERPILLAR 321DL HYDRAULIC EXCAVATOR"},
+ {no:"EX222",cls:"Exc 25t SA/LA",d:"CATERPILLAR 321DL HYDRAULIC EXCAVATOR"},
+ {no:"EX223",cls:"Exc 25t SA/LA",d:"CATERPILLAR 321DL HYDRAULIC EXCAVATOR"},
+ {no:"EX225",cls:"Exc 14t",d:"CATERPILLAR 314C CR HYDRAULIC EXCAVATOR"},
+ {no:"EX226",cls:"Exc 14t",d:"CATERPILLAR 314C CR HYDRAULIC EXCAVATOR"},
+ {no:"EX227",cls:"Exc 14t",d:"CATERPILLAR 314C CR HYDRAULIC EXCAVATOR"},
+ {no:"EX228",cls:"Exc 14t",d:"CATERPILLAR 312D HYDRAULIC EXCAVATOR"},
+ {no:"EX230",cls:"Exc 14t",d:"CATERPILLAR 312D HYDRAULIC EXCAVATOR"},
+ {no:"EX231",cls:"Exc 20t",d:"KATO HD820-R5 HYDRAULIC EXCAVATOR WITH PIPING"},
+ {no:"EX232",cls:"Exc 20t",d:"KATO HD820-R5 HYDRAULIC EXCAVATOR WITH PIPING"},
+ {no:"EX233",cls:"Exc 20t",d:"KATO HD820-R5 HYDRAULIC EXCAVATOR"},
+ {no:"EX233B",cls:"Exc 20t",d:"KATO HD820-R5 HYDRAULIC EXCAVATOR WITH PIPING"},
+ {no:"EX234",cls:"Exc 20t",d:"KATO HD820-R5 HYDRAULIC EXCAVATOR"},
+ {no:"EX234B",cls:"Exc 20t",d:"KATO HD820-R5 HYDRAULIC EXCAVATOR WITH PIPING"},
+ {no:"EX235",cls:"Exc 20t",d:"KATO HD820-R5 HYDRAULIC EXCAVATOR"},
+ {no:"EX235B",cls:"Exc 20t",d:"KATO HD820-R5 HYDRAULIC EXCAVATOR WITH PIPING"},
+ {no:"EX236",cls:"Exc 20t",d:"KATO HD820-R5 HYDRAULIC EXCAVATOR"},
+ {no:"EX236B",cls:"Exc 20t",d:"KATO HD820-R5 HYDRAULIC EXCAVATOR WITH PIPING"},
+ {no:"EX237",cls:"Exc 20t",d:"KATO HD820-R5 HYDRAULIC EXCAVATOR"},
+ {no:"EX237B",cls:"Exc 20t",d:"KATO HD820-R5 HYDRAULIC EXCAVATOR WITH PIPING"},
+ {no:"EX238B",cls:"Exc 20t",d:"SUMITOMO SH210-5 EXCAVATOR"},
+ {no:"EX238C",cls:"Exc 20t",d:"KATO HD820-R5 HYDRAULIC EXCAVATOR WITH PIPING"},
+ {no:"EX240",cls:"Exc 20t",d:"KATO HD820-R5 HYDRAULIC EXCAVATOR"},
+ {no:"EX240C",cls:"Exc 20t",d:"KATO HD820-R5 HYDRAULIC EXCAVATOR WITH PIPING"},
+ {no:"EX241",cls:"Exc 20t",d:"KATO HD820-R5 HYDRAULIC EXCAVATOR"},
+ {no:"EX241C",cls:"Exc 20t",d:"KATO HD820-R5 HYDRAULIC EXCAVATOR WITH PIPING"},
+ {no:"EX243",cls:"Exc 20t",d:"SUMITOMO SH210-5 EXCAVATOR C/W 800M SHOE 2.94M ARM & 0."},
+ {no:"EX252C",cls:"Exc 20t",d:"CATERPILLAR 320D HYDRAULIC EXCAVATOR"},
+ {no:"EX253C",cls:"Exc 20t",d:"CATERPILLAR 320D HYDRAULIC EXCAVATOR"},
+ {no:"EX254C",cls:"Exc 20t",d:"CATERPILLAR 320D HYDRAULIC EXCAVATOR"},
+ {no:"EX255B",cls:"Exc 20t",d:"CATERPILLAR 320D HYDRAULIC EXCAVATOR"},
+ {no:"EX256",cls:"Roller",d:"CATERPILLAR CB34 ROLLER COMPACTOR"},
+ {no:"EX257",cls:"Roller",d:"CATERPILLAR CB34 ROLLER COMPACTOR"},
+ {no:"EX258",cls:"Roller",d:"CATERPILLAR CB34 ROLLER COMPACTOR"},
+ {no:"EX260",cls:"Roller",d:"CATERPILLAR CB34 ROLLER COMPACTOR"},
+ {no:"EX262",cls:"Mini 5.5t",d:"CATERPILLAR 304C MINI EXCAVATOR"},
+ {no:"EX263",cls:"Mini 5.5t",d:"CATERPILLAR 304C MINI EXCAVATOR"},
+ {no:"EX264C",cls:"Exc 20t",d:"VOLVO EC210B PRIME HYDRAULIC EXCAVATOR"},
+ {no:"EX265C",cls:"Exc 20t",d:"VOLVO EC210B PRIME HYDRAULIC EXCAVATOR"},
+ {no:"EX266B",cls:"Exc 20t",d:"CATERPILLAR 320D HYDRAULIC EXCAVATOR"},
+ {no:"EX267B",cls:"Exc 20t",d:"CATERPILLAR 320D HYDRAULIC EXCAVATOR"},
+ {no:"EX268",cls:"Exc 25t SA/LA",d:"CATERPILLAR 321DL CR HYDRAULIC EXCAVATOR"},
+ {no:"EX270",cls:"Exc 25t SA/LA",d:"CATERPILLAR 321DL CR HYDRAULIC EXCAVATOR"},
+ {no:"EX272B",cls:"Exc 20t",d:"CATERPILLAR 320D HYDRAULIC EXCAVATOR"},
+ {no:"EX273",cls:"Mini 5.5t",d:"CATERPILLAR 304C CR MINI EXCAVATOR"},
+ {no:"EX274",cls:"Mini 5.5t",d:"CATERPILLAR 304C CR MINI EXCAVATOR"},
+ {no:"EX275",cls:"Mini 5.5t",d:"CATERPILLAR 304C CR MINI EXCAVATOR"},
+ {no:"EX276B",cls:"Exc 20t",d:"CATERPILLAR 320D HYDRAULIC EXCAVATOR"},
+ {no:"EX277B",cls:"Exc 20t",d:"CATERPILLAR 320D HYDRAULIC EXCAVATOR"},
+ {no:"EX278",cls:"Exc 14t",d:"CATERPILLAR 314D CR HYDRAULIC EXCAVATOR"},
+ {no:"EX280",cls:"Exc 14t",d:"CATERPILLAR 314D CR HYDRAULIC EXCAVATOR"},
+ {no:"EX281",cls:"Exc 14t",d:"CATERPILLAR 314D CR HYDRAULIC EXCAVATOR"},
+ {no:"EX283",cls:"Exc 14t",d:"CATERPILLAR 312D2 HYDRAULIC EXCAVATOR"},
+ {no:"EX284",cls:"Exc 14t",d:"CATERPILLAR 312D2 HYDRAULIC EXCAVATOR"},
+ {no:"EX285",cls:"Exc 14t",d:"CATERPILLAR 312D2 HYDRAULIC EXCAVATOR"},
+ {no:"EX286",cls:"Exc 14t",d:"CATERPILLAR 312D2 HYDRAULIC EXCAVATOR"},
+ {no:"EX288",cls:"Exc 14t",d:"CATERPILLAR 312D2 HYDRAULIC EXCAVATOR"},
+ {no:"EX289",cls:"Exc 14t",d:"CATERPILLAR 312D2 HYDRAULIC EXCAVATOR"},
+ {no:"EX290",cls:"Exc 14t",d:"CATERPILLAR 312D HYDRAULIC EXCAVATOR"},
+ {no:"EX291",cls:"",d:"-"},
+ {no:"EX292",cls:"Exc 14t",d:"CATERPILLAR 312D2 HYDRAULIC EXCAVATOR"},
+ {no:"EX293",cls:"Exc 14t",d:"CATERPILLAR 312D2 HYDRAULIC EXCAVATOR"},
+ {no:"EX294",cls:"Exc 14t",d:"CATERPILLAR 312D2 HYDRAULIC EXCAVATOR"},
+ {no:"EX295",cls:"Exc 14t",d:"CATERPILLAR 312D2 HYDRAULIC EXCAVATOR"},
+ {no:"EX296",cls:"Exc 14t",d:"CATERPILLAR 312D2 HYDRAULIC EXCAVATOR"},
+ {no:"EX297",cls:"Exc 14t",d:"CATERPILLAR 312D2 HYDRAULIC EXCAVATOR"},
+ {no:"EX298",cls:"Exc 14t",d:"CATERPILLAR 312D2 HYDRAULIC EXCAVATOR"},
+ {no:"EX300B",cls:"Exc 8t",d:"KATO HD308USV SHORT REACH EXCAVATOR"},
+ {no:"EX301B",cls:"Exc 8t",d:"KATO HD308USV SHORT REACH EXCAVATOR"},
+ {no:"EX302B",cls:"Exc 8t",d:"KATO HD308USV SHORT REACH EXCAVATOR"},
+ {no:"EX303",cls:"Exc 14t",d:"CATERPILLAR 314D CR HYDRAULIC EXCAVATOR"},
+ {no:"EX306",cls:"Exc 8t",d:"KATO HD308US MINI EXCAVATOR"},
+ {no:"EX308",cls:"Exc 8t",d:"KATO HD308US MINI EXCAVATOR"},
+ {no:"EX310",cls:"Exc 8t",d:"KATO HD308US MINI EXCAVATOR"},
+ {no:"EX313",cls:"Exc 8t",d:"KATO HD308US MINI EXCAVATOR"},
+ {no:"EX314",cls:"Exc 8t",d:"KATO HD308US MINI EXCAVATOR"},
+ {no:"EX315",cls:"Exc 25t SA/LA",d:"CATERPILLAR 321DL HYDRAULIC EXCAVATOR"},
+ {no:"EX316",cls:"Exc 25t SA/LA",d:"CATERPILLAR 321DL HYDRAULIC EXCAVATOR"},
+ {no:"EX317",cls:"Exc 20t",d:"CATERPILLAR 320D HYDRAULIC EXCAVATOR"},
+ {no:"EX318",cls:"Exc 20t",d:"CATERPILLAR 320D HYDRAULIC EXCAVATOR"},
+ {no:"EX320",cls:"Exc 20t",d:"CATERPILLAR 320D HYDRAULIC EXCAVATOR"},
+ {no:"EX322B",cls:"Exc 20t",d:"CATERPILLAR 320D HYDRAULIC EXCAVATOR"},
+ {no:"EX323",cls:"Exc 20t",d:"CATERPILLAR 320D HYDRAULIC EXCAVATOR"},
+ {no:"EX327",cls:"Exc 8t",d:"KATO HD308US SHORT REACH EXCAVATOR"},
+ {no:"EX332",cls:"Roller",d:"CATERPIILAR CS56 VIBRATORY SOIL COMPACTOR"},
+ {no:"EX333",cls:"Roller",d:"CATERPIILAR CS56 ROLLER COMPACTOR"},
+ {no:"EX334",cls:"Exc 8t",d:"KOBELCO SK70SR-2 HYDRAULIC EXCAVATOR"},
+ {no:"EX335",cls:"Exc 30t",d:"HITACHI ZX330LC-3 HYDRAULIC EXCAVATOR CHAMELEON: TELESC"},
+ {no:"EX336",cls:"Exc 30t",d:"HITACHI ZX330LC-3 HYDRAULIC EXCAVATOR CHAMELEON: TELESC"},
+ {no:"EX337B",cls:"Exc 30t",d:"HITACHI ZX330LC-3 HYDRAULIC EXCAVATOR CHAMELEON: TELESC"},
+ {no:"EX338B",cls:"Exc 30t",d:"HITACHI ZX330LC-3 HYDRAULIC EXCAVATOR CHAMELEON: TELESC"},
+ {no:"EX340B",cls:"Exc 30t",d:"HITACHI ZX330LC-5G HYDRAULIC EXCAVATOR CHAMELEON: TELES"},
+ {no:"EX341",cls:"Exc 30t",d:"HITACHI ZX330LC-3 HYDRAULIC EXCAVATOR CHAMELEON: TELESC"},
+ {no:"EX342",cls:"Exc 30t",d:"HITACHI ZX330LC-3 HYDRAULIC EXCAVATOR CHAMELEON: TELESC"},
+ {no:"EX343",cls:"Exc 30t",d:"HITACHI ZX330LC-3 HYDRAULIC EXCAVATOR CHAMELEON: TELESC"},
+ {no:"EX344B",cls:"Exc 30t",d:"HITACHI ZX330LC-3 HYDRAULIC EXCAVATOR CHAMELEON: TELESC"},
+ {no:"EX345B",cls:"Exc 30t",d:"HITACHI ZX330LC-5G HYDRAULIC EXCAVATOR CHAMELEON: TELES"},
+ {no:"EX346B",cls:"Exc 35-40t",d:"VOLVO EC360BLC EXCAVATOR C/W ACCESSORIES"},
+ {no:"EX347",cls:"Exc 30t",d:"HITACHI ZX330LC-5G HYDRAULIC EXCAVATOR CHAMELEON: TELES"},
+ {no:"EX348",cls:"Exc 30t",d:"HITACHI ZX330LC-5G HYDRAULIC EXCAVATOR CHAMELEON: TELES"},
+ {no:"EX350B",cls:"Exc 45t+",d:"DOOSAN DX480LC EXCAVATOR C/W 30M TELESCOPIC ARM BUCKET "},
+ {no:"EX351C",cls:"Exc 35-40t",d:"KOMATSU PC350LC-8M2 HYDRAULIC EXCAVATOR WITHOUT BUCKET"},
+ {no:"EX352C",cls:"Exc 35-40t",d:"KOMATSU PC350LC-8M2 HYDRAULIC EXCAVATOR WITHOUT BUCKET "},
+ {no:"EX353C",cls:"Exc 35-40t",d:"KOMATSU PC350LC-8M2 HYDRAULIC EXCAVATOR WITHOUT BUCKET "},
+ {no:"EX354B",cls:"Exc 35-40t",d:"KOMATSU PC350LC-8M2 HYDRAULIC EXCAVATOR WITHOUT BUCKET "},
+ {no:"EX355",cls:"Exc 35-40t",d:"KOMATSU PC350LC-8M2 HYDRAULIC EXCAVATOR WITHOUT BUCKET "},
+ {no:"EX356",cls:"Exc 35-40t",d:"KOMATSU PC350LC-8M2 HYDRAULIC EXCAVATOR WITHOUT BUCKET "},
+ {no:"EX357B",cls:"Exc 35-40t",d:"KOMATSU PC350LC-8M2 HYDRAULIC EXCAVATOR WITHOUT BUCKET "},
+ {no:"EX358",cls:"Exc 35-40t",d:"KOMATSU PC350LC-8M2 HYDRAULIC EXCAVATOR WITHOUT BUCKET "},
+ {no:"EX360B",cls:"Exc 35-40t",d:"KOMATSU PC350LC-8M2 HYDRAULIC EXCAVATOR WITHOUT BUCKET "},
+ {no:"EX361C",cls:"Exc 35-40t",d:"KOMATSU PC350LC-8M2 HYDRAULIC EXCAVATOR WITHOUT BUCKET "},
+ {no:"EX362C",cls:"Exc 35-40t",d:"KOMATSU PC350LC-8M2 HYDRAULIC EXCAVATOR WITHOUT BUCKET "},
+ {no:"EX363",cls:"Exc 35-40t",d:"KOMATSU PC350LC-8M2 HYDRAULIC EXCAVATOR WITHOUT BUCKET "},
+ {no:"EX364",cls:"Exc 35-40t",d:"KOMATSU PC350LC-8M2 HYDRAULIC EXCAVATOR WITHOUT BUCKET "},
+ {no:"EX365",cls:"Exc 35-40t",d:"KOMATSU PC350LC-8M2 HYDRAULIC EXCAVATOR WITHOUT BUCKET "},
+ {no:"EX366",cls:"Exc 35-40t",d:"KOMATSU PC350LC-8M2 HYDRAULIC EXCAVATOR WITHOUT BUCKET "},
+ {no:"EX367B",cls:"Exc 35-40t",d:"KOMATSU PC350LC-8M2 HYDRAULIC EXCAVATOR WITHOUT BUCKET "},
+ {no:"EX368B",cls:"Exc 35-40t",d:"KOMATSU PC350LC-8M2 HYDRAULIC EXCAVATOR WITHOUT BUCKET "},
+ {no:"EX370B",cls:"Exc 35-40t",d:"KOMATSU PC350LC-8M2 HYDRAULIC EXCAVATOR WITHOUT BUCKET "},
+ {no:"EX371B",cls:"Exc 35-40t",d:"CATERPILLAR 336DL HYDRAULIC EXCAVATOR"},
+ {no:"EX372B",cls:"Exc 35-40t",d:"CATERPILLAR 336DL HYDRAULIC EXCAVATOR"},
+ {no:"EX373B",cls:"Exc 30t",d:"HITACHI ZX330LC-5G CHAMELEON HYDRAULIC TELESCOPIC TYPE "},
+ {no:"EX374B",cls:"Exc 30t",d:"HITACHI ZX330LC-5G CHAMELEON HYDRAULIC TELESCOPIC TYPE "},
+ {no:"EX375B",cls:"Exc 30t",d:"HITACHI ZX330LC-5A CHAMELEON HYDRAULIC TELESCOPIC TYPE "},
+ {no:"EX376B",cls:"Exc 30t",d:"HITACHI ZX330LC-5A CHAMELEON HYDRAULIC TELESCOPIC TYPE "},
+ {no:"EX383",cls:"Roller",d:"VOLVO SOIL COMPACTOR (MODEL NO.SD100DC) C/W ACCESSORIES"},
+ {no:"EX384B",cls:"Exc 35-40t",d:"SANY SY365H HYDRAULIC EXCAVATOR"},
+ {no:"EX386B",cls:"Exc 35-40t",d:"CATERPILLAR 336DL HYDRAULIC EXCAVATOR"},
+ {no:"EX398",cls:"Exc 30t",d:"HITACHI ZX330LC-3 CHAMELEON: HYDRAULIC TELESCOPIC TYPE "},
+ {no:"EX400",cls:"Exc 30t",d:"HITACHI ZX330-LC3 CHAMELEON: HYDRAULIC TELESCOPIC TYPE "},
+ {no:"EX402",cls:"Exc 45t+",d:"DOOSAN DX480LC EXCAVATOR C/W 30M TELESCOPIC ARM BUCKET "},
+ {no:"EX403",cls:"Exc 30t",d:"HITACHI ZX330-LC3 CHAMELEON: HYDRAULIC TELESCOPIC TYPE "},
+ {no:"EX404",cls:"Exc 30t",d:"HITACHI ZX330-LC3 CHAMELEON: HYDRAULIC TELESCOPIC TYPE "},
+ {no:"EX405",cls:"Crusher/Screener",d:"POWERSCREEN MAXTRAK 1300 MOBILE CONE CRUSHER C/W ACCESS"},
+ {no:"EX406",cls:"Crusher/Screener",d:"POWERSCREEN CHIEFTAIN 2100 2 DECK CRAWLER SCREEN"},
+ {no:"EX407",cls:"Exc 35-40t",d:"VOLVO EC380DL HYDRAULIC EXCAVATOR"},
+ {no:"EX408",cls:"Exc 20t",d:"VOLVO EC210B PRIME HYDRAULIC EXCAVATOR"},
+ {no:"EX410",cls:"Exc 35-40t",d:"KOBELCO SK350LC-8 HYDRAULIC EXCAVATOR"},
+ {no:"EX411",cls:"Exc 35-40t",d:"KOBELCO SK350LC-8 HYDRAULIC EXCAVATOR"},
+ {no:"EX412",cls:"Exc 35-40t",d:"VOLVO EC380DL HYDRAULIC EXCAVATOR"},
+ {no:"EX413",cls:"Crusher/Screener",d:"POWERSCREEN CHIEFTAIN 1700 2 DECK MOBILE SCREENER"},
+ {no:"EX414B",cls:"Exc 35-40t",d:"CATERPILLAR 336D2L HYDRAULIC EXCAVATOR"},
+ {no:"EX415B",cls:"Mini 5.5t",d:"YANMAR MINI VIO55-6B EXCAVATOR"},
+ {no:"EX416",cls:"Mini 5.5t",d:"YANMAR MINI VIO55-6B EXCAVATOR"},
+ {no:"EX417",cls:"Exc 35-40t",d:"CATERPILLAR 340D2L HYDRAULIC EXCAVATOR"},
+ {no:"EX418",cls:"Roller",d:"CATERPILLAR CS79B SOIL COMPACTOR (WD8529X)"},
+ {no:"EX419",cls:"Exc 14t",d:"VOLVO EC140BLC HYDRAULIC EXCAVATOR"},
+ {no:"EX420",cls:"Exc 14t",d:"VOLVO EC140BLC HYDRAULIC EXCAVATOR"},
+ {no:"EX421",cls:"Exc 14t",d:"VOLVO EC140BLC HYDRAULIC EXCAVATOR"},
+ {no:"EX422",cls:"Exc 14t",d:"VOLVO EC140BLC HYDRAULIC EXCAVATOR"},
+ {no:"EX423",cls:"Roller",d:"CATERPILLAR CS533E VIBRATORY COMPACTOR (WD4406T)"},
+ {no:"EX424",cls:"Exc 35-40t",d:"CATERPILLAR 340D2L HYDRAULIC EXCAVATOR"},
+ {no:"EX425",cls:"Exc 14t",d:"VOLVO EC140BLC HYDRAULIC EXCAVATOR"},
+ {no:"EX426",cls:"Exc 14t",d:"VOLVO EC140BLC HYDRAULIC EXCAVATOR"},
+ {no:"EX427",cls:"Exc 14t",d:"VOLVO EC140BLC HYDRAULIC EXCAVATOR"},
+ {no:"EX428",cls:"Exc 14t",d:"VOLVO EC140BLC HYDRAULIC EXCAVATOR"},
+ {no:"EX429",cls:"Exc 14t",d:"VOLVO EC140BLC HYDRAULIC EXCAVATOR"},
+ {no:"EX430",cls:"Exc 14t",d:"VOLVO EC140BLC HYDRAULIC EXCAVATOR"},
+ {no:"EX431",cls:"Exc 35-40t",d:"VOLVO EC380DL CRAWLER EXCAVATOR (30M)"},
+ {no:"EX432",cls:"Exc 35-40t",d:"VOLVO EC380DL CRAWLER EXCAVATOR (27M)"},
+ {no:"EX433",cls:"Exc 35-40t",d:"DOOSAN DX380LC-3 HYDRAULIC EXCAVATOR (WITH SLIDING CABI"},
+ {no:"EX434",cls:"Exc 14t",d:"VOLVO EC140BLC HYDRAULIC EXCAVATOR"},
+ {no:"EX435",cls:"Exc 14t",d:"VOLVO EC140BLC HYDRAULIC EXCAVATOR"},
+ {no:"EX436",cls:"Exc 35-40t",d:"CATERPILLAR 340D2L HYDRAULIC EXCAVATOR"},
+ {no:"EX437",cls:"Exc 35-40t",d:"CATERPILLAR 340D2L HYDRAULIC EXCAVATOR"},
+ {no:"EX438",cls:"Crusher/Screener",d:"POWERSCREEN WARRIOR 2100 C/W ACCESSORIES"},
+ {no:"EX439",cls:"Exc 35-40t",d:"VOLVO EC380DL CRAWLER EXCAVATOR"},
+ {no:"EX440B",cls:"Exc 35-40t",d:"VOLVO EC380DL CRAWLER EXCAVATOR"},
+ {no:"EX441",cls:"Exc 30t",d:"HITACHI ZX330LC-5G CHAMELEON HYDRAULIC TELESCOPIC TYPE "},
+ {no:"EX442",cls:"Exc 30t",d:"HITACHI ZX330LC-5G CHAMELEON HYDRAULIC TELESCOPIC TYPE "},
+ {no:"EX443",cls:"Exc 14t",d:"VOLVO EC140BLC HYDRAULIC EXCAVATOR"},
+ {no:"EX444",cls:"Exc 14t",d:"VOLVO EC140BLC HYDRAULIC EXCAVATOR"},
+ {no:"EX445",cls:"Exc 14t",d:"VOLVO EC140BLC HYDRAULIC EXCAVATOR"},
+ {no:"EX446",cls:"Exc 8t",d:"KOBELCO SK75SR-3 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX447",cls:"Exc 8t",d:"KOBELCO SK75SR-3 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX448",cls:"Exc 8t",d:"KOBELCO SK75SR-3 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX449",cls:"Exc 20t",d:"SUMITOMO SH210-5 HYDRAULIC EXCAVATOR"},
+ {no:"EX450",cls:"Exc 20t",d:"SUMITOMO SH210-5 HYDRAULIC EXCAVATOR"},
+ {no:"EX451",cls:"Exc 20t",d:"SUMITOMO SH210-5 HYDRAULIC EXCAVATOR"},
+ {no:"EX452",cls:"Exc 35-40t",d:"VOLVO EC350DL CRAWLER EXCAVATOR"},
+ {no:"EX453",cls:"Exc 35-40t",d:"VOLVO EC350DL CRAWLER EXCAVATOR"},
+ {no:"EX454",cls:"Exc 35-40t",d:"VOLVO EC350DL CRAWLER EXCAVATOR"},
+ {no:"EX455",cls:"Exc 35-40t",d:"VOLVO EC350DL CRAWLER EXCAVATOR"},
+ {no:"EX456",cls:"Roller",d:"CATERPILLAR CS79B SMOOTH DRUM SOIL COMPACTOR (WD8506L)"},
+ {no:"EX457",cls:"Exc 20t",d:"SUMITOMO SH210-5 HYDRAULIC EXCAVATOR"},
+ {no:"EX458",cls:"Exc 20t",d:"SUMITOMO SH210-5 HYDRAULIC EXCAVATOR"},
+ {no:"EX459",cls:"Exc 35-40t",d:"VOLVO EC350DL CRAWLER EXCAVATOR"},
+ {no:"EX460",cls:"Roller",d:"AMMANN TANDEM ROLLER ARX40"},
+ {no:"EX461",cls:"Roller",d:"CATERPILLAR CS79B SMOOTH DRUM SOIL COMPACTOR (WD8499Z)"},
+ {no:"EX462",cls:"Roller",d:"CATERPILLAR CS79B SMOOTH DRUM SOIL COMPACTOR (WD8791D)"},
+ {no:"EX463",cls:"Exc 35-40t",d:"VOLVO EC350DL CRAWLER EXCAVATOR"},
+ {no:"EX464",cls:"Exc 35-40t",d:"VOLVO EC350DL CRAWLER EXCAVATOR"},
+ {no:"EX465",cls:"Exc 35-40t",d:"VOLVO EC350DL CRAWLER EXCAVATOR"},
+ {no:"EX466",cls:"Exc 35-40t",d:"VOLVO EC350DL CRAWLER EXCAVATOR"},
+ {no:"EX467",cls:"Mini 5.5t",d:"YANMAR VIO55-6B MINI HYDRAULIC EXCAVATOR"},
+ {no:"EX468",cls:"Mini 5.5t",d:"YANMAR VIO55-6B MINI HYDRAULIC EXCAVATOR"},
+ {no:"EX469",cls:"Exc 35-40t",d:"VOLVO EC350DL CRAWLER EXCAVATOR"},
+ {no:"EX470",cls:"Exc 20t",d:"SUMITOMO SH210-5 HYDRAULIC EXCAVATOR"},
+ {no:"EX471",cls:"Crusher/Screener",d:"POWERSCREEN WARRIOR 2100 C/W ACCESSORIES"},
+ {no:"EX472",cls:"Exc 35-40t",d:"VOLVO EC350DL CRAWLER EXCAVATOR"},
+ {no:"EX473",cls:"Exc 35-40t",d:"VOLVO EC350DL CRAWLER EXCAVATOR"},
+ {no:"EX474",cls:"Exc 35-40t",d:"VOLVO EC350DL CRAWLER EXCAVATOR"},
+ {no:"EX475",cls:"Exc 35-40t",d:"VOLVO EC350DL CRAWLER EXCAVATOR C/W ACCESSORIES"},
+ {no:"EX476",cls:"Exc 35-40t",d:"VOLVO EC350DL CRAWLER EXCAVATOR"},
+ {no:"EX477",cls:"Exc 35-40t",d:"VOLVO EC350DL CRAWLER EXCAVATOR C/W ACCESSORIES"},
+ {no:"EX478",cls:"Exc 35-40t",d:"VOLVO EC350DL CRAWLER EXCAVATOR"},
+ {no:"EX479",cls:"Exc 25t SA/LA",d:"SUMITOMO SH240-5 HYDRAULIC EXCAVATOR"},
+ {no:"EX480",cls:"",d:"-"},
+ {no:"EX481",cls:"Exc 30t",d:"SUMITOMO SH330LC-6 HYDRAULIC EXCAVATOR"},
+ {no:"EX482",cls:"",d:"-"},
+ {no:"EX483",cls:"",d:"-"},
+ {no:"EX484",cls:"Exc 30t",d:"SUMITOMO SH330LC-6 HYDRAULIC EXCAVATOR"},
+ {no:"EX485",cls:"Exc 30t",d:"SUMITOMO SH330LC-6 HYDRAULIC EXCAVATOR"},
+ {no:"EX486",cls:"",d:"-"},
+ {no:"EX487",cls:"Exc 30t",d:"SUMITOMO SH330LC-6 HYDRAULIC EXCAVATOR"},
+ {no:"EX488",cls:"Exc 30t",d:"SUMITOMO SH330LC-6 HYDRAULIC EXCAVATOR WITH REAR CAMERA"},
+ {no:"EX489",cls:"Exc 30t",d:"SUMITOMO SH330LC-6 HYDRAULIC EXCAVATOR WITH REAR CAMERA"},
+ {no:"EX490",cls:"Exc 35-40t",d:"VOLVO EC350DL CRAWLER EXCAVATOR"},
+ {no:"EX491",cls:"Exc 35-40t",d:"VOLVO EC350DL CRAWLER EXCAVATOR"},
+ {no:"EX492",cls:"Mini 5.5t",d:"YANMAR VIO55-6B MINI EXCAVATOR"},
+ {no:"EX493",cls:"Mini 5.5t",d:"YANMAR VIO55-6B MINI EXCAVATOR"},
+ {no:"EX494",cls:"Mini 5.5t",d:"YANMAR VIO17 MINI EXCAVATOR"},
+ {no:"EX495",cls:"Crusher/Screener",d:"POWERSCREEN WARRIOR 2100 MOBILE SCREENER"},
+ {no:"EX496",cls:"Exc 35-40t",d:"VOLVO EC350DL CRAWLER EXCAVATOR"},
+ {no:"EX497",cls:"Exc 14t",d:"VOLVO ECR145EL CRAWLER EXCAVATOR"},
+ {no:"EX498",cls:"Mini 5.5t",d:"YANMAR VIO10 MINI EXCAVATOR"},
+ {no:"EX500",cls:"Wheel loader",d:"CATERPILLAR 966H WHEEL LOADER (WD4528A)"},
+ {no:"EX501",cls:"Wheel loader",d:"CATERPILLAR 950H WHEEL LOADER (WD8502Y)"},
+ {no:"EX502",cls:"Wheel loader",d:"CATERPILLAR 950H WHEEL LOADER (WD8518C)"},
+ {no:"EX503",cls:"Wheel loader",d:"CATERPILLAR 950H WHEEL LOADER (WD4543E)"},
+ {no:"EX504",cls:"Wheel loader",d:"CATERPILLAR 950H WHEEL LOADER (WD4540M)"},
+ {no:"EX505",cls:"Wheel loader",d:"CATERPILLAR 950H WHEEL LOADER (WD4556T)"},
+ {no:"EX506",cls:"Exc 14t",d:"SUMITOMO SH130-5 EXCAVATOR"},
+ {no:"EX507",cls:"Exc 14t",d:"SUMITOMO SH130-5 EXCAVATOR WITH REAR CAMERA"},
+ {no:"EX508",cls:"Exc 14t",d:"SUMITOMO SH130-5 EXCAVATOR WITH REAR CAMERA"},
+ {no:"EX509",cls:"Exc 14t",d:"SUMITOMO SH130-6 EXCAVATOR WITH REAR CAMERA WITH SHORT "},
+ {no:"EX510",cls:"Exc 14t",d:"SUMITOMO SH130-6 EXCAVATOR WITH REAR CAMERA WITH SHORT "},
+ {no:"EX511",cls:"Exc 20t",d:"SUMITOMO SH210-5 EXCAVATOR"},
+ {no:"EX512",cls:"Exc 20t",d:"SUMITOMO SH210-5 EXCAVATOR"},
+ {no:"EX513",cls:"Exc 20t",d:"SUMITOMO SH210-5 EXCAVATOR WITH REAR CAMERA"},
+ {no:"EX514",cls:"Exc 20t",d:"SUMITOMO SH210-5 EXCAVATOR WITH REAR CAMERA"},
+ {no:"EX515",cls:"Exc 20t",d:"SUMITOMO SH210-5 EXCAVATOR WITH REAR CAMERA"},
+ {no:"EX516",cls:"Exc 25t SA/LA",d:"SUMITOMO SH240-5 HYDRAULIC EXCAVATOR"},
+ {no:"EX517",cls:"Exc 25t SA/LA",d:"SUMITOMO SH240-5 HYDRAULIC EXCAVATOR"},
+ {no:"EX518",cls:"Exc 25t SA/LA",d:"SUMITOMO SH240-5 HYDRAULIC EXCAVATOR/REAR CAMERA"},
+ {no:"EX519",cls:"Exc 25t SA/LA",d:"SUMITOMO SH240-5 HYDRAULIC EXCAVATOR/REAR CAMERA"},
+ {no:"EX520",cls:"Roller",d:"CATERPILLAR CB34B UTILITY ROLLER"},
+ {no:"EX521",cls:"Exc 30t",d:"SUMITOMO SH330LC-6 HYDRAULIC EXCAVATOR/REAR CAMERA WITH"},
+ {no:"EX522",cls:"Exc 30t",d:"SUMITOMO SH330LC-6 HYDRAULIC EXCAVATOR/REAR CAMERA WITH"},
+ {no:"EX523",cls:"Exc 30t",d:"SUMITOMO SH330LC-6 HYDRAULIC EXCAVATOR/REAR CAMERA WITH"},
+ {no:"EX524",cls:"Exc 30t",d:"SUMITOMO SH330LC-6 HYDRAULIC EXCAVATOR/REAR CAMERA WITH"},
+ {no:"EX525",cls:"Exc 30t",d:"SUMITOMO SH330LC-6 HYDRAULIC EXCAVATOR/REAR CAMERA WITH"},
+ {no:"EX526",cls:"Exc 30t",d:"SUMITOMO SH330LC-6 HYDRAULIC EXCAVATOR/REAR CAMERA"},
+ {no:"EX527",cls:"Exc 30t",d:"SUMITOMO SH330LC-6 HYDRAULIC EXCAVATOR/REAR CAMERA"},
+ {no:"EX528",cls:"Exc 30t",d:"SUMITOMO SH330LC-6 HYDRAULIC EXCAVATOR/REAR CAMERA"},
+ {no:"EX529",cls:"Exc 30t",d:"SUMITOMO SH330LC-6 HYDRAULIC EXCAVATOR/REAR CAMERA"},
+ {no:"EX530",cls:"",d:"-"},
+ {no:"EX531",cls:"Exc 30t",d:"SUMITOMO SH330LC-6 HYDRAULIC EXCAVATOR/REAR CAMERA WITH"},
+ {no:"EX532",cls:"Exc 30t",d:"SUMITOMO SH330LC-6 HYDRAULIC EXCAVATOR/REAR CAMERA WITH"},
+ {no:"EX533",cls:"Exc 30t",d:"SUMITOMO SH330LC-6 HYDRAULIC EXCAVATOR USED"},
+ {no:"EX534",cls:"Exc 30t",d:"SUMITOMO SH330LC-6 HYDRAULIC EXCAVATOR/REAR CAMERA WITH"},
+ {no:"EX535",cls:"Exc 30t",d:"SUMITOMO SH330LC-6 HYDRAULIC EXCAVATOR/REAR CAMERA"},
+ {no:"EX536",cls:"Exc 20t",d:"SUMITOMO SH210LC-6 HYDRAULIC EXCAVATOR/REAR CAMERA / 50"},
+ {no:"EX537",cls:"Exc 20t",d:"SUMITOMO SH210LC-6 HYDRAULIC EXCAVATOR/REAR CAMERA"},
+ {no:"EX538",cls:"Exc 20t",d:"SUMITOMO SH210LC-6 HYDRAULIC EXCAVATOR/REAR CAMERA"},
+ {no:"EX539",cls:"Exc 20t",d:"SUMITOMO SH210LC-6 HYDRAULIC EXCAVATOR/REAR CAMERA"},
+ {no:"EX540",cls:"Exc 25t SA/LA",d:"SUMITOMO SH250-6 EXCAVATOR WITH 2 VIEW CAMERA"},
+ {no:"EX541",cls:"Exc 8t",d:"SUMITOMO SH75X-3B EXCAVATOR WITH REAR CAMERA"},
+ {no:"EX542",cls:"Exc 25t SA/LA",d:"SUMITOMO SH250-6 EXCAVATOR WITH REAR CAMERA"},
+ {no:"EX543",cls:"Exc 25t SA/LA",d:"SUMITOMO SH250-6 EXCAVATOR WITH REAR CAMERA"},
+ {no:"EX544",cls:"Exc 25t SA/LA",d:"SUMITOMO SH250-6 EXCAVATOR WITH REAR CAMERA"},
+ {no:"EX545",cls:"Exc 25t SA/LA",d:"SUMITOMO SH250-6 EXCAVATOR WITH REAR CAMERA"},
+ {no:"EX546",cls:"Exc 25t SA/LA",d:"SUMITOMO SH250-6 EXCAVATOR WITH REAR CAMERA"},
+ {no:"EX547",cls:"Exc 25t SA/LA",d:"SUMITOMO SH250-6 EXCAVATOR WITH REAR CAMERA"},
+ {no:"EX548",cls:"Exc 25t SA/LA",d:"SUMITOMO SH250-6 EXCAVATOR WITH REAR CAMERA"},
+ {no:"EX549",cls:"Exc 25t SA/LA",d:"SUMITOMO SH250-6 EXCAVATOR WITH REAR CAMERA"},
+ {no:"EX550",cls:"Exc 25t SA/LA",d:"SUMITOMO SH250-6 EXCAVATOR WITH REAR CAMERA"},
+ {no:"EX551",cls:"Exc 25t SA/LA",d:"SUMITOMO SH250-6 EXCAVATOR WITH REAR CAMERA"},
+ {no:"EX552",cls:"Roller",d:"CATERPILLAR CS11GC VIBRATORY SOIL COMPACTOR"},
+ {no:"EX553",cls:"Exc 14t",d:"SUMITOMO SH145X-6 EXCAVATOR WITH REAR CAMERA"},
+ {no:"EX554",cls:"Exc 14t",d:"SUMITOMO SH145X-6 EXCAVATOR WITH REAR CAMERA"},
+ {no:"EX555",cls:"Mobile crane",d:"CRAWLER CRANE LIEBHERR HS855HD C/W BOOM & ACCESSORIES"},
+ {no:"EX556",cls:"Exc 14t",d:"SUMITOMO SH145X-6 EXCAVATOR WITH REAR CAMERA"},
+ {no:"EX557",cls:"Exc 14t",d:"HITACHI ZX130-5G HYDRAULIC EXCAVATOR"},
+ {no:"EX558",cls:"Exc 14t",d:"HITACHI ZX130-5G HYDRAULIC EXCAVATOR"},
+ {no:"EX559",cls:"Exc 14t",d:"HITACHI ZX130-5G HYDRAULIC EXCAVATOR"},
+ {no:"EX560",cls:"Exc 14t",d:"HITACHI ZX130-5G HYDRAULIC EXCAVATOR"},
+ {no:"EX561",cls:"Exc 14t",d:"HITACHI ZX130-5G HYDRAULIC EXCAVATOR"},
+ {no:"EX562",cls:"Exc 14t",d:"SUMITOMO SH130-6 EXCAVATOR WITH REAR CAMERA WITH STD AR"},
+ {no:"EX563",cls:"Exc 14t",d:"SUMITOMO SH130-6 EXCAVATOR WITH REAR CAMERA WITH STD AR"},
+ {no:"EX564",cls:"Exc 14t",d:"SUMITOMO SH130-6 EXCAVATOR WITH REAR CAMERA WITH STD AR"},
+ {no:"EX565",cls:"Exc 14t",d:"SUMITOMO SH130-6 EXCAVATOR WITH REAR CAMERA WITH STD AR"},
+ {no:"EX566",cls:"Exc 14t",d:"SUMITOMO SH130-6 EXCAVATOR WITH REAR CAMERA WITH STD AR"},
+ {no:"EX567",cls:"Exc 14t",d:"SUMITOMO SH130-6 EXCAVATOR WITH REAR CAMERA WITH STD AR"},
+ {no:"EX572",cls:"Exc 25t SA/LA",d:"SUMITOMO SH250LHD-6 HYDRAULIC EXCAVATOR"},
+ {no:"EX573",cls:"Exc 25t SA/LA",d:"SUMITOMO SH250-6 HYDRAULIC EXCAVATOR"},
+ {no:"EX574",cls:"Exc 25t SA/LA",d:"SUMITOMO SH250-6 HYDRAULIC EXCAVATOR"},
+ {no:"EX575",cls:"Exc 25t SA/LA",d:"SUMITOMO SH250-6 HYDRAULIC EXCAVATOR"},
+ {no:"EX576",cls:"Exc 25t SA/LA",d:"SUMITOMO SH250-6 HYDRAULIC EXCAVATOR"},
+ {no:"EX577",cls:"Exc 25t SA/LA",d:"SUMITOMO SH250-6 HYDRAULIC EXCAVATOR"},
+ {no:"EX578",cls:"Exc 25t SA/LA",d:"SUMITOMO SH250-6 HYDRAULIC EXCAVATOR"},
+ {no:"EX580",cls:"Exc 25t SA/LA",d:"SUMITOMO SH250-6 HYDRAULIC EXCAVATOR"},
+ {no:"EX581",cls:"Exc 25t SA/LA",d:"SUMITOMO SH250-6 HYDRAULIC EXCAVATOR"},
+ {no:"EX582",cls:"Exc 35-40t",d:"SUMITOMO SH350LHD-6 HYDRAULIC EXCAVATOR/REAR CAMERA"},
+ {no:"EX583",cls:"Exc 35-40t",d:"SUMITOMO SH350LHD-6 HYDRAULIC EXCAVATOR/REAR CAMERA"},
+ {no:"EX584",cls:"Exc 35-40t",d:"SUMITOMO SH350LHD-6 HYDRAULIC EXCAVATOR/REAR CAMERA"},
+ {no:"EX585",cls:"Exc 35-40t",d:"SUMITOMO SH350LHD-6 HYDRAULIC EXCAVATOR/REAR CAMERA"},
+ {no:"EX586",cls:"Exc 35-40t",d:"SUMITOMO SH350LHD-6 HYDRAULIC EXCAVATOR/REAR CAMERA"},
+ {no:"EX587",cls:"Exc 35-40t",d:"SUMITOMO SH350LHD-6 HYDRAULIC EXCAVATOR/REAR CAMERA"},
+ {no:"EX588",cls:"Exc 35-40t",d:"SUMITOMO SH350LHD-6 HYDRAULIC EXCAVATOR/REAR CAMERA"},
+ {no:"EX590",cls:"Exc 35-40t",d:"SUMITOMO SH350LHD-6 HYDRAULIC EXCAVATOR/REAR CAMERA"},
+ {no:"EX591",cls:"Exc 35-40t",d:"SUMITOMO SH350LHD-6 HYDRAULIC EXCAVATOR/REAR CAMERA"},
+ {no:"EX592",cls:"Roller",d:"CATERPILLAR CS11GS VIBRATORY SOIL COMPACTOR (WD4507K)"},
+ {no:"EX593",cls:"Roller",d:"CATERPILLAR CS11GC VIBRATORY SOIL COMPACTOR (WD4477M)"},
+ {no:"EX594",cls:"Exc 8t",d:"KATO HD308US-7 HYDRAULIC EXCAVATOR SHORT REACH C/W ACCE"},
+ {no:"EX595",cls:"Exc 8t",d:"KATO HD308US-7 HYDRAULIC EXCAVATOR SHORT REACH C/W ACCE"},
+ {no:"EX596",cls:"Mini 5.5t",d:"KATO HD35V4 MINI EXCAVATOR SHORT REACH"},
+ {no:"EX597",cls:"Mini 5.5t",d:"KATO HD35V4 MINI EXCAVATOR SHORT REACH"},
+ {no:"EX598",cls:"Mini 5.5t",d:"KATO HD35V4 MINI EXCAVATOR SHORT REACH"},
+ {no:"EX600",cls:"Exc 14t",d:"KATO HD512-R5 FULLY HYDRAULIC EXCAVATOR"},
+ {no:"EX601",cls:"Exc 14t",d:"KATO HD512-R5 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX602",cls:"Exc 14t",d:"KATO HD512-R5 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX603",cls:"Exc 14t",d:"KATO HD512-R5 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX604",cls:"Exc 14t",d:"KATO HD512-R5 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX605",cls:"Exc 14t",d:"KATO HD512-R5 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX606",cls:"Exc 14t",d:"KATO HD512-R5 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX607",cls:"Exc 14t",d:"KATO HD512-R5 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX608",cls:"Exc 14t",d:"KATO HD512-R5 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX610",cls:"Exc 14t",d:"KATO HD512-R5 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX611",cls:"Exc 14t",d:"KATO HD512-R5 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX612",cls:"Exc 14t",d:"KATO HD512-R5 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX613",cls:"Exc 14t",d:"KATO HD512-R5 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX614",cls:"Exc 14t",d:"KATO HD512-R5 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX615",cls:"Exc 14t",d:"KATO HD512-R5 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX616",cls:"Exc 14t",d:"KATO HD512-R5 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX617",cls:"Exc 14t",d:"KATO HD512-R5 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX618",cls:"Exc 14t",d:"KATO HD512-R5 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX620",cls:"Exc 14t",d:"KATO HD512-R5 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX621",cls:"Exc 14t",d:"KATO HD512-R5 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX622",cls:"Exc 14t",d:"KATO HD512-R5 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX623",cls:"Exc 14t",d:"KATO HD512-R5 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX624",cls:"Exc 14t",d:"KATO HD512-R5 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX625",cls:"Exc 14t",d:"KATO HD512-R5 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX626",cls:"Exc 14t",d:"KATO HD512-R5 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX627",cls:"Exc 14t",d:"KATO HD512-R5 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX628",cls:"Exc 14t",d:"KATO HD512-R5 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX630",cls:"Exc 14t",d:"HITACHI ZX135US-5A HYDRAULIC EXCAVATOR"},
+ {no:"EX631",cls:"Exc 14t",d:"HITACHI ZX135US-5A HYDRAULIC EXCAVATOR"},
+ {no:"EX632",cls:"Exc 14t",d:"HITACHI ZX135US-5A HYDRAULIC EXCAVATOR"},
+ {no:"EX633",cls:"Exc 20t",d:"SUMITOMO SH210-6 HYDRAULIC EXCAVATOR"},
+ {no:"EX634",cls:"Exc 20t",d:"SUMITOMO SH210-6 HYDRAULIC EXCAVATOR"},
+ {no:"EX635",cls:"Exc 20t",d:"SUMITOMO SH210-6 HYDRAULIC EXCAVATOR"},
+ {no:"EX636",cls:"Exc 20t",d:"SUMITOMO SH210-6 HYDRAULIC EXCAVATOR"},
+ {no:"EX637",cls:"Exc 35-40t",d:"KOMATSU PC350LC-8M0 EXCAVATOR WITH ACCESSORIES (PIPING "},
+ {no:"EX638",cls:"Exc 35-40t",d:"KOMATSU PC350LC-8M0 EXCAVATOR WITHOUT BUCKET (STANDARD)"},
+ {no:"EX640",cls:"Exc 35-40t",d:"KOMATSU PC350LC-8M0 EXCAVATOR WITHOUT BUCKET (STANDARD)"},
+ {no:"EX641",cls:"Exc 35-40t",d:"KOMATSU PC350LC-8M0 EXCAVATOR WITHOUT BUCKET (STANDARD)"},
+ {no:"EX642",cls:"Exc 35-40t",d:"KOMATSU PC350LC-8M0 EXCAVATOR WITHOUT BUCKET (STANDARD)"},
+ {no:"EX643",cls:"Mini 5.5t",d:"KATO HD35V4 MINI EXCAVATOR SHORT REACH"},
+ {no:"EX644",cls:"Exc 14t",d:"KATO HD512-R5 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX645",cls:"Exc 14t",d:"KATO HD512-R5 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX646",cls:"Exc 14t",d:"KATO HD512-R5 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX647",cls:"Exc 35-40t",d:"KOMATSU PC350LC-8M0 EXCAVATOR WITHOUT BUCKET (PIPING KI"},
+ {no:"EX648",cls:"Exc 35-40t",d:"KOMATSU PC350LC-8M2 HYDRAULIC EXCAVATOR WITHOUT BUCKET "},
+ {no:"EX650",cls:"Exc 35-40t",d:"KOMATSU PC350LC-8M2 HYDRAULIC EXCAVATOR WITHOUT BUCKET "},
+ {no:"EX651",cls:"Exc 35-40t",d:"KOMATSU PC350LC-8M2 HYDRAULIC EXCAVATOR WITHOUT BUCKET "},
+ {no:"EX652",cls:"Exc 35-40t",d:"KOMATSU PC350LC-8M2 HYDRAULIC EXCAVATOR WITHOUT BUCKET "},
+ {no:"EX653",cls:"Roller",d:"USED CATERPILLAR CS11GC SOIL COMPACTOR"},
+ {no:"EX654",cls:"Exc 35-40t",d:"USED VOLVO EC380DL HYDRAULIC EXCAVATOR"},
+ {no:"EX655",cls:"Exc 35-40t",d:"USED VOLVO EC380DL HYDRAULIC EXCAVATOR"},
+ {no:"EX656",cls:"Exc 35-40t",d:"USED VOLVO EC350DL HYDRAULIC EXCAVATOR"},
+ {no:"EX657",cls:"Exc 35-40t",d:"USED VOLVO EC350DL HYDRAULIC EXCAVATOR"},
+ {no:"EX658",cls:"Dozer",d:"USED CATERPILLAR D6R GP BULLDOZER"},
+ {no:"EX660",cls:"Exc 20t",d:"KOMATSU PC200-10M0 HYDRAULIC EXCAVATOR (PIPING KIT)"},
+ {no:"EX661",cls:"Exc 20t",d:"KOMATSU PC200-10M0 HYDRAULIC EXCAVATOR (PIPING KIT)"},
+ {no:"EX662",cls:"Exc 20t",d:"KOMATSU PC200-10M0 HYDRAULIC EXCAVATOR (PIPING KIT)"},
+ {no:"EX663",cls:"Exc 20t",d:"KOMATSU PC200-10M0 HYDRAULIC EXCAVATOR (STANDARD)"},
+ {no:"EX664",cls:"Exc 20t",d:"KOMATSU PC200-10M0 HYDRAULIC EXCAVATOR (STANDARD)"},
+ {no:"EX665",cls:"Exc 14t",d:"VOLVO ECR145EL CRAWLER EXCAVATOR"},
+ {no:"EX666",cls:"Grader",d:"CATERPILLAR 140K MOTOR GRADER (WF123A)"},
+ {no:"EX667",cls:"Exc 30t",d:"ZX330LC-5G CHAMELEON HYDRAULIC TELESCOPIC"},
+ {no:"EX668",cls:"Exc 30t",d:"ZX330LC-5G CHAMELEON HYDRAULIC TELESCOPIC"},
+ {no:"EX670",cls:"Exc 14t",d:"KOMATSU PC138US-8 HYDRAULIC EXCAVATOR"},
+ {no:"EX671",cls:"Exc 14t",d:"KOMATSU PC138US-8 HYDRAULIC EXCAVATOR"},
+ {no:"EX672",cls:"Exc 14t",d:"KOMATSU PC138US-8 UG DEMOLITION HYDRAULIC EXCAVATOR"},
+ {no:"EX673",cls:"Exc 14t",d:"KOMATSU PC138US-8 UG DEMOLITION HYDRAULIC EXCAVATOR"},
+ {no:"EX674",cls:"Exc 14t",d:"KOMATSU PC138US-8 UG DEMOLITION HYDRAULIC EXCAVATOR"},
+ {no:"EX675",cls:"Exc 14t",d:"KOMATSU PC138US-8 UG DEMOLITION HYDRAULIC EXCAVATOR"},
+ {no:"EX676",cls:"Exc 35-40t",d:"SUMITOMO SH350LHD-6 HYDRAULIC EXCAVATOR"},
+ {no:"EX677",cls:"Exc 35-40t",d:"KOMATSU PC350LC-8M2 HYDRAULIC EXCAVATOR WITHOUT BUCKET"},
+ {no:"EX678",cls:"Exc 35-40t",d:"KOMATSU PC350LC-8M2 HYDRAULIC EXCAVATOR WITHOUT BUCKET"},
+ {no:"EX680",cls:"Exc 35-40t",d:"KOMATSU PC350LC-8M2 HYDRAULIC EXCAVATOR WITHOUT BUCKET"},
+ {no:"EX688",cls:"Exc 20t",d:"KOMATSU PC200-10M0 HYDRAULIC EXCAVATOR (STANDARD)"},
+ {no:"EX691",cls:"Exc 20t",d:"KOMATSU PC210-10M0 HYDRAULIC EXCAVATOR WITH PIPING KIT"},
+ {no:"EX692",cls:"Exc 20t",d:"KOMATSU PC210-10M0 HYDRAULIC EXCAVATOR WITH PIPING KIT"},
+ {no:"EX693",cls:"Exc 20t",d:"KOMATSU PC210-10M0 HYDRAULIC EXCAVATOR WITH PIPING KIT"},
+ {no:"EX694",cls:"Grader",d:"USED CATERPILLAR 140K MOTOR GRADER (WD8831Y)"},
+ {no:"EX695",cls:"Mini 5.5t",d:"KUBOTA U55-6 MINI EXCAVATOR"},
+ {no:"EX696",cls:"Mini 5.5t",d:"KUBOTA U55-6 MINI EXCAVATOR"},
+ {no:"EX697",cls:"Mini 5.5t",d:"KUBOTA U55-6 MINI EXCAVATOR"},
+ {no:"EX698",cls:"Mini 5.5t",d:"KUBOTA U55-6 MINI EXCAVATOR"},
+ {no:"EX700",cls:"Mini 5.5t",d:"KUBOTA U55-6 MINI EXCAVATOR"},
+ {no:"EX701",cls:"Roller",d:"BOMAG BW211D-40SL SINGLE DRUM VIBRATORY ROLLER"},
+ {no:"EX702",cls:"Roller",d:"BOMAG BW211D-40SL SINGLE DRUM VIBRATORY ROLLER"},
+ {no:"EX703",cls:"Exc 14t",d:"KOMATSU PC138US-8 HYDRAULIC EXCAVATOR"},
+ {no:"EX704",cls:"Exc 14t",d:"KOMATSU PC138US-8 HYDRAULIC EXCAVATOR"},
+ {no:"EX705",cls:"Exc 14t",d:"KOMATSU PC138US-8 HYDRAULIC EXCAVATOR"},
+ {no:"EX706",cls:"Exc 14t",d:"KOMATSU PC138US-8 HYDRAULIC EXCAVATOR"},
+ {no:"EX707",cls:"Exc 14t",d:"KOMATSU PC138US-8 HYDRAULIC EXCAVATOR"},
+ {no:"EX708",cls:"Exc 35-40t",d:"SUMITOMO SH350LHD-6 HYDRAULIC EXCAVATOR"},
+ {no:"EX710",cls:"Exc 35-40t",d:"SUMITOMO SH350LHD-6 HYDRAULIC EXCAVATOR"},
+ {no:"EX711",cls:"Exc 35-40t",d:"SUMITOMO SH350LHD-6 HYDRAULIC EXCAVATOR"},
+ {no:"EX712",cls:"Exc 35-40t",d:"SUMITOMO SH350LHD-6 HYDRAULIC EXCAVATOR"},
+ {no:"EX713",cls:"Exc 35-40t",d:"SUMITOMO SH350LHD-6 HYDRAULIC EXCAVATOR"},
+ {no:"EX714",cls:"Exc 35-40t",d:"SUMITOMO SH350LHD-6 HYDRAULIC EXCAVATOR"},
+ {no:"EX715",cls:"Exc 35-40t",d:"SUMITOMO SH350LHD-6 HYDRAULIC EXCAVATOR"},
+ {no:"EX716",cls:"Exc 35-40t",d:"SUMITOMO SH350LHD-6 HYDRAULIC EXCAVATOR"},
+ {no:"EX717",cls:"Exc 35-40t",d:"SUMITOMO SH350LHD-6 HYDRAULIC EXCAVATOR"},
+ {no:"EX718",cls:"Exc 35-40t",d:"SUMITOMO SH350LHD-6 HYDRAULIC EXCAVATOR"},
+ {no:"EX720",cls:"Grader",d:"CATERPILAR 12H MOTOR GRADER"},
+ {no:"EX721",cls:"Dozer",d:"USED CATERPILLAR D6R GP BULLDOZER"},
+ {no:"EX722",cls:"Dozer",d:"CATERPILLAR D6R BULLDOZER USED"},
+ {no:"EX723",cls:"Dozer",d:"USED CATERPILLAR D6R GP BULLDOZER"},
+ {no:"EX724",cls:"Roller",d:"BOMAG BW211D-40 SINGLE DRUM VIBRATORY ROLLER"},
+ {no:"EX725",cls:"Roller",d:"BOMAG BW211D-40 SINGLE DRUM VIBRATORY ROLLER"},
+ {no:"EX726",cls:"Roller",d:"BOMAG BW211D-40 SINGLE DRUM VIBRATORY ROLLER"},
+ {no:"EX727",cls:"Roller",d:"BOMAG BW211D-40 SINGLE DRUM VIBRATORY ROLLER"},
+ {no:"EX728",cls:"Exc 8t",d:"KATO HD308US-7 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX730",cls:"Exc 8t",d:"KATO HD308US-7 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX731",cls:"Exc 8t",d:"KATO HD308US-7 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX732",cls:"Exc 8t",d:"KATO HD308US-7 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX733",cls:"Dozer",d:"KOMATSU D39PX-22 CRAWLER DOZER"},
+ {no:"EX734",cls:"Mini 5.5t",d:"KUBOTA U55-6 MINI EXCAVATOR"},
+ {no:"EX735",cls:"Mini 5.5t",d:"KUBOTA U55-6 MINI EXCAVATOR"},
+ {no:"EX736",cls:"Roller",d:"KANTO TEKKO KV40DS VIBRATION ROLLER WITH KUBOTA TIER"},
+ {no:"EX737",cls:"Roller",d:"KANTO TEKKO KV40DS VIBRATION ROLLER WITH KUBOTA TIER"},
+ {no:"EX738",cls:"Roller",d:"KANTO TEKKO KV40DS VIBRATION ROLLER WITH KUBOTA TIER"},
+ {no:"EX740",cls:"Roller",d:"BOMAG BW211D-40SL SINGLE DRUM VIBRATORY ROLLER"},
+ {no:"EX741",cls:"Roller",d:"BOMAG BW211D-40SL SINGLE DRUM VIBRATORY ROLLER"},
+ {no:"EX742",cls:"Exc 25t SA/LA",d:"SUMITOMO SH250-6 HYDRAULIC EXCAVATOR"},
+ {no:"EX743",cls:"Exc 20t",d:"KOMATSU PC210-10M0 HYDRAULIC EXCAVATOR WITH PIPING KIT"},
+ {no:"EX744",cls:"Exc 20t",d:"KOMATSU PC210-10M0 HYDRAULIC EXCAVATOR WITH PIPING KIT"},
+ {no:"EX745",cls:"Exc 20t",d:"KOMATSU PC210-10M0 HYDRAULIC EXCAVATOR WITH PIPING KIT"},
+ {no:"EX746",cls:"Exc 20t",d:"KOMATSU PC210-10M0 HYDRAULIC EXCAVATOR WITH PIPING KIT"},
+ {no:"EX747",cls:"Exc 20t",d:"KOMATSU PC210-10M0 HYDRAULIC EXCAVATOR WITH PIPING KIT"},
+ {no:"EX748",cls:"Exc 20t",d:"KOMATSU PC210-10M0 HYDRAULIC EXCAVATOR WITH PIPING KIT"},
+ {no:"EX750",cls:"Exc 20t",d:"KOMATSU PC210-10M0 HYDRAULIC EXCAVATOR WITH PIPING KIT"},
+ {no:"EX751",cls:"Exc 20t",d:"KOMATSU PC210-10M0 HYDRAULIC EXCAVATOR WITH PIPING KIT"},
+ {no:"EX752",cls:"Exc 20t",d:"KOMATSU PC210-10M0 HYDRAULIC EXCAVATOR WITH PIPING KIT"},
+ {no:"EX753",cls:"Exc 20t",d:"KOMATSU PC210-10M0 HYDRAULIC EXCAVATOR WITH PIPING KIT"},
+ {no:"EX754",cls:"Mini 5.5t",d:"KUBOTA U55-6 MINI EXCAVATOR"},
+ {no:"EX755",cls:"Mini 5.5t",d:"KUBOTA U55-6 MINI EXCAVATOR"},
+ {no:"EX756",cls:"Exc 8t",d:"KATO HD308US-7 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX757",cls:"Exc 8t",d:"KATO HD308US-7 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX758",cls:"Exc 8t",d:"KATO HD308US-7 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX760",cls:"Exc 8t",d:"KATO HD308US-7 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX761",cls:"Exc 8t",d:"KATO HD308US-7 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX762",cls:"Exc 8t",d:"KATO HD308US-7 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX763",cls:"Exc 35-40t",d:"SUMITOMO SH350LHD-6 HYDRAULIC EXCAVATOR"},
+ {no:"EX764",cls:"Exc 35-40t",d:"SUMITOMO SH350LHD-6 HYDRAULIC EXCAVATOR"},
+ {no:"EX765",cls:"Exc 35-40t",d:"SUMITOMO SH350LHD-6 HYDRAULIC EXCAVATOR"},
+ {no:"EX766",cls:"Exc 35-40t",d:"SUMITOMO SH350LHD-6 HYDRAULIC EXCAVATOR"},
+ {no:"EX767",cls:"Exc 35-40t",d:"SUMITOMO SH350LHD-6 HYDRAULIC EXCAVATOR"},
+ {no:"EX768",cls:"Exc 35-40t",d:"SUMITOMO SH350LHD-6 HYDRAULIC EXCAVATOR"},
+ {no:"EX770",cls:"Exc 35-40t",d:"SUMITOMO SH350LHD-6 HYDRAULIC EXCAVATOR"},
+ {no:"EX771",cls:"Exc 45t+",d:"VOLVO EC480DL CRAWLER EXCAVATOR"},
+ {no:"EX772",cls:"Dozer",d:"KOMATSU D65PX-16 CRAWLER DOZER"},
+ {no:"EX773",cls:"Dozer",d:"KOMATSU D65PX-16 CRAWLER DOZER"},
+ {no:"EX774",cls:"Dozer",d:"KOMATSU D65PX-16 CRAWLER DOZER"},
+ {no:"EX775",cls:"Dozer",d:"KOMATSU D65PX-16 CRAWLER DOZER"},
+ {no:"EX776B",cls:"Dozer",d:"KOMATSU D65PX-16 CRAWLER DOZER"},
+ {no:"EX777",cls:"Dozer",d:"CATERPILLAR D6R2LGP BULLDOZER C/W ACCESSORIES"},
+ {no:"EX778",cls:"Dozer",d:"CATERPILLAR D6R2LGP TRACK TYPE TRACTOR C/W ACCESSORIES"},
+ {no:"EX779",cls:"Dozer",d:"CATERPILLAR D6R2LGP BULLDOZER C/W ACCESSORIES"},
+ {no:"EX780",cls:"Dozer",d:"USED CATERPILLAR D6R2LGP BULLDOZER C/W ACCESSORIES"},
+ {no:"EX781",cls:"Exc 14t",d:"KOMATSU PC138US-8 HYDRAULIC EXCAVATOR (PIPING)"},
+ {no:"EX782",cls:"Exc 14t",d:"KOMATSU PC138US-8 HYDRAULIC EXCAVATOR (PIPING)"},
+ {no:"EX783",cls:"Roller",d:"KANTO TEKKO KV40DS RIDE-ON STEEL TANDERN VIBRATION ROLL"},
+ {no:"EX784",cls:"Roller",d:"KANTO TEKKO KV40DS RIDE-ON STEEL TANDERN VIBRATION ROLL"},
+ {no:"EX785",cls:"Roller",d:"KANTO TEKKO KV25DS RIDE-ON STEEL TANDERN VIBRATION ROLL"},
+ {no:"EX786",cls:"Roller",d:"KANTO TEKKO KV15CS RIDE-ON STEEL TANDERN VIBRATION ROLL"},
+ {no:"EX787",cls:"Dozer",d:"KOMATSU D39PX-22 BULLDOZER"},
+ {no:"EX788",cls:"Dozer",d:"KOMATSU D39PX-22 BULLDOZER"},
+ {no:"EX790",cls:"Exc 14t",d:"KATO HD512-R5 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX791",cls:"Exc 14t",d:"KATO HD512-R5 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX792",cls:"Exc 14t",d:"KATO HD512-R5 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX793",cls:"Exc 14t",d:"KATO HD512-R5 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX794",cls:"Exc 14t",d:"KATO HD512-R5 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX795",cls:"Exc 14t",d:"KATO HD512-R5 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX796",cls:"Exc 14t",d:"KATO HD512-R5 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX797",cls:"Exc 14t",d:"KATO HD512-R5 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX798",cls:"Exc 14t",d:"KATO HD512-R5 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX800",cls:"Exc 14t",d:"KATO HD512-R5 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX801",cls:"Exc 14t",d:"KATO HD512-R5 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX802",cls:"Exc 14t",d:"KATO HD512-R5 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX803",cls:"Exc 14t",d:"KATO HD512-R5 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX804",cls:"Exc 14t",d:"KATO HD512-R5 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX805",cls:"Exc 14t",d:"KATO HD512-R5 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX806",cls:"Exc 14t",d:"KATO HD512-R5 STANDARD HYDRAULIC EXCAVATOR"},
+ {no:"EX807",cls:"Exc 14t",d:"KATO HD512-R5 STANDARD HYDRAULIC EXCAVATOR"},
+ {no:"EX808",cls:"Exc 14t",d:"KATO HD512-R5 STANDARD HYDRAULIC EXCAVATOR"},
+ {no:"EX810",cls:"Exc 14t",d:"KATO HD512-R5 STANDARD HYDRAULIC EXCAVATOR"},
+ {no:"EX811",cls:"Exc 14t",d:"KATO HD512-R5 STANDARD HYDRAULIC EXCAVATOR"},
+ {no:"EX812",cls:"Exc 14t",d:"KATO HD512-R5 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX813",cls:"Exc 14t",d:"KATO HD512-R5 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX814",cls:"Exc 14t",d:"KATO HD512-R5 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX815",cls:"Exc 14t",d:"KATO HD512-R5 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX816",cls:"Exc 14t",d:"KATO HD512-R5 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX817",cls:"Exc 14t",d:"KATO HD512-R5 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX818",cls:"Exc 14t",d:"KATO HD512-R5 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX820",cls:"Exc 14t",d:"KATO HD512-R5 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX821",cls:"Exc 14t",d:"KATO HD512-R5 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX822",cls:"Exc 14t",d:"KATO HD512-R5 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX823",cls:"Exc 14t",d:"KATO HD512-R5 SHORT REACH HYDRAULIC EXCAVATOR"},
+ {no:"EX824",cls:"Dozer",d:"KOMATSU D65PX-16 CRAWLER DOZER"},
+ {no:"EX825",cls:"Exc 20t",d:"KOMATSU PC210-10M0 HYDRAULIC EXCAVATOR WITH PIPING KIT"},
+ {no:"EX826",cls:"Exc 20t",d:"KOMATSU PC210-10M0 HYDRAULIC EXCAVATOR WITH PIPING KIT"},
+ {no:"EX827",cls:"Exc 20t",d:"KOMATSU PC210-10M0 HYDRAULIC EXCAVATOR WITH PIPING KIT"},
+ {no:"EX828",cls:"Exc 20t",d:"KOMATSU PC210-10M0 HYDRAULIC EXCAVATOR WITH PIPING KIT"},
+ {no:"EX830",cls:"Exc 35-40t",d:"KATO HD1638-R5 HYDRAULIC EXCAVATOR"},
+ {no:"EX831",cls:"Exc 35-40t",d:"KATO HD1638-R5 HYDRAULIC EXCAVATOR"},
+ {no:"EX832",cls:"Exc 35-40t",d:"KATO HD1638-R5 HYDRAULIC EXCAVATOR"},
+ {no:"EX833",cls:"Exc 35-40t",d:"KATO HD1638-R5 HYDRAULIC EXCAVATOR"},
+ {no:"EX834",cls:"Exc 35-40t",d:"KATO HD1638-R5 HYDRAULIC EXCAVATOR"},
+ {no:"EX835",cls:"Exc 35-40t",d:"KATO HD1638-R5 HYDRAULIC EXCAVATOR"},
+ {no:"EX836",cls:"Exc 35-40t",d:"KATO HD1638-R5 HYDRAULIC EXCAVATOR"},
+ {no:"EX837",cls:"Exc 35-40t",d:"KATO HD1638-R5 HYDRAULIC EXCAVATOR WITHOUT BUCKET"},
+ {no:"EX838",cls:"Exc 35-40t",d:"KATO HD1638-R5 HYDRAULIC EXCAVATOR WITHOUT BUCKET"},
+ {no:"EX840",cls:"Exc 35-40t",d:"KATO HD1638-R5 HYDRAULIC EXCAVATOR WITHOUT BUCKET"},
+ {no:"EX841",cls:"Exc 35-40t",d:"KATO HD1638-R5 HYDRAULIC EXCAVATOR WITHOUT BUCKET"},
+ {no:"EX842",cls:"Exc 35-40t",d:"KATO HD1638-R5 HYDRAULIC EXCAVATOR WITHOUT BUCKET"},
+ {no:"EX843",cls:"Exc 45t+",d:"KOMATSU PC500LC-10R HYDRAULIC EXCAVATOR WITH PIPING KIT"},
+ {no:"EX844",cls:"Exc 45t+",d:"KOMATSU PC500LC-10R HYDRAULIC EXCAVATOR WITH PIPING KIT"},
+ {no:"EX845",cls:"Exc 45t+",d:"KOMATSU PC500LC-10R HYDRAULIC EXCAVATOR WITH PIPING KIT"},
+ {no:"EX846",cls:"Exc 45t+",d:"KOMATSU PC500LC-10R HYDRAULIC EXCAVATOR WITH PIPING KIT"},
+ {no:"EX847",cls:"Exc 45t+",d:"KOMATSU PC500LC-10R HYDRAULIC EXCAVATOR WITH PIPING KIT"},
+ {no:"EX848",cls:"Exc 45t+",d:"KOMATSU PC500LC-10R HYDRAULIC EXCAVATOR WITH PIPING KIT"},
+ {no:"EX850",cls:"Exc 45t+",d:"KOMATSU PC500LC-10R HYDRAULIC EXCAVATOR (STANDARD)"},
+ {no:"EX851",cls:"Exc 45t+",d:"KOMATSU PC500LC-10R HYDRAULIC EXCAVATOR WITH PIPING KIT"},
+ {no:"EX852",cls:"Exc 45t+",d:"KOMATSU PC500LC-10R HYDRAULIC EXCAVATOR WITH PIPING KIT"},
+ {no:"EX853",cls:"Exc 45t+",d:"KOMATSU PC500LC-10R HYDRAULIC EXCAVATOR (STANDARD)"},
+ {no:"EX854",cls:"Exc 14t",d:"KOMATSU PC138US-8 HYDRAULIC EXCAVATOR (PIPING)"},
+ {no:"EX855",cls:"Exc 14t",d:"KOMATSU PC138US-8 HYDRAULIC EXCAVATOR (PIPING)"},
+ {no:"EX856",cls:"Exc 14t",d:"KOMATSU PC138US-8 HYDRAULIC EXCAVATOR (PIPING)"},
+ {no:"EX857",cls:"Exc 14t",d:"KOMATSU PC138US-8 HYDRAULIC EXCAVATOR (PIPING)"},
+ {no:"EX858",cls:"Exc 14t",d:"KOMATSU PC138US-8 HYDRAULIC EXCAVATOR (PIPING)"},
+ {no:"EX860",cls:"Exc 14t",d:"KOMATSU PC138US-8 HYDRAULIC EXCAVATOR (PIPING)"},
+ {no:"EX861",cls:"Exc 14t",d:"KOMATSU PC138US-8 HYDRAULIC EXCAVATOR (PIPING)"},
+ {no:"EX862",cls:"Exc 45t+",d:"VOLVO EC480DL CRAWLER EXCAVATOR"},
+ {no:"EX863",cls:"Exc 14t",d:"KOMATSU PC138US-8 HYDRAULIC EXCAVATOR (PIPING)"},
+ {no:"EX864",cls:"Exc 14t",d:"KOMATSU PC138US-8 HYDRAULIC EXCAVATOR (PIPING)"},
+ {no:"EX865",cls:"Exc 35-40t",d:"KATO HD1638-R5 HYDRAULIC EXCAVATOR WITH BUCKET"},
+ {no:"EX866",cls:"Exc 35-40t",d:"SUMITOMO SH350LHD-6 HYDRAULIC EXCAVATOR"},
+ {no:"EX867",cls:"Exc 35-40t",d:"SUMITOMO SH350LHD-6 HYDRAULIC EXCAVATOR"},
+ {no:"EX868",cls:"Exc 35-40t",d:"SUMITOMO SH350LHD-6 HYDRAULIC EXCAVATOR"},
+ {no:"EX870",cls:"Exc 35-40t",d:"SUMITOMO SH350LHD-6 HYDRAULIC EXCAVATOR"},
+ {no:"EX871",cls:"Exc 35-40t",d:"SUMITOMO SH350LHD-6 HYDRAULIC EXCAVATOR WITHOUT BUCKET"},
+ {no:"EX872",cls:"Exc 14t",d:"KOMATSU PC138US-8 UG DEMOLITION HYDRAULIC EXCAVATOR"},
+ {no:"EX878",cls:"Exc 20t",d:"KOMATSU PC210-10M0 HYDRAULIC EXCAVATOR WITH PIPING KIT"},
+ {no:"EX880",cls:"Exc 20t",d:"KOMATSU PC210-10M0 HYDRAULIC EXCAVATOR WITH PIPING KIT"},
+ {no:"EX881",cls:"Exc 20t",d:"KOMATSU PC210-10M0 HYDRAULIC EXCAVATOR WITH PIPING KIT"},
+ {no:"EX882",cls:"Crusher/Screener",d:"SANDVIK QJ341 JAW CRUSHER C/W ACCESSORIES"},
+ {no:"EX883",cls:"Crusher/Screener",d:"SANDVIK QJ341 JAW CRUSHER C/W ACCESSORIES"},
+ {no:"EX884",cls:"Roller",d:"BOMAG BW211D-40SL SINGLE DRUM VIBRATORY ROLLER / W-plat"},
+ {no:"EX888",cls:"Crusher/Screener",d:"POWERSCREEN PREMIERTRAK R400X"},
+ {no:"EX890",cls:"Exc 20t",d:"KOMATSU PC210-10M0 HYDRAULIC EXCAVATOR WITH PIPING KIT"},
+ {no:"EX891",cls:"Exc 20t",d:"KOMATSU PC210-10M0 HYDRAULIC EXCAVATOR WITH PIPING KIT"},
+ {no:"EX892",cls:"Exc 20t",d:"KOMATSU PC210-10M0 HYDRAULIC EXCAVATOR WITH PIPING KIT"},
+ {no:"EX893",cls:"Exc 20t",d:"KOMATSU PC210-10M0 HYDRAULIC EXCAVATOR WITH PIPING KIT"},
+ {no:"EX894",cls:"Exc 20t",d:"KOMATSU PC210-10M0 HYDRAULIC EXCAVATOR WITH PIPING KIT"},
+ {no:"EX895",cls:"Exc 20t",d:"KOMATSU PC210-10M0 HYDRAULIC EXCAVATOR WITH PIPING KIT"},
+ {no:"EX896",cls:"Exc 20t",d:"KOMATSU PC210-10M0 HYDRAULIC EXCAVATOR WITH PIPING KIT"},
+ {no:"EX897",cls:"Exc 20t",d:"KOMATSU PC210-10M0 HYDRAULIC EXCAVATOR WITH PIPING KIT"},
+ {no:"EX898",cls:"Exc 20t",d:"KOMATSU PC210-10M0 HYDRAULIC EXCAVATOR WITH PIPING KIT"},
+ {no:"EX900",cls:"Exc 20t",d:"KOMATSU PC210-10M0 HYDRAULIC EXCAVATOR WITH PIPING KIT"},
+ {no:"EX915",cls:"Exc 45t+",d:"KOMATSU PC500LC-10R HYDRAULIC EXCAVATOR WITH PIPING KIT"},
+ {no:"EX916",cls:"Exc 45t+",d:"KOMATSU PC500LC-10R HYDRAULIC EXCAVATOR WITH PIPING KIT"},
+ {no:"EX917",cls:"Exc 45t+",d:"KOMATSU PC500LC-10R HYDRAULIC EXCAVATOR WITH PIPING KIT"},
+ {no:"EX918",cls:"Exc 45t+",d:"KOMATSU PC500LC-10R HYDRAULIC EXCAVATOR WITH PIPING KIT"},
+ {no:"EX920",cls:"Exc 45t+",d:"KOMATSU PC500LC-10R HYDRAULIC EXCAVATOR (STANDARD)"},
+ {no:"EX921",cls:"Exc 45t+",d:"KOMATSU PC500LC-10R HYDRAULIC EXCAVATOR (STANDARD)"},
+ {no:"EX922",cls:"Exc 45t+",d:"KOMATSU PC500LC-10R HYDRAULIC EXCAVATOR (STANDARD)"},
+ {no:"EX923",cls:"Exc 45t+",d:"KOMATSU PC500LC-10R HYDRAULIC EXCAVATOR (STANDARD)"},
+ {no:"EX924",cls:"Exc 45t+",d:"KOMATSU PC500LC-10R HYDRAULIC EXCAVATOR (STANDARD)"},
+ {no:"EX925",cls:"Exc 45t+",d:"KOMATSU PC500LC-10R HYDRAULIC EXCAVATOR (STANDARD)"},
+ {no:"EX926",cls:"Exc 45t+",d:"KOMATSU PC500LC-10R HYDRAULIC EXCAVATOR (STANDARD)"},
+ {no:"EX927",cls:"Exc 45t+",d:"KOMATSU PC500LC-10R HYDRAULIC EXCAVATOR (STANDARD)"},
+ {no:"EX932",cls:"Exc 45t+",d:"KOMATSU PC500LC-10R HYDRAULIC EXCAVATOR (STANDARD)"},
+ {no:"EX943",cls:"Exc 14t",d:"KOMATSU PC138US-8 HYDRAULIC EXCAVATOR (PIPING)"},
+ {no:"EX944",cls:"Exc 14t",d:"KOMATSU PC138US-8 HYDRAULIC EXCAVATOR (PIPING)"},
+ {no:"EX945",cls:"Exc 14t",d:"KOMATSU PC138US-8 HYDRAULIC EXCAVATOR (PIPING)"},
+ {no:"EX946",cls:"Exc 14t",d:"KOMATSU PC138US-8 HYDRAULIC EXCAVATOR (PIPING)"},
+ {no:"EX954",cls:"Dozer",d:"KOMATSU D85PX-15R BULLDOZER"},
+ {no:"EX955",cls:"Dozer",d:"KOMATSU D85PX-15R BULLDOZER"},
+ {no:"EX1635",cls:"Generator/Welder",d:"Model: SDG150S Generator 125KVA"},
+ {no:"EX1637",cls:"Generator/Welder",d:"Model: Airman/SDG150S Generator 125KVA"},
+ {no:"EX2424",cls:"Air compressor",d:"Model: WDC185S Diesel Air Compressor"},
+ {no:"10-2",cls:"Lighting tower",d:"Model: TLG-12ESX LED Tower Light"},
+ {no:"10-8",cls:"Lighting tower",d:"Model: Yanmar 3TNV70-F Tower Light"},
+ {no:"6-48",cls:"Lighting tower",d:"Model: WDT4L195 LED Tower Light"},
+ {no:"6-5",cls:"Lighting tower",d:"Model: WDT4L195 LED Tower Light"},
+ {no:"8-13",cls:"Lighting tower",d:"Model: DCA-10ESX-DA LED Tower Light"},
+ {no:"8-16",cls:"Lighting tower",d:"Model: Kubota D1403-KA Tower Light"},
+ {no:"8-18",cls:"Lighting tower",d:"Model: DCA-10ESX-DA LED Tower Light"},
+ {no:"8-22",cls:"Lighting tower",d:"Model: DCA-10ESX-DA LED Tower Light"},
+ {no:"8-25",cls:"Lighting tower",d:"Model: Kubota D1403-KA Tower Light"},
+ {no:"8-26",cls:"Lighting tower",d:"Model: DCA-10ESX-DA LED Tower Light"},
+ {no:"8-27",cls:"Lighting tower",d:"Model: Kubota D1403-KA Tower Light"},
+ {no:"8-28",cls:"Lighting tower",d:"Model: Kubota D1403-KA Tower Light"},
+ {no:"8-34",cls:"Lighting tower",d:"Model: Kubota D1403-KA Tower Light"},
+ {no:"8-51",cls:"Lighting tower",d:"Model: DCA-10ESX-DA LED Tower Light"},
+ {no:"8-54",cls:"Lighting tower",d:"Model: Kubota D1403-KA Tower Light"},
+ {no:"A1",cls:"Air compressor",d:"Air Receiver (JIAXING) Hyundai"},
+ {no:"A10",cls:"Air compressor",d:"Air Receiver (MONSTER AIR)"},
+ {no:"A11",cls:"Air compressor",d:"Air Receiver (MONSTER AIR)"},
+ {no:"A12",cls:"Air compressor",d:"Air Receiver (MONSTER AIR)"},
+ {no:"A13",cls:"Air compressor",d:"AIR COMPRESSOR, 10HP DIESEL ENGINE KEY START (MONSTER)"},
+ {no:"A14",cls:"Air compressor",d:"Air Receiver (MONSTER AIR)"},
+ {no:"A15",cls:"Air compressor",d:"AIR COMPRESSOR - AIRMAN PDS185S-5C5"},
+ {no:"A16",cls:"Air compressor",d:"AIR RECEIVER (MONSTER AIR) 10HP 8BAR 400L"},
+ {no:"A17",cls:"Air compressor",d:"AIR COMPRESSOR: RS30I_A14 OIL FLOODED SCREW"},
+ {no:"A18",cls:"",d:"AIR DRYER: D300IN-A REFRIGERATED (50HZ)"},
+ {no:"A19",cls:"Air compressor",d:"AIR RECEIVER: MONSTERAIR MAW3050 3 HP 8BAR 50L"},
+ {no:"A2",cls:"Air compressor",d:"Air Receiver (JIAXING)"},
+ {no:"A20",cls:"Air compressor",d:"AIR COMPRESSOR - AIRMAN PDS185S-5C5"},
+ {no:"A21",cls:"Air compressor",d:"Air Receiver (MONSTER AIR)"},
+ {no:"A22",cls:"Air compressor",d:"AIR COMPRESSOR - MONSTER AIR TB100-300H 10HP 12BAR"},
+ {no:"A24",cls:"Air compressor",d:"AIR COMPRESSOR - MONSTER AIR TS55U-180H/186DR 10HP C/W "},
+ {no:"A25",cls:"Air compressor",d:"AIR COMPRESSOR - AIRMAN PDS175S SCREW COMPRESSOR"},
+ {no:"A26",cls:"Air compressor",d:"AIR COMPRESSOR - AIRMAN PDS185S-5C5"},
+ {no:"A27",cls:"Air compressor",d:"AIR COMPRESSOR - AIRMAN PDS185S-5C5"},
+ {no:"A28",cls:"Air compressor",d:"AIR COMPRESSOR - MONSTER AIR TS55U-180H/186DR 10HP C/W "},
+ {no:"A29",cls:"Air compressor",d:"AIR COMPRESSOR - MONSTER AIR TS55U-180H/186DR 10HP C/W "},
+ {no:"A3",cls:"Air compressor",d:"Air Receiver (INGERSOLL-RAND-CHINA)"},
+ {no:"A30",cls:"Air compressor",d:"AIR COMPRESSOR - AIRMAN PDS185S-5C5"},
+ {no:"A31",cls:"Air compressor",d:"AIR COMPRESSOR - AIRMAN PDS185S-5C5"},
+ {no:"A32",cls:"Air compressor",d:"AIR COMPRESSOR - AIRMAN PDS185S-5C5"},
+ {no:"A33",cls:"Air compressor",d:"AIR COMPRESSOR - AIRMAN PDS185S-5C5"},
+ {no:"A4",cls:"Air compressor",d:"Air Receiver (COMPONENTA)"},
+ {no:"A5",cls:"Air compressor",d:"Air Receiver (VANSIN-SINGAPORE)"},
+ {no:"A6",cls:"Air compressor",d:"Air Receiver (JIAXING-CHINA)"},
+ {no:"A7",cls:"Air compressor",d:"Air Receiver (MONSTER AIR)"},
+ {no:"A8",cls:"Air compressor",d:"Air Receiver (MONSTER AIR)"},
+ {no:"A9",cls:"Air compressor",d:"Air Receiver (MONSTER AIR)"},
+ {no:"ADT1",cls:"Dump truck (ADT)",d:"KOMATSU HM400-3R ARTICULATED DUMP TRUCK (WD7581A)"},
+ {no:"ADT10",cls:"Dump truck (ADT)",d:"KOMATSU HM400-3R ARTICULATED DUMP TRUCK (WD7553G)"},
+ {no:"ADT11",cls:"Dump truck (ADT)",d:"KOMATSU HM400-3R ARTICULATED DUMP TRUCK (WD7494T)"},
+ {no:"ADT12",cls:"Dump truck (ADT)",d:"KOMATSU HM400-3R ARTICULATED DUMP TRUCK (WD8974T)"},
+ {no:"ADT13",cls:"Dump truck (ADT)",d:"KOMATSU HM400-3R ARTICULATED DUMP TRUCK (WD9012M)"},
+ {no:"ADT14",cls:"Dump truck (ADT)",d:"KOMATSU HM400-3R ARTICULATED DUMP TRUCK (WD9002S)"},
+ {no:"ADT15",cls:"Dump truck (ADT)",d:"KOMATSU HM400-3R ARTICULATED DUMP TRUCK (WD9008B)"},
+ {no:"ADT16",cls:"Dump truck (ADT)",d:"KOMATSU HM400-3R ARTICULATED DUMP TRUCK (WD8991T)"},
+ {no:"ADT17",cls:"Dump truck (ADT)",d:"KOMATSU HM400-3R ARTICULATED DUMP TRUCK (WD9151U)"},
+ {no:"ADT18",cls:"Dump truck (ADT)",d:"KOMATSU HM400-3R ARTICULATED DUMP TRUCK (WD9167A)"},
+ {no:"ADT2",cls:"Dump truck (ADT)",d:"KOMATSU HM400-3R ARTICULATED DUMP TRUCK (WD7551L)"},
+ {no:"ADT20",cls:"Dump truck (ADT)",d:"KOMATSU HM400-3R ARTICULATED DUMP TRUCK (WD9165E)"},
+ {no:"ADT21",cls:"Dump truck (ADT)",d:"KOMATSU HM400-3R ARTICULATED DUMP TRUCK (WD9177X)"},
+ {no:"ADT22",cls:"Dump truck (ADT)",d:"KOMATSU HM400-3R ARTICULATED DUMP TRUCK (WD9170P)"},
+ {no:"ADT23",cls:"Dump truck (ADT)",d:"KOMATSU HM400-3R ARTICULATED DUMP TRUCK (WD9513J)"},
+ {no:"ADT24",cls:"Dump truck (ADT)",d:"KOMATSU HM400-3R ARTICULATED DUMP TRUCK (WD9526Y)"},
+ {no:"ADT25",cls:"Dump truck (ADT)",d:"KOMATSU HM400-3R ARTICULATED DUMP TRUCK (WD9509Y)"},
+ {no:"ADT26",cls:"Dump truck (ADT)",d:"KOMATSU HM400-3R ARTICULATED DUMP TRUCK (WD9524C)"},
+ {no:"ADT27",cls:"Dump truck (ADT)",d:"KOMATSU HM400-3R ARTICULATED DUMP TRUCK (WD9529P)"},
+ {no:"ADT28",cls:"Dump truck (ADT)",d:"KOMATSU HM400-3R ARTICULATED DUMP TRUCK / W-plate WD950"},
+ {no:"ADT3",cls:"Dump truck (ADT)",d:"KOMATSU HM400-3R ARTICULATED DUMP TRUCK (WD7591X)"},
+ {no:"ADT30",cls:"Dump truck (ADT)",d:"KOMATSU HM400-3R ARTICULATED DUMP TRUCK / W-plate WD952"},
+ {no:"ADT31",cls:"Dump truck (ADT)",d:"KOMATSU HM400-3R ARTICULATED DUMP TRUCK / W-plate WD954"},
+ {no:"ADT32",cls:"Dump truck (ADT)",d:"KOMATSU HM400-3R ARTICULATED DUMP TRUCK / W-plate WD949"},
+ {no:"ADT33",cls:"Dump truck (ADT)",d:"KOMATSU HM400-3R ARTICULATED DUMP TRUCK / W-plate WD953"},
+ {no:"ADT34",cls:"Dump truck (ADT)",d:"KOMATSU HM400-3R ARTICULATED DUMP TRUCK"},
+ {no:"ADT35",cls:"Dump truck (ADT)",d:"KOMATSU HM400-3R ARTICULATED DUMP TRUCK"},
+ {no:"ADT36",cls:"Dump truck (ADT)",d:"KOMATSU HM400-3R ARTICULATED DUMP TRUCK"},
+ {no:"ADT37",cls:"Dump truck (ADT)",d:"KOMATSU HM400-3R ARTICULATED DUMP TRUCK"},
+ {no:"ADT38",cls:"Dump truck (ADT)",d:"KOMATSU HM400-3R ARTICULATED DUMP TRUCK"},
+ {no:"ADT4",cls:"Dump truck (ADT)",d:"KOMATSU HM400-3R ARTICULATED DUMP TRUCK (WD7548Y)"},
+ {no:"ADT40",cls:"Dump truck (ADT)",d:"KOMATSU HM400-3R ARTICULATED DUMP TRUCK"},
+ {no:"ADT41",cls:"Dump truck (ADT)",d:"KOMATSU HM400-3R ARTICULATED DUMP TRUCK"},
+ {no:"ADT5",cls:"Dump truck (ADT)",d:"KOMATSU HM400-3R ARTICULATED DUMP TRUCK (WD7543K)"},
+ {no:"ADT6",cls:"Dump truck (ADT)",d:"KOMATSU HM400-3R ARTICULATED DUMP TRUCK (WD7540T)"},
+ {no:"ADT7",cls:"Dump truck (ADT)",d:"KOMATSU HM400-3R ARTICULATED DUMP TRUCK (WD7566U)"},
+ {no:"ADT8",cls:"Dump truck (ADT)",d:"KOMATSU HM400-3R ARTICULATED DUMP TRUCK (WD7546C)"},
+ {no:"ADT9",cls:"Dump truck (ADT)",d:"MODEL HM400-37 / W-plate WD7494T"},
+ {no:"ATS1",cls:"",d:"ATS: AUTOMATIC TRANSFER SWITCH 125AMP MODEL: CHDG-ATS12"},
+ {no:"ATV1",cls:"",d:"AODES PATHCROSS MUD PRO 1000L"},
+ {no:"ATV2",cls:"",d:"AODES PATHCROSS MUD PRO 1000L"},
+ {no:"BOOMLIFT",cls:"",d:"GENIE Z-45/25 BOOMLIFT"},
+ {no:"C1",cls:"Air compressor",d:"RECIPROCATING AIR COMPRESSOR V-1.0/12 HSS"},
+ {no:"C1-1",cls:"Roller",d:"KANTO H650K HAND GUIDED ROLLER"},
+ {no:"C12",cls:"Crusher/Screener",d:"OKADA HYD CRUSHER MODEL: TS-WB1400V FHR"},
+ {no:"C13",cls:"Crusher/Screener",d:"GUZZILLA SECONDARY CRUSHER MODEL: MC201"},
+ {no:"C5",cls:"Crusher/Screener",d:"TOKU SECONDARY CRUSHER: TM201"},
+ {no:"C6",cls:"Crusher/Screener",d:"TOKU SECONDARY CRUSHER: TM201"},
+ {no:"C8",cls:"Crusher/Screener",d:"TOKU PRIMARY CRUSHER: D211A"},
+ {no:"C9",cls:"Crusher/Screener",d:"TOKU PRIMARY CRUSHER: D351A"},
+ {no:"CNC-T1",cls:"",d:"HORIZONTAL CNC LATHE NEWAY NL636SC"},
+ {no:"DB1",cls:"",d:"DB BOX: 63AMP MCB & 30MA ELCB / MODEL: CHDG-DB2"},
+ {no:"DB2",cls:"",d:"DB BOX: 63AMP MCB & 30MA ELCB / MODEL: CHDG-DB2"},
+ {no:"DB3",cls:"",d:"DB BOX: 63AMP MCB & 30MA ELCB"},
+ {no:"DHP-1",cls:"",d:"HYDRAULIC DOUBLE HEAD PUNCHING MACHINE 20Y-100T"},
+ {no:"DTR101",cls:"",d:"DOLLY TRAILER, BOX 5TONS PAYLOAD LST9400LKX"},
+ {no:"DTR102",cls:"",d:"DOLLY TRAILER, BOX 5TONS PAYLOAD LST9400LKX"},
+ {no:"ECM1",cls:"",d:"FLEXI CONTINUOUS MONITORING SYSTEM"},
+ {no:"ECM2",cls:"",d:"FLEXI CONTINUOUS MONITORING SYSTEM"},
+ {no:"ECM61",cls:"",d:"M60 SILTY WATER TREATMENT SYSTEM 60M3/HR"},
+ {no:"ECM62",cls:"",d:"Model: WITCO M60 ECM Tank (recon unit)"},
+ {no:"ECM63",cls:"",d:"Model: WITCO M60 ECM Tank (recon unit)"},
+ {no:"ECM64",cls:"",d:"Model: WITCO M60 ECM Tank (recon unit)"},
+ {no:"ECM81",cls:"",d:"M80 SILTY WATER TREATMENT SYSTEM 80M3/HR"},
+ {no:"ECM810",cls:"",d:"Model: WITCO M80 ECM Tank (recon unit)"},
+ {no:"ECM811",cls:"",d:"Model: Flexi M80 ECM Tank (recon unit)"},
+ {no:"ECM812",cls:"",d:"Model: WITCO M80 ECM Tank (recon unit)"},
+ {no:"ECM813",cls:"",d:"Model: WITCO M80 ECM Tank (recon unit)"},
+ {no:"ECM814",cls:"",d:"Model: WITCO M80 ECM Tank (recon unit)"},
+ {no:"ECM815",cls:"",d:"Model: Flexi M80 ECM Tank (recon unit)"},
+ {no:"ECM82",cls:"",d:"AWTS 80 ABSOLUTE WASTEWATER TREATMENT SYSTEM 80M3/HOUR"},
+ {no:"ECM83",cls:"",d:"Model: Flexi M80 ECM Tank (recon unit)"},
+ {no:"ECM84",cls:"",d:"Model: Flexi M80 ECM Tank (recon unit)"},
+ {no:"ECM85",cls:"",d:"Model: Flexi M80 ECM Tank (recon unit)"},
+ {no:"ECM86",cls:"",d:"Model: Flexi M80 ECM Tank (recon unit)"},
+ {no:"ECM87",cls:"",d:"Model: WITCO M80 ECM Tank (recon unit)"},
+ {no:"ECM88",cls:"",d:"Model: WITCO M80 ECM Tank (recon unit)"},
+ {no:"EX17-01",cls:"",d:"XCMG XE17U HYDRAULIC EXCAVATOR"},
+ {no:"F1",cls:"Forklift",d:"KOMATSU FD30T-17 DIESEL FORKLIFT"},
+ {no:"F2",cls:"Forklift",d:"KOMATSU FD30T-17 FORKLIFT WD2741M"},
+ {no:"F2 (WD2741M)",cls:"Forklift",d:"KOMATSU FD30T-17TFV4.5M DIESEL FORKLIFT (F2)"},
+ {no:"F3",cls:"Forklift",d:"HYSTER 3.5TON 4W DR FORKLIFT F3.5UT4"},
+ {no:"F3 (WD6126M)",cls:"Forklift",d:"HYSTER F3.5UT4 DIESEL FORKLIFT"},
+ {no:"F4",cls:"Forklift",d:"HYSTER 3TON FORKLIFT H3.0XT"},
+ {no:"F4 (WD6147C)",cls:"Forklift",d:"HYSTER H3.0XT DIESEL FORKLIFT"},
+ {no:"F5",cls:"Forklift",d:"MODEL HYSTER H3.5UT / W-plate WD9614B"},
+ {no:"F5 (WB6911Z)",cls:"Forklift",d:"1995 MODEL FGJ02A30U-2W400 NISSAN FORLIFT (3 TON)"},
+ {no:"F5 (WD9614B)",cls:"Forklift",d:"HYSTER H3.5UT DIESEL FORKLIFT TRUCK"},
+ {no:"F6 (WB6912X)",cls:"Forklift",d:"1997 MODEL WGF03A40U-2W400 NISSAN FORLIFT (4.5 TON)"},
+ {no:"F6 (WD9983K)",cls:"Forklift",d:"HYSTER H7.0UT6 DIESEL FORKLIFT TRUCK"},
+ {no:"F7",cls:"Forklift",d:"HYSTER 5TON FORKLIFT H5.0UTS6"},
+ {no:"F7 (WD7601B)",cls:"Forklift",d:"HYSTER H5.0UTS6 DIESEL FORKLIFT"},
+ {no:"FP1",cls:"",d:"SAMBO SFP150/80 FILTER PRESS MACHINE"},
+ {no:"G005/1703",cls:"Generator/Welder",d:"LED TOWER LIGHT 4 X 1000W ATTACHED WITH GENERATOR (PL4/"},
+ {no:"G005/1706",cls:"Generator/Welder",d:"LED TOWER LIGHT 4 X 1000W ATTACHED WITH GENERATOR (PL4/"},
+ {no:"G005/1710",cls:"Generator/Welder",d:"LED TOWER LIGHT 4 X 1000W ATTACHED WITH GENERATOR (PL4/"},
+ {no:"G075/0124",cls:"Generator/Welder",d:"GENERATOR CH-GEN CHDG75SPD"},
+ {no:"G1",cls:"Generator/Welder",d:"GENERATOR: DENYO CA-25SPI"},
+ {no:"G10",cls:"Generator/Welder",d:"GENERATOR: DENYO DLW-400ESW"},
+ {no:"G11",cls:"Generator/Welder",d:"GENERATOR: KAMA KDE6500TN"},
+ {no:"G12",cls:"Generator/Welder",d:"GENERATOR: KAMA KDE6500TN"},
+ {no:"G13",cls:"Generator/Welder",d:"GENERATOR: 45KVA CHDG45SPI (S)"},
+ {no:"G14",cls:"Generator/Welder",d:"GENERATOR: 45KVA CHDG45SPI (S)"},
+ {no:"G15",cls:"Generator/Welder",d:"GENERATOR: 45KVA CHDG45SPI (S)"},
+ {no:"G16",cls:"Generator/Welder",d:"GENERATOR: 45KVA CHDG45SPI (S)"},
+ {no:"G17",cls:"Generator/Welder",d:"GENERATOR: KDE11000TF DENKO GENSET"},
+ {no:"G18",cls:"Generator/Welder",d:"GENERATOR: 45KVA CHDG45SPI (S)"},
+ {no:"G19",cls:"Generator/Welder",d:"GENERATOR \u2013 KDE6500TF DENKO GENSET"},
+ {no:"G2",cls:"Generator/Welder",d:"GENERATOR: NIPPON NES25SI-2"},
+ {no:"G20",cls:"Generator/Welder",d:"GENERATOR: KDE11000TF DENKO GENSET"},
+ {no:"G21",cls:"Generator/Welder",d:"GENERATOR: KDE11000TF DENKO GENSET"},
+ {no:"G22",cls:"Generator/Welder",d:"GENERATOR \u2013 KDE6500TF DENKO GENSET"},
+ {no:"G23",cls:"Generator/Welder",d:"GENERATOR \u2013 KDE6500TF DENKO GENSET"},
+ {no:"G23B",cls:"Generator/Welder",d:"GENERATOR \u2013 KDE9600TF DENKO GENSET"},
+ {no:"G24",cls:"Generator/Welder",d:"GENERATOR \u2013 KDE6500TF DENKO GENSET"},
+ {no:"G25",cls:"Generator/Welder",d:"GENERATOR: KDE11000TF DENKO GENSET"},
+ {no:"G25B",cls:"Generator/Welder",d:"GENERATOR \u2013 KDE9600TF DENKO GENSET"},
+ {no:"G26",cls:"Generator/Welder",d:"GENERATOR: KDE11000TF DENKO GENSET"},
+ {no:"G27",cls:"Generator/Welder",d:"GENERATOR \u2013 KDE9600TF DENKO GENSET"},
+ {no:"G28",cls:"Generator/Welder",d:"GENERATOR: KDE6500TF DENKO GENSET"},
+ {no:"G29",cls:"Generator/Welder",d:"GENERATOR: KDE6500TF DENKO GENSET"},
+ {no:"G3",cls:"Generator/Welder",d:"GENERATOR: DENYO ES-25ESI"},
+ {no:"G30",cls:"Generator/Welder",d:"GENERATOR: KDE6500TF DENKO GENSET"},
+ {no:"G31",cls:"Generator/Welder",d:"GENERATOR: KDE6500TF DENKO GENSET"},
+ {no:"G32",cls:"Generator/Welder",d:"GENERATOR: KDE9600TF DENKO GENSET"},
+ {no:"G33",cls:"Generator/Welder",d:"GENERATOR NEW POWER CHDG-45SPI"},
+ {no:"G34",cls:"Generator/Welder",d:"GENERATOR NEW POWER CHDG-45SPI"},
+ {no:"G35",cls:"Generator/Welder",d:"GENERATOR NEW POWER CHDG-45SPI"},
+ {no:"G36",cls:"Generator/Welder",d:"GENERATOR NEW POWER CHDG-45SPI"},
+ {no:"G37",cls:"Generator/Welder",d:"GENERATOR NEW POWER CHDG-45SPI"},
+ {no:"G38",cls:"Generator/Welder",d:"GENSET GENERATOR NLG20ESW"},
+ {no:"G39",cls:"Generator/Welder",d:"GENSET GENERATOR NLG20ESW"},
+ {no:"G4",cls:"Generator/Welder",d:"GENERATOR: DENYO DCA-45SPH"},
+ {no:"G40",cls:"Generator/Welder",d:"GENSET GENERATOR NLG45ESW"},
+ {no:"G41",cls:"Generator/Welder",d:"GENSET GENERATOR NLG45ESW"},
+ {no:"G42",cls:"Generator/Welder",d:"GENSET GENERATOR NLG45ESW"},
+ {no:"G43",cls:"Generator/Welder",d:"GENSET GENERATOR NLG45ESW"},
+ {no:"G44",cls:"Generator/Welder",d:"GENSET GENERATOR NLG20ESW"},
+ {no:"G45",cls:"Generator/Welder",d:"GENSET GENERATOR NLG20ESW"},
+ {no:"G46",cls:"Generator/Welder",d:"GENSET GENERATOR NLG20ESW"},
+ {no:"G47",cls:"Generator/Welder",d:"GENERATOR NEW POWER CHDG-45SPI"},
+ {no:"G48",cls:"Generator/Welder",d:"GENERATOR NEW POWER CHDG-45SPI"},
+ {no:"G5",cls:"Generator/Welder",d:"GENERATOR: DENYO DCA-25ESK-DA"},
+ {no:"G50",cls:"Generator/Welder",d:"GENERATOR NEW POWER CHDG-45SPI"},
+ {no:"G51",cls:"Generator/Welder",d:"GENERATOR NEW POWER CHDG-45SPI"},
+ {no:"G52",cls:"Generator/Welder",d:"GENERATOR NEW POWER CHDG-45SPI"},
+ {no:"G53",cls:"Generator/Welder",d:"GENERATOR NEW POWER CHDG-45SPI"},
+ {no:"G54",cls:"Generator/Welder",d:"GENERATOR NEW POWER CHDG-45SPI"},
+ {no:"G55",cls:"Generator/Welder",d:"GENERATOR NEW POWER CHDG-45SPI"},
+ {no:"G56",cls:"Generator/Welder",d:"GENERATOR NEW POWER CHDG-45SPI"},
+ {no:"G57",cls:"Generator/Welder",d:"GENERATOR NEW POWER CHDG-45SPI"},
+ {no:"G58",cls:"Generator/Welder",d:"GENERATOR NEW POWER CHDG-45SPI"},
+ {no:"G6",cls:"Generator/Welder",d:"GENERATOR: DENYO DCA-25ESK-DA"},
+ {no:"G60",cls:"Generator/Welder",d:"GENERATOR NEW POWER CHDG-45SPI"},
+ {no:"G61",cls:"Generator/Welder",d:"GENERATOR NEW POWER CHDG-45SPI"},
+ {no:"G7",cls:"Generator/Welder",d:"GENERATOR: AIRMAN SDG25AS"},
+ {no:"G8",cls:"Generator/Welder",d:"GENERATOR: NIPPON NES25SN"},
+ {no:"G9",cls:"Generator/Welder",d:"GENERATOR: DENYO 220KVA"},
+ {no:"H1",cls:"Generator/Welder",d:"GENERATOR: DENYO DCA-125SPM"},
+ {no:"H2",cls:"Generator/Welder",d:"GENERATOR: DENYO DCA-125SPK3"},
+ {no:"H3",cls:"Generator/Welder",d:"GENERATOR: AIRMAN SDG25AS"},
+ {no:"H4",cls:"Air compressor",d:"MONSTERAIR 5.5HP 12BAR 180L 2 STAGE AIR COMPRESSOR"},
+ {no:"IRW-1",cls:"",d:"HYDRAULIC IRONWORKER Q35Y-20"},
+ {no:"L-1",cls:"Wheel loader",d:"CATERPILLAR 966G WHEEL LOADER"},
+ {no:"L-2",cls:"Wheel loader",d:"CATERPILLAR 966G WHEEL LOADER"},
+ {no:"L-3",cls:"Wheel loader",d:"CATERPILLAR 972G WHEEL LOADER"},
+ {no:"L-4",cls:"Wheel loader",d:"CATERPILLAR 972G WHEEL LOADER"},
+ {no:"L-5",cls:"Wheel loader",d:"CATERPILLAR 972G WHEEL LOADER"},
+ {no:"L-6",cls:"Wheel loader",d:"CATERPILLAR 972G WHEEL LOADER"},
+ {no:"M1",cls:"",d:"WELLON GAP BED LATHE CQ6280C/300"},
+ {no:"M141",cls:"Exc 14t",d:"KOMATSU PC138US-8 HYDRAULIC EXCAVATOR"},
+ {no:"M142",cls:"Exc 14t",d:"KOMATSU PC138US-8 HYDRAULIC EXCAVATOR"},
+ {no:"M143",cls:"Exc 14t",d:"KOMATSU PC138US-8 HYDRAULIC EXCAVATOR"},
+ {no:"M144",cls:"Exc 14t",d:"KOMATSU PC138US-8 HYDRAULIC EXCAVATOR"},
+ {no:"M145",cls:"Exc 14t",d:"KOMATSU PC138US-8 HYDRAULIC EXCAVATOR"},
+ {no:"M2",cls:"",d:"WELLON UNIVERSAL MILLING MACHINE UM1680"},
+ {no:"M2-1",cls:"",d:"KATO HD18VX HYDRAULIC EXCAVATOR"},
+ {no:"M2-2",cls:"",d:"KATO HD18VX HYDRAULIC EXCAVATOR"},
+ {no:"M201",cls:"Exc 20t",d:"KOMATSU PC210-10M0 HYDRAULIC EXCAVATOR"},
+ {no:"M202",cls:"Exc 20t",d:"KATO HD820-R5 HYDRAULIC EXCAVATOR"},
+ {no:"M203",cls:"Exc 20t",d:"KATO HD820-R5 HYDRAULIC EXCAVATOR"},
+ {no:"M204",cls:"Exc 20t",d:"KATO HD820-R5 HYDRAULIC EXCAVATOR"},
+ {no:"M205",cls:"Exc 20t",d:"KATO HD820-R5 HYDRAULIC EXCAVATOR"},
+ {no:"M3",cls:"",d:"WELLON RADIAL DRILLING MACHINE Z3050X16"},
+ {no:"M3-1",cls:"",d:"KATO HD25V5 HYDRAULIC EXCAVATOR"},
+ {no:"M4-1",cls:"Mini 5.5t",d:"KATO HD37V5 HYDRAULIC EXCAVATOR"},
+ {no:"M4-10",cls:"Mini 5.5t",d:"KATO HD37V5 HYDRAULIC EXCAVATOR"},
+ {no:"M4-11",cls:"Mini 5.5t",d:"KATO HD37V5 HYDRAULIC EXCAVATOR"},
+ {no:"M4-12",cls:"Mini 5.5t",d:"KATO HD37V5 HYDRAULIC EXCAVATOR"},
+ {no:"M4-2",cls:"Mini 5.5t",d:"KATO HD37V5 HYDRAULIC EXCAVATOR"},
+ {no:"M4-3",cls:"Mini 5.5t",d:"KATO HD37V5 HYDRAULIC EXCAVATOR"},
+ {no:"M4-4",cls:"Mini 5.5t",d:"KATO HD37V5 HYDRAULIC EXCAVATOR"},
+ {no:"M4-5",cls:"Mini 5.5t",d:"KATO HD37V5 HYDRAULIC EXCAVATOR"},
+ {no:"M4-6",cls:"Mini 5.5t",d:"KATO HD37V5 HYDRAULIC EXCAVATOR"},
+ {no:"M4-7",cls:"Mini 5.5t",d:"KATO HD37V5 HYDRAULIC EXCAVATOR"},
+ {no:"M4-8",cls:"Mini 5.5t",d:"KATO HD37V5 HYDRAULIC EXCAVATOR"},
+ {no:"M4-9",cls:"Mini 5.5t",d:"KATO HD37V5 HYDRAULIC EXCAVATOR"},
+ {no:"M5-1",cls:"Mini 5.5t",d:"KUBOTA U55-6 HYDRAULIC EXCAVATOR"},
+ {no:"M6-1",cls:"Mini 5.5t",d:"KATO HD60V5 HYDRAULIC EXCAVATOR"},
+ {no:"M6-10",cls:"Mini 5.5t",d:"KATO HD60V5 HYDRAULIC EXCAVATOR"},
+ {no:"M6-11",cls:"Mini 5.5t",d:"KATO HD60V5 HYDRAULIC EXCAVATOR"},
+ {no:"M6-12",cls:"Mini 5.5t",d:"KATO HD60V5 HYDRAULIC EXCAVATOR"},
+ {no:"M6-13",cls:"Mini 5.5t",d:"KATO HD60V5 HYDRAULIC EXCAVATOR"},
+ {no:"M6-14",cls:"Mini 5.5t",d:"KATO HD60V5 HYDRAULIC EXCAVATOR"},
+ {no:"M6-15",cls:"Mini 5.5t",d:"KATO HD60V5 HYDRAULIC EXCAVATOR"},
+ {no:"M6-16",cls:"Mini 5.5t",d:"KATO HD60V5 HYDRAULIC EXCAVATOR"},
+ {no:"M6-2",cls:"Mini 5.5t",d:"KATO HD60V5 HYDRAULIC EXCAVATOR"},
+ {no:"M6-3",cls:"Mini 5.5t",d:"KATO HD60V5 HYDRAULIC EXCAVATOR"},
+ {no:"M6-4",cls:"Mini 5.5t",d:"KATO HD60V5 HYDRAULIC EXCAVATOR"},
+ {no:"M6-5",cls:"Mini 5.5t",d:"KATO HD60V5 HYDRAULIC EXCAVATOR"},
+ {no:"M6-6",cls:"Mini 5.5t",d:"KATO HD60V5 HYDRAULIC EXCAVATOR"},
+ {no:"M6-7",cls:"Mini 5.5t",d:"KATO HD60V5 HYDRAULIC EXCAVATOR"},
+ {no:"M6-8",cls:"Mini 5.5t",d:"KATO HD60V5 HYDRAULIC EXCAVATOR"},
+ {no:"M6-9",cls:"Mini 5.5t",d:"KATO HD60V5 HYDRAULIC EXCAVATOR"},
+ {no:"ORV1",cls:"",d:"ISUZU EURO 5 PICK-UP TFS85JSR(A)"},
+ {no:"ORV10",cls:"Tipper",d:"SCANIA P340CB6X4MHZ, TIPPER"},
+ {no:"ORV101",cls:"",d:"ISUZU EURO 5 PICK-UP TFS85JSR(A)"},
+ {no:"ORV102",cls:"",d:"FOTON TUNLAND G7 PICKUP TRUCK"},
+ {no:"ORV103",cls:"",d:"FOTON TUNLAND G7 PICKUP TRUCK"},
+ {no:"ORV104",cls:"",d:"FOTON TUNLAND G7 PICKUP TRUCK"},
+ {no:"ORV105",cls:"",d:"FOTON TUNLAND G9 DOUBLE CAB PICKUP TRUCK"},
+ {no:"ORV106",cls:"",d:"FOTON TUNLAND G9 DOUBLE CAB PICKUP TRUCK"},
+ {no:"ORV107",cls:"",d:"FOTON TUNLAND G9 DOUBLE CAB PICKUP TRUCK"},
+ {no:"ORV108",cls:"",d:"FOTON TUNLAND G9 DOUBLE CAB PICKUP TRUCK"},
+ {no:"ORV11",cls:"Tipper",d:"SCANIA P340CB6X4MHZ, TIPPER"},
+ {no:"ORV110",cls:"",d:"FOTON TUNLAND G9 DOUBLE CAB PICKUP TRUCK"},
+ {no:"ORV111",cls:"",d:"FOTON TUNLAND G9 DOUBLE CAB PICKUP TRUCK"},
+ {no:"ORV112",cls:"",d:"FOTON TUNLAND G9 DOUBLE CAB PICKUP TRUCK"},
+ {no:"ORV113",cls:"",d:"FOTON TUNLAND G9 DOUBLE CAB PICKUP TRUCK"},
+ {no:"ORV12",cls:"Tipper",d:"SCANIA P340CB6X4MHZ, TIPPER"},
+ {no:"ORV13",cls:"Tipper",d:"SCANIA P340CB6X4MHZ, TIPPER"},
+ {no:"ORV14",cls:"",d:"LAND ROVER DEFENDER 90"},
+ {no:"ORV2",cls:"",d:"ISUZU PICK-UP TFS69H29(T)"},
+ {no:"ORV201",cls:"",d:"ISUZU 10FT NHR69EU3ES"},
+ {no:"ORV202",cls:"",d:"ISUZU NHR69E LORRY"},
+ {no:"ORV3",cls:"",d:"ISUZU 10FT NHR69EU3ES"},
+ {no:"ORV301",cls:"",d:"NISSAN 14FT YU41H4 LORRY WOODEN BODY"},
+ {no:"ORV302",cls:"",d:"MISUBISHI CANTER 14FT FE83BE6SRDEA"},
+ {no:"ORV303",cls:"",d:"MISUBISHI CANTER 14FT FEB71GR4SDED"},
+ {no:"ORV304",cls:"",d:"DONGFENG CARGO TRUCK EQ1060TZ20D3"},
+ {no:"ORV305",cls:"",d:"DONGFENG CARGO TRUCK EQ1060TZ20D3"},
+ {no:"ORV306",cls:"",d:"DONGFENG CARGO TRUCK EQ1060TZ20D3"},
+ {no:"ORV307",cls:"",d:"DONGFENG CARGO TRUCK ISUZU QL1043FMHW"},
+ {no:"ORV308",cls:"",d:"DONGFENG CARGO TRUCK ISUZU QL1043FMHW"},
+ {no:"ORV4",cls:"",d:"NISSAN 14FT YU41H4"},
+ {no:"ORV401",cls:"",d:"SCANIA P340CB6X4MHZ, HOOKLIFT"},
+ {no:"ORV5",cls:"",d:"MITSUBISHI FUSO FV519J (HOOKLIFT)"},
+ {no:"ORV501",cls:"Water truck",d:"ISUZU CXZ50K WATER TANKER"},
+ {no:"ORV502",cls:"Water truck",d:"SCANIA P380CB6X4MHZ, WATER TANKER"},
+ {no:"ORV503",cls:"Water truck",d:"SCANIA P380CB6X4MHZ, WATER TANKER"},
+ {no:"ORV504",cls:"Water truck",d:"SCANIA P380CB6X4MHZ, WATER TANKER"},
+ {no:"ORV505",cls:"Water truck",d:"SCANIA P380CB6X4MHZ, WATER TANKER"},
+ {no:"ORV6",cls:"Water truck",d:"ISUZU CXZ50K WATER TANKER"},
+ {no:"ORV601",cls:"Tipper",d:"SCANIA P340CB6X4MHZ, TIPPER"},
+ {no:"ORV602",cls:"Tipper",d:"SCANIA P340CB6X4MHZ, TIPPER"},
+ {no:"ORV603",cls:"Tipper",d:"SCANIA P340CB6X4MHZ, TIPPER"},
+ {no:"ORV604",cls:"Tipper",d:"SCANIA P340CB6X4MHZ, TIPPER"},
+ {no:"ORV605",cls:"Tipper",d:"SCANIA P340CB6X4MHZ, TIPPER"},
+ {no:"ORV606",cls:"Tipper",d:"SCANIA P340CB6X4MHZ, TIPPER"},
+ {no:"ORV607",cls:"Tipper",d:"SCANIA P340CB6X4MHZ, TIPPER"},
+ {no:"ORV7",cls:"Tipper",d:"SCANIA P340CB6X4MHZ, TIPPER"},
+ {no:"ORV8",cls:"Tipper",d:"SCANIA P340CB6X4MHZ, TIPPER"},
+ {no:"ORV801",cls:"",d:"LAND ROVER DEFENDER 90"},
+ {no:"ORV802",cls:"",d:"LAND ROVER DEFENDER 110"},
+ {no:"ORV803",cls:"",d:"LAND ROVER DEFENDER 90"},
+ {no:"ORV804",cls:"",d:"LAND ROVER DEFENDER 90"},
+ {no:"ORV805",cls:"",d:"LAND ROVER DEFENDER 90"},
+ {no:"ORV806",cls:"",d:"LAND ROVER DEFENDER 90"},
+ {no:"ORV9",cls:"Tipper",d:"SCANIA P340CB6X4MHZ, TIPPER"},
+ {no:"P01",cls:"Crusher/Screener",d:"POWERSCREEN MAXTRAK 1300 MOBILE CONE CRUSHER C/W ACCESS"},
+ {no:"P02",cls:"Crusher/Screener",d:"POWERSCREEN CHIEFTAIN 2100X 3 DECK CRAWLER"},
+ {no:"P03",cls:"Crusher/Screener",d:"POWERSCREEN WARRIOR 2400"},
+ {no:"P1",cls:"Crusher/Screener",d:"POWERSCREEN MAXTRAK 1300 MOBILE CONE CRUSHER C/W ACCESS"},
+ {no:"P2",cls:"Crusher/Screener",d:"POWERSCREEN CHIEFTAIN 2100 SCREENER"},
+ {no:"P3",cls:"Crusher/Screener",d:"POWERSCREEN WARRIOR WR2400"},
+ {no:"PBM-20",cls:"",d:"CHINA HYDRAULIC 4-ROLL BENDING MACHINE"},
+ {no:"PC01",cls:"Mini 5.5t",d:"KOMATSU PC01-1A MINI HYDRAULIC EXCAVATOR"},
+ {no:"R1",cls:"",d:"TR G75 170F"},
+ {no:"R1-1",cls:"Roller",d:"KANTO H650K HAND GUIDED ROLLER"},
+ {no:"R10",cls:"",d:"Surface Finishing Screed MCD"},
+ {no:"R100",cls:"",d:"MAKITA DUB184 CORDLESS BLOWER 18V"},
+ {no:"R101",cls:"",d:"DIAMOND REBAR CUTTER HANDHELD DC-16W 16MM 230V"},
+ {no:"R102",cls:"Crusher/Screener",d:"MAKITA M9000B ELECTRICAL ANGLE GRINDER 7\u201d 230V"},
+ {no:"R103",cls:"",d:"MAKITA 5806B ELECTRICAL CIRCULAR SAW 185MM 110V"},
+ {no:"R104",cls:"",d:"MAKITA 5806B ELECTRICAL CIRCULAR SAW 185MM 110V"},
+ {no:"R105",cls:"Compactor",d:"DIESEL PLATE COMPACTOR HSD90"},
+ {no:"R106",cls:"Compactor",d:"DIESEL PLATE COMPACTOR HSD90"},
+ {no:"R107",cls:"Compactor",d:"DIESEL PLATE COMPACTOR HSD90"},
+ {no:"R108",cls:"Compactor",d:"DIESEL PLATE COMPACTOR HSD90"},
+ {no:"R109",cls:"Compactor",d:"DIESEL PLATE COMPACTOR HSD90"},
+ {no:"R11",cls:"",d:"Surface Finishing Screed MCD"},
+ {no:"R110",cls:"",d:"CONCRETE VIBRATOR ENGINE 45MM"},
+ {no:"R111",cls:"",d:"CONCRETE VIBRATOR ENGINE 45MM"},
+ {no:"R112",cls:"",d:"TRANSFORMER 3.3KVA 110V"},
+ {no:"R113",cls:"",d:"TRANSFORMER 3.3KVA 110V"},
+ {no:"R114",cls:"",d:"MAKITA HR2470 ELECTRICAL COMBINATION HAMMER SDS 24MM 11"},
+ {no:"R115",cls:"",d:"MAKITA HR2470 ELECTRICAL COMBINATION HAMMER SDS 24MM 11"},
+ {no:"R116",cls:"",d:"MAKITA M2401B ELECTRICAL PORTABLE CUT-OFF 14\u201d 230V"},
+ {no:"R117",cls:"Crusher/Screener",d:"BOSCH GWS 060 ELECTRICAL PROFESSIONAL ANGLE GRINDER 100"},
+ {no:"R118",cls:"Crusher/Screener",d:"BOSCH GWS 060 ELECTRICAL PROFESSIONAL ANGLE GRINDER 100"},
+ {no:"R119",cls:"",d:"MAKITA HR2230 ELECTRICAL ROTARY HAMMER 22MM 110V"},
+ {no:"R12",cls:"",d:"Diesel/Gasoline/Electric Road Cutter Type 500"},
+ {no:"R121",cls:"Crusher/Screener",d:"BOSCH GWS 060 ELECTRICAL PROFESSIONAL ANGLE GRINDER 100"},
+ {no:"R123",cls:"Crusher/Screener",d:"BOSCH GWS 6-100 ELECTRICAL ANGLE GRINDER, 110V 100MM"},
+ {no:"R124",cls:"",d:"DEVON BATTERY ROTARY HAMMER 18MM SDS 5403-Li-20 20V"},
+ {no:"R125",cls:"Crusher/Screener",d:"MAKITA 9556HP ELECTRICAL ANGLE GRINDER 100MM 110V"},
+ {no:"R126",cls:"",d:"MAKITA M5801 ELECTRICAL CIRCULAR SAW 185MM 230V"},
+ {no:"R127",cls:"",d:"CONCRETE VIBRATION ENGINE 45MM"},
+ {no:"R128",cls:"",d:"MAKITA LW1401 ELECTRICAL PORTABLE CUT-OFF MACHINE 14\u201d 1"},
+ {no:"R129",cls:"",d:"TRANSFORMER 3.3KVA 110V"},
+ {no:"R13",cls:"Compactor",d:"HANSHIDA FPC-220 VIBRATORY COMPACTOR"},
+ {no:"R130",cls:"",d:"TRANSFORMER 5.0KVA 110V"},
+ {no:"R131",cls:"Crusher/Screener",d:"MAKITA 9556HP ELECTRICAL ANGLE GRINDER 100MM 110V"},
+ {no:"R132",cls:"",d:"MAKITA HR4501C ELECTRICAL ROTARY HAMMER 230V 45MM MAX"},
+ {no:"R133",cls:"",d:"DONG CHENG DZG6S ZIG-FF-5S DEMOLITION HAMMER 230V"},
+ {no:"R134",cls:"Crusher/Screener",d:"BOSCH GWS 060 ELECTRICAL PROFESSIONAL ANGLE GRINDER 100"},
+ {no:"R135",cls:"",d:"HIKOKI H41SST DEMOLITION HAMMER 230V"},
+ {no:"R136",cls:"",d:"BOSCH GSH 500 DEMOLITION HAMMER"},
+ {no:"R137",cls:"",d:"BOSCH GBH 2-26 RE ELECTRICAL PROFESSIONAL ROTARY HAMMER"},
+ {no:"R138",cls:"Crusher/Screener",d:"BOSCH GWS 060 ELECTRICAL PROFESSIONAL ANGLE GRINDER 100"},
+ {no:"R139",cls:"",d:"TRANSFORMER 3.3KVA 110V"},
+ {no:"R14",cls:"Compactor",d:"GEI TR G75 170F RAMMER AIR COOLED 4 STROKE DIESEL ENGIN"},
+ {no:"R140",cls:"",d:"DEVON ELECTRICAL CIRCULAR SAW 165MM 20V"},
+ {no:"R141",cls:"",d:"MAKITA 5806B ELECTRICAL CIRCULAR SAW 185MM 110V"},
+ {no:"R143",cls:"",d:"GEI PT G100 170F DIESEL POWER TROWEL"},
+ {no:"R144",cls:"",d:"MAKITA HR2470 ELECTRICAL COMBINATION HAMMER SDS 24MM 11"},
+ {no:"R145",cls:"Crusher/Screener",d:"BOSCH GWS 700 ELECTRICAL ANGLE GRINDER 4\u201d 230V"},
+ {no:"R146",cls:"",d:"MAKITA M2401B ELECTRICAL PORTABLE CUT-OFF 14\u201d 230V"},
+ {no:"R147",cls:"",d:"MAKITA M2401B ELECTRICAL PORTABLE CUT-OFF 14\u201d 230V"},
+ {no:"R148",cls:"",d:"MAKITA HR2470X5 ELECTRICAL COMBINATION HAMMER SDS 24MM "},
+ {no:"R149",cls:"",d:"MAKITA HR2470X5 ELECTRICAL COMBINATION HAMMER SDS 24MM "},
+ {no:"R15",cls:"",d:"CUTTER ZS1115"},
+ {no:"R150",cls:"",d:"MAKITA HR2470X5 ELECTRICAL COMBINATION HAMMER SDS 24MM "},
+ {no:"R151",cls:"Crusher/Screener",d:"MAKITA 9556HP/BX ELECTRICAL ANGLE GRINDER 100MM 230V"},
+ {no:"R152",cls:"",d:"MAKITA HR2470X5 ELECTRICAL COMBINATION HAMMER SDS 24MM "},
+ {no:"R154",cls:"",d:"HIKOKI H41SST DEMOLITION HAMMER 230V"},
+ {no:"R155",cls:"Crusher/Screener",d:"MAKITA DGA413 BATTERY CORDLESS ANGLE GRINDER 100MM 18V"},
+ {no:"R156",cls:"",d:"DONG CHENG DZG6S ZIG-FF-6S DEMOLITION HAMMER 230V"},
+ {no:"R157",cls:"Crusher/Screener",d:"MAKITA 9556HP ELECTRICAL ANGLE GRINDER 100MM 110V"},
+ {no:"R158",cls:"",d:"MAKITA HR2470 ELECTRICAL COMBINATION HAMMER SDS 24MM 23"},
+ {no:"R159",cls:"",d:"MAKITA 5806B ELECTRICAL CIRCULAR SAW 185MM 230V"},
+ {no:"R16",cls:"",d:"VIBRATORY SCREED GX35T"},
+ {no:"R160",cls:"",d:"MAKITA HR2470 ELECTRICAL COMBINATION HAMMER SDS 24MM 11"},
+ {no:"R161",cls:"Crusher/Screener",d:"DONG CHENG DCSM03-100 4\u201d CORDLESS ANGLE GRINDER 100MM 2"},
+ {no:"R162",cls:"",d:"MAKITA HM0810TA HEX SHANK DEMOLITION HAMMER 110V"},
+ {no:"R163",cls:"",d:"MAKITA 5806B ELECTRICAL CIRCULAR SAW 185MM 230V"},
+ {no:"R164",cls:"Crusher/Screener",d:"MAKITA DGA408 BATTERY CORDLESS ANGLE GRINDER 100MM 18V"},
+ {no:"R165",cls:"",d:"DONG CHENG DZG6S ZIG-FF-6S DEMOLITION HAMMER 230V"},
+ {no:"R166",cls:"",d:"MAKITA HR2470 ELECTRICAL COMBINATION HAMMER SDS 24MM 23"},
+ {no:"R167",cls:"Crusher/Screener",d:"MAKITA 9556HP ELECTRICAL ANGLE GRINDER 100MM 230V"},
+ {no:"R18",cls:"",d:"VIBRATORY SCREED GX35T"},
+ {no:"R19",cls:"Compactor",d:"VIBRATORY RAMMER HCR125"},
+ {no:"R2",cls:"",d:"Vibroplate DPU 655He"},
+ {no:"R20",cls:"Compactor",d:"GEI TR G75 170F RAMMER AIR COOLED 4 STROKE DIESEL ENGIN"},
+ {no:"R21",cls:"Compactor",d:"KASAMA DIESEL TAMPING RAMMER RGM75 170F"},
+ {no:"R22",cls:"Compactor",d:"KASAMA DIESEL TAMPING RAMMER RGM75 170F"},
+ {no:"R23",cls:"",d:"VIBRATORY PLATE FPC-220"},
+ {no:"R24",cls:"",d:"VIBRATORY PLATE FPC-220"},
+ {no:"R25",cls:"",d:"MAKITA HR2470 ELECTRICAL COMBINATION HAMMER SDS 24MM 11"},
+ {no:"R26",cls:"",d:"CONCRETE CUTTER TYPE 500"},
+ {no:"R27",cls:"",d:"POWER TROWEL"},
+ {no:"R3",cls:"",d:"DIESEL CONCRETE CUTTER CC-500(E)"},
+ {no:"R30",cls:"",d:"VIBRATORY PLATE KPC80"},
+ {no:"R31",cls:"Compactor",d:"DIESEL PLATE COMPACTOR CP G90"},
+ {no:"R32",cls:"Compactor",d:"PLATE COMPACTOR CP G90"},
+ {no:"R33",cls:"Compactor",d:"VIBRATORY PLATE COMPACTOR KPC80"},
+ {no:"R35",cls:"",d:"WALL CUTTING MACHINE GX800"},
+ {no:"R36",cls:"",d:"DOUBLE DISC POWER TROWEL HSD90"},
+ {no:"R37",cls:"",d:"COLPAVE SPRAY MACHINE 40L"},
+ {no:"R38",cls:"",d:"DIESEL CONCRETE CUTTER CC-500(E)"},
+ {no:"R39",cls:"",d:"DIESEL CONCRETE CUTTER FSG405"},
+ {no:"R4",cls:"",d:"CONCRETE CUTTER CNQ16"},
+ {no:"R40",cls:"",d:"DIESEL CONCRETE CUTTER HSD500"},
+ {no:"R41",cls:"",d:"DIESEL CONCRETE CUTTER HSD500"},
+ {no:"R42",cls:"",d:"DIESEL CONCRETE CUTTER CC-500(E)"},
+ {no:"R43",cls:"Compactor",d:"DIESEL PLATE COMPACTOR 90T"},
+ {no:"R44",cls:"Compactor",d:"DIESEL PLATE COMPACTOR 90T"},
+ {no:"R45",cls:"Compactor",d:"DIESEL PLATE COMPACTOR 90T"},
+ {no:"R46",cls:"Compactor",d:"DIESEL PLATE COMPACTOR 90T"},
+ {no:"R47",cls:"Compactor",d:"DIESEL PLATE COMPACTOR 90T"},
+ {no:"R48",cls:"",d:"DONGCHENG ELECTRICAL HAND BREAKER Z1G-FF-6 110V"},
+ {no:"R49",cls:"",d:"MAKITA ELECTRICAL HAND BREAKER HM0810TA 110V"},
+ {no:"R5",cls:"Compactor",d:"RAMMER TR G75 170F"},
+ {no:"R50",cls:"",d:"KASEI LEAF BLOWER EB-260 PETROL"},
+ {no:"R51",cls:"",d:"KASEI LEAF BLOWER EB-260 PETROL"},
+ {no:"R52",cls:"",d:"MAKITA HR4003C ROTARY HAMMER, 240V 40MM MAX"},
+ {no:"R53",cls:"",d:"MAKITA HR4003C ROTARY HAMMER, 240V 40MM MAX"},
+ {no:"R54",cls:"",d:"DONGCHENG DCMY165 BATTERY CORDLESS BRUSHLESS MOTOR CIRC"},
+ {no:"R55",cls:"",d:"REBAR CUTTER HANDHELD NRC-20 20MM MAX 220V"},
+ {no:"R56",cls:"",d:"ELECTRO-HYDRAULIC REBAR STRAIGHTENER HANDHELD HBB-32 13"},
+ {no:"R57",cls:"",d:"REBAR CUTTER HANDHELD NRC-20 20MM MAX 220V"},
+ {no:"R58",cls:"",d:"REBAR CUTTER HANDHELD NRC-20 20MM MAX 220V"},
+ {no:"R59",cls:"",d:"REBAR CUTTER HANDHELD NRC-20 20MM MAX 220V"},
+ {no:"R6",cls:"Compactor",d:"PLATE COMPACTOR CNP15"},
+ {no:"R60",cls:"",d:"REBAR CUTTER HANDHELD NRC-20 20MM MAX 220V"},
+ {no:"R61",cls:"",d:"REBAR CUTTER HANDHELD NRC-20 20MM MAX 220V"},
+ {no:"R65",cls:"",d:"TIEDAO 91235A ELECTRICAL CIRCULAR SAW 235MM 220V"},
+ {no:"R66",cls:"Crusher/Screener",d:"BOSCH GWS 6-100 ELECTRICAL ANGLE GRINDER 110V 100MM"},
+ {no:"R68",cls:"",d:"WENZHOU JIETUO REBAR BENDER HANDHELD 16-33M HRB-32"},
+ {no:"R69",cls:"",d:"WENZHOU JIETOU REBAR CUTTER HANDHELD 4-32MM RC-32"},
+ {no:"R7",cls:"",d:"CONCRETE CUTTER"},
+ {no:"R70",cls:"",d:"TTR DEMOLITION HAMMER T-735"},
+ {no:"R72",cls:"",d:"MAKITA HR4003C ELECTRICAL ROTARY HAMMER 240V 40MM MAX"},
+ {no:"R73",cls:"",d:"DONGCHENG ELECTRIAL HAND BREAKER Z1G-FF-6,110V"},
+ {no:"R74",cls:"",d:"DONGCHENG ELECTRIAL HAND BREAKER AZG6,110V"},
+ {no:"R75",cls:"",d:"DONGCHENG ELECTRIAL HAND BREAKER AZG6,110V"},
+ {no:"R77",cls:"",d:"MAKITA BATTERY ROTARY HAMMER DRILL 26MM SDS+ DHR263 36V"},
+ {no:"R78",cls:"",d:"DONGCHENG ELECTRIAL HAND BREAKER AZG6,110V"},
+ {no:"R79",cls:"",d:"DONGCHENG ELECTRIAL HAND BREAKER AZG6,110V"},
+ {no:"R8",cls:"Compactor",d:"WACKER NEUSON COMPACTOR"},
+ {no:"R80",cls:"",d:"HILTI TE 50\u2013AVR BATTERY ROTARY HAMMER 110V 32MM MAX"},
+ {no:"R81",cls:"Crusher/Screener",d:"BOSCH GWS 6-100 DISC GRINDER, 110V 100MM"},
+ {no:"R82",cls:"",d:"TRANSFORMER 3.3KVA, 110V"},
+ {no:"R83",cls:"",d:"TRANSFORMER 3.3KVA. 110V"},
+ {no:"R85",cls:"",d:"MAKITA 5806B ELECTRICAL CIRCULAR SAW 185MM 110V"},
+ {no:"R86",cls:"",d:"MAKITA HR2470 ELECTRICAL COMBINATION HAMMER SDS 24MM 23"},
+ {no:"R88",cls:"",d:"MAKITA 5806B ELECTRICAL CIRCULAR SAW 185MM 110V"},
+ {no:"R89",cls:"",d:"MAKITA 5806B ELECTRICAL CIRCULAR SAW 185MM 110V"},
+ {no:"R9",cls:"Roller",d:"489P-CNP15-00 ROLLER COMPACTOR"},
+ {no:"R90",cls:"",d:"DONGCHENG ELECTRICAL HAND DRILL ZIC-FF05-26 MAX 26MM 72"},
+ {no:"R91",cls:"",d:"DONGCHENG ELECTRICAL HAND DRILL ZIC-FF05-26 MAX 26MM 72"},
+ {no:"R92",cls:"",d:"MAKITA LW1401 ELECTRICAL PORTABLE CUT-OFF MACHINE 14\u201d 1"},
+ {no:"R93",cls:"",d:"MAKITA LW1401 ELECTRICAL PORTABLE CUT-OFF MACHINE 14\u201d 1"},
+ {no:"R94",cls:"Crusher/Screener",d:"BOSCH GWS 060 ELECTRICAL PROFESSIONAL ANGLE GRINDER 100"},
+ {no:"R95",cls:"Crusher/Screener",d:"MAKITA DGA408 BATTERY CORDLESS ANGLE GRINDER 100MM 18V"},
+ {no:"R96",cls:"Crusher/Screener",d:"BOSCH GWS 6-100 ELECTRICAL ANGLE GRINDER 110V 100MM"},
+ {no:"R97",cls:"",d:"TRANSFORMER 3.3KVA 110V"},
+ {no:"R98",cls:"",d:"HIKOKI VTP-18 ELECTRICAL IMPACT DRILL 13MM 230V"},
+ {no:"R99",cls:"",d:"HIKOKI DH 26PC2 ELECTRICAL ROTARY HAMMER 26MM 110V"},
+ {no:"RB3",cls:"",d:"ROCK BIN3 24TON"},
+ {no:"RB4",cls:"",d:"ROCK BIN4 24TON"},
+ {no:"RB5",cls:"",d:"ROCK BIN5 24TON"},
+ {no:"RB8",cls:"",d:"ROCK BIN8 24TON"},
+ {no:"RC1",cls:"Roller",d:"DVRS65K / 1 TON ROLLER"},
+ {no:"RC10",cls:"Roller",d:"LDR642-3 / 1 TON ROLLER"},
+ {no:"RC11",cls:"Roller",d:"LDR642-3 / 1 TON ROLLER"},
+ {no:"RC12",cls:"Roller",d:"MODEL: VR600P/D DOUBLE WHEELS ONE TON ROLLER 173 DIESEL"},
+ {no:"RC13",cls:"Roller",d:"VR600P/D 1 TON DOUBLE WHEEL ROLLER"},
+ {no:"RC14",cls:"Roller",d:"VR600P/D 1 TON DOUBLE WHEEL ROLLER"},
+ {no:"RC15",cls:"Roller",d:"MODEL: VR600P/D DOUBLE WHEELS ONE TON ROLLER 173 DIESEL"},
+ {no:"RC16",cls:"Roller",d:"MODEL: MRH-601DS MIKASA VIBRATION ROLLER"},
+ {no:"RC17",cls:"Roller",d:"VR600P/D 1 TON DOUBLE WHEEL ROLLER"},
+ {no:"RC18",cls:"Roller",d:"VR600P/D 1 TON DOUBLE WHEEL ROLLER"},
+ {no:"RC19",cls:"Roller",d:"VR600P/D 1 TON DOUBLE WHEEL ROLLER"},
+ {no:"RC2",cls:"Roller",d:"DVRS65K / 1 TON ROLLER"},
+ {no:"RC20",cls:"Roller",d:"VR600P/D 1 TON DOUBLE WHEEL ROLLER"},
+ {no:"RC21",cls:"Roller",d:"MODEL: VR600P/D DOUBLE WHEELS ONE TON ROLLER 173 DIESEL"},
+ {no:"RC22",cls:"Roller",d:"MODEL: VR600P/D DOUBLE WHEEL ONE ROLLER COMPACTOR HSD60"},
+ {no:"RC23",cls:"Roller",d:"MODEL: VR600P/D DOUBLE WHEEL ONE ROLLER COMPACTOR HSD60"},
+ {no:"RC24",cls:"Roller",d:"MODEL: VR600P/D DOUBLE WHEEL ONE ROLLER COMPACTOR HSD60"},
+ {no:"RC25",cls:"Roller",d:"MODEL: VR600P/D DOUBLE WHEEL ONE ROLLER COMPACTOR HSD60"},
+ {no:"RC26",cls:"Roller",d:"MODEL: VR600P/D DOUBLE WHEEL ONE ROLLER COMPACTOR HSD60"},
+ {no:"RC27",cls:"Roller",d:"MODEL: VR600P/D DOUBLE WHEEL ONE ROLLER COMPACTOR HSD60"},
+ {no:"RC28",cls:"Roller",d:"MODEL: VR600P/D DOUBLE WHEEL ONE ROLLER COMPACTOR HSD60"},
+ {no:"RC29",cls:"Roller",d:"MODEL: VR600P/D DOUBLE WHEEL ONE ROLLER COMPACTOR HSD60"},
+ {no:"RC3",cls:"Roller",d:"DVRS65K / 1 TON ROLLER"},
+ {no:"RC30",cls:"Roller",d:"MODEL: VR600P/D DOUBLE WHEEL ONE ROLLER COMPACTOR HSD60"},
+ {no:"RC31",cls:"Roller",d:"MODEL: VR600P/D DOUBLE WHEEL ONE ROLLER COMPACTOR HSD60"},
+ {no:"RC32",cls:"Roller",d:"MODEL: VR600P/D DOUBLE WHEEL ONE ROLLER COMPACTOR HSD60"},
+ {no:"RC33",cls:"Roller",d:"MODEL: VR600P/D DOUBLE WHEEL ONE ROLLER COMPACTOR HSD60"},
+ {no:"RC34",cls:"Roller",d:"MODEL: VR600P/D DOUBLE WHEEL ONE ROLLER COMPACTOR HSD60"},
+ {no:"RC35",cls:"Roller",d:"MODEL: VR600P/D DOUBLE WHEEL ONE ROLLER COMPACTOR HSD60"},
+ {no:"RC36",cls:"Roller",d:"MODEL: VR600P/D DOUBLE WHEEL ONE ROLLER COMPACTOR HSD60"},
+ {no:"RC37",cls:"Roller",d:"MODEL: KANTO H650K HAND GUIDED ROLLER"},
+ {no:"RC38",cls:"Roller",d:"MODEL: KANTO H650K HAND GUIDED ROLLER"},
+ {no:"RC39",cls:"Roller",d:"MODEL: KANTO H650K HAND GUIDED ROLLER"},
+ {no:"RC4",cls:"Roller",d:"DVRS65K / 1 TON ROLLER"},
+ {no:"RC40",cls:"Roller",d:"MODEL: KANTO H650K HAND GUIDED ROLLER"},
+ {no:"RC41",cls:"Roller",d:"MODEL: KANTO H650K HAND GUIDED ROLLER"},
+ {no:"RC42",cls:"Roller",d:"MODEL: KANTO H650K HAND GUIDED ROLLER"},
+ {no:"RC43",cls:"Roller",d:"MODEL: KANTO H650K HAND GUIDED ROLLER"},
+ {no:"RC44",cls:"Roller",d:"MODEL: KANTO H650K HAND GUIDED ROLLER"},
+ {no:"RC45",cls:"Roller",d:"MODEL: KANTO H650K HAND GUIDED ROLLER"},
+ {no:"RC46",cls:"Roller",d:"MODEL: KANTO H650K HAND GUIDED ROLLER"},
+ {no:"RC47",cls:"Roller",d:"MODEL: KANTO H650K HAND GUIDED ROLLER"},
+ {no:"RC48",cls:"Roller",d:"MODEL: KANTO H650K HAND GUIDED ROLLER"},
+ {no:"RC5",cls:"Roller",d:"DVRS65K / 1 TON ROLLER"},
+ {no:"RC50",cls:"Roller",d:"MODEL: KANTO H650K HAND GUIDED ROLLER"},
+ {no:"RC51",cls:"Roller",d:"MODEL: KANTO H650K HAND GUIDED ROLLER"},
+ {no:"RC52",cls:"Roller",d:"MODEL: KANTO H650K HAND GUIDED ROLLER"},
+ {no:"RC53",cls:"Roller",d:"MODEL: KANTO H650K HAND GUIDED ROLLER"},
+ {no:"RC6",cls:"Roller",d:"MASTERPAC ONE TON ROLLER C/W KUBOTA E75-NB3 ENGINE"},
+ {no:"RC7",cls:"Roller",d:"DVRS65K / 1 TON ROLLER"},
+ {no:"RC8",cls:"Roller",d:"DVRS65K / 1 TON ROLLER"},
+ {no:"RC9",cls:"Roller",d:"DVRS65K / 1 TON ROLLER"},
+ {no:"SB1",cls:"",d:"SOIL BIN 1"},
+ {no:"SB2",cls:"",d:"SOIL BIN 2"},
+ {no:"SB3",cls:"",d:"SOIL BIN 3"},
+ {no:"SL1",cls:"",d:"14M SCISSORS LIFT"},
+ {no:"SMS-1",cls:"",d:"SMS HYDRAULIC PRESS BRAKE MODEL SMP 300/4000"},
+ {no:"SMS-2",cls:"",d:"SMS HYDRAULIC GUILLOTINE SHEAR MODEL SMS 16 X 3100"},
+ {no:"SMS1",cls:"",d:"SMS HYDRAULIC PRESS BRAKE MODEL SMP 300/4000"},
+ {no:"SMS2",cls:"",d:"SMS HYDRAULIC GUILLOTINE SHEAR MODEL SMS 16 X 3100"},
+ {no:"SP1",cls:"",d:"SURVEYING PRISM, HD19 SINGLE PRISM ASSEMBLY"},
+ {no:"SP2",cls:"",d:"SURVEYING PRISM, HD19 SINGLE PRISM ASSEMBLY"},
+ {no:"SP3",cls:"",d:"SURVEYING PRISM, MYZOX PG-2500GP"},
+ {no:"SP4",cls:"",d:"SURVEYING PRISM, HD19 SINGLE PRISM ASSEMBLY"},
+ {no:"ST1",cls:"Lighting tower",d:"BIGLUX BL2P-G9EHSL0P HISOLO MOBILE SOLAR TOWER LIGHT"},
+ {no:"ST2",cls:"Lighting tower",d:"BIGLUX BL2P-G9EHSL0P HISOLO MOBILE SOLAR TOWER LIGHT"},
+ {no:"ST3",cls:"Lighting tower",d:"BIGLUX BL2P-G9EHSL0P HISOLO MOBILE SOLAR TOWER LIGHT"},
+ {no:"ST4",cls:"Lighting tower",d:"BIGLUX BL2P-G9EHSL0P HISOLO MOBILE SOLAR TOWER LIGHT"},
+ {no:"T1",cls:"Lighting tower",d:"USED ALLIGHT TOWERS"},
+ {no:"T10",cls:"Lighting tower",d:"ROBUST POWER TOWER RPLT-3800 4500W 9M 360DEG"},
+ {no:"T11",cls:"Generator/Welder",d:"USED ISUZU TRUCK ATTACHED WITH USED LIGHTING TOWER AND "},
+ {no:"T12",cls:"Generator/Welder",d:"USED ISUZU TRUCK ATTACHED WITH USED LIGHTING TOWER AND "},
+ {no:"T13",cls:"Lighting tower",d:"ROBUST POWER TOWER RPLT-3800-L350-EU 350W (4 X 350W) 9M"},
+ {no:"T14",cls:"Lighting tower",d:"ROBUST RPLT-3800 MOBILE LIGHTING TOWER"},
+ {no:"T15",cls:"Lighting tower",d:"ROBUST POWER TOWER RPLT-3800-L350-EU 350W (4 X 350W) 9M"},
+ {no:"T16",cls:"Lighting tower",d:"ROBUST RPLT-3800 MOBILE LIGHTING TOWER"},
+ {no:"T17",cls:"Lighting tower",d:"ROBUST RPLT-3800 MOBILE LIGHTING TOWER"},
+ {no:"T18",cls:"Lighting tower",d:"ROBUST RPLT-3800 MOBILE LIGHTING TOWER"},
+ {no:"T2",cls:"Lighting tower",d:"MODEL: SB12K-10 USED ALLIGHT TOWERS"},
+ {no:"T20",cls:"Lighting tower",d:"ROBUST POWER TOWER RPLT-3800-L350-EU 350W (4 X 350W) 9M"},
+ {no:"T21",cls:"Lighting tower",d:"ROBUST RPLT-3800 MOBILE LIGHTING TOWER"},
+ {no:"T22",cls:"Lighting tower",d:"ROBUST POWER TOWER RPLT-3800-L350-EU 350W (4 X 350W) 9M"},
+ {no:"T23",cls:"Lighting tower",d:"ROBUST RPLT-3800 MOBILE LIGHTING TOWER"},
+ {no:"T24",cls:"Lighting tower",d:"ROBUST RPLT-3800 MOBILE LIGHTING TOWER"},
+ {no:"T25",cls:"Lighting tower",d:"ROBUST RPLT-3800 MOBILE LIGHTING TOWER"},
+ {no:"T26",cls:"Lighting tower",d:"ROBUST RPLT-3800 MOBILE LIGHTING TOWER"},
+ {no:"T27",cls:"Lighting tower",d:"ROBUST RPLT-3800 MOBILE LIGHTING TOWER"},
+ {no:"T28",cls:"Lighting tower",d:"ROBUST RPLT-3800 MOBILE LIGHTING TOWER"},
+ {no:"T3",cls:"Lighting tower",d:"MODEL: U-FB308B USED TADANO 6 x 1000W LIGHTING TOWER TR"},
+ {no:"T30",cls:"Lighting tower",d:"ROBUST RPLT-3800 MOBILE LIGHTING TOWER"},
+ {no:"T31",cls:"Lighting tower",d:"ROBUST RPLT-3800 MOBILE LIGHTING TOWER"},
+ {no:"T32",cls:"Lighting tower",d:"ROBUST RPLT-3800 MOBILE LIGHTING TOWER"},
+ {no:"T33",cls:"Lighting tower",d:"ROBUST RPLT-3800 MOBILE LIGHTING TOWER"},
+ {no:"T34",cls:"Lighting tower",d:"ROBUST RPLT-3800 MOBILE LIGHTING TOWER"},
+ {no:"T35",cls:"Generator/Welder",d:"USED ISUZU TRUCK ATTACHED WITH USED LIGHTING TOWER AND "},
+ {no:"T36",cls:"Lighting tower",d:"ROBUST RPLT-3800 MOBILE LIGHTING TOWER"},
+ {no:"T37",cls:"Lighting tower",d:"ROBUST RPLT-3800 MOBILE LIGHTING TOWER"},
+ {no:"T38",cls:"Lighting tower",d:"ROBUST RPLT-3800 MOBILE LIGHTING TOWER"},
+ {no:"T4",cls:"Lighting tower",d:"MODEL: KOMATSU LIGHTING TOWER LW250-3"},
+ {no:"T40",cls:"Lighting tower",d:"ROBUST RPLT-3800 MOBILE LIGHTING TOWER"},
+ {no:"T5",cls:"Lighting tower",d:"MODEL: JPN NO: B65342 NIGHTSHIFTER 6000W LIGHT TOWER"},
+ {no:"T6",cls:"Lighting tower",d:"PR POWER PR12000 LIGHTING TOWER 12000W (USED)"},
+ {no:"T6A",cls:"Lighting tower",d:"MODEL: PR POWER PR12000 LIGHTING TOWER (USED)"},
+ {no:"T7",cls:"Lighting tower",d:"MODEL: PR POWER PR12000 LIGHTING TOWER (USED)"},
+ {no:"T8",cls:"Lighting tower",d:"ROBUST POWER TOWER RPLT-3800 4500W 9M 360DEG"},
+ {no:"TS1",cls:"",d:"TOTAL STATION, SOKKIA iM101 MANUAL"},
+ {no:"TS2",cls:"",d:"TOTAL STATION, SOKKIA iM101 MANUAL"},
+ {no:"TS3",cls:"",d:"TOTAL STATION, SOKKIA iM101 MANUAL"},
+ {no:"VR10/0063",cls:"Roller",d:"MIKASA MRH-601DS VIBRO ROLLER 1 TON"},
+ {no:"VR10/0068",cls:"Roller",d:"MIKASA MRH-601DS VIBRO ROLLER 1 TON"},
+ {no:"W1",cls:"Generator/Welder",d:"WELDING GENERATOR: SHINDAIWA DGW 400DM DIESEL SOUNDPROO"},
+ {no:"W10",cls:"Generator/Welder",d:"WELDING GENERATOR: DENYO DLW-400ESW DIESEL SOUNDPROOF"},
+ {no:"W11",cls:"Generator/Welder",d:"WELDING: DENYO DLW-400ESW"},
+ {no:"W12",cls:"Generator/Welder",d:"WELDING GENERATOR: DENYO DLW-400ESW DIESEL SOUNDPROOF"},
+ {no:"W13",cls:"Generator/Welder",d:"WELDING GENERATOR: DENYO DLW-300LSW"},
+ {no:"W14",cls:"Generator/Welder",d:"WELDING GENERATOR: SHINDAIWA DGW400DMK-S2V DIESEL SOUND"},
+ {no:"W15",cls:"Generator/Welder",d:"WELDING GENERATOR: SHINDAIWA DGW400DMK-S2V DIESEL SOUND"},
+ {no:"W16",cls:"Generator/Welder",d:"WELDING GENERATOR: SHINDAIWA DGW400DMK-S2V DIESEL SOUND"},
+ {no:"W17",cls:"Generator/Welder",d:"WELDING GENERATOR: SHINDAIWA DGW400DMK-S2V DIESEL SOUND"},
+ {no:"W18",cls:"Generator/Welder",d:"WELDING GENERATOR: SHINDAIWA DGW400DMK-S2V DIESEL SOUND"},
+ {no:"W2",cls:"Generator/Welder",d:"WELDING GENERATOR: DENYO DLW-300ES DIESEL SOUNDPROOF"},
+ {no:"W3",cls:"Generator/Welder",d:"WELDING GENERATOR: DENYO TLW-450 SSWI DIESEL SOUNDPROOF"},
+ {no:"W4",cls:"Generator/Welder",d:"WELDING GENERATOR: DENYO DLW-320LS DIESEL SOUNDPROOF"},
+ {no:"W5",cls:"Generator/Welder",d:"WELDING GENERATOR: DENYO DLW-400ESW DIESEL SOUNDPROOF"},
+ {no:"W6",cls:"Generator/Welder",d:"WELDING GENERATOR: DENYO DLW-400ESW DIESEL SOUNDPROOF"},
+ {no:"W7",cls:"Generator/Welder",d:"WELDING GENERATOR: DENYO DLW-400ESW DIESEL SOUNDPROOF"},
+ {no:"W8",cls:"Generator/Welder",d:"WELDING: DENYO DLW-400ESW (DB)"},
+ {no:"W9",cls:"Generator/Welder",d:"WELDING GENERATOR: DENYO DLW-400ESW DIESEL SOUNDPROOF"},
+ {no:"WB9579E",cls:"Forklift",d:"KOMATSU DIESEL FORKLIFT (3 TON) - WB9579E"},
+ {no:"WBP1",cls:"",d:"HYDRAJET 2511CEL"},
+ {no:"WBP10",cls:"",d:"AIKO 188FA DIESEL HIGH PRESSURE PUMP (WASHING BAY JET)"},
+ {no:"WBP11",cls:"",d:"NPM1525R COLD WATER JET"},
+ {no:"WBP12",cls:"",d:"HAWK NPM1525R DIESEL COLD WATER PRESSURE WASHER"},
+ {no:"WBP13",cls:"",d:"HAWK NPM1525R DIESEL COLD WATER PRESSURE WASHER"},
+ {no:"WBP14",cls:"",d:"HPW-CK186FRE WASHING BAY JET"},
+ {no:"WBP15",cls:"",d:"BRAND: HAWK MODEL: NPM1525 COLD WATER PRESSURE WASHER"},
+ {no:"WBP16",cls:"",d:"BRAND: HAWK MODEL: NPM1525 COLD WATER PRESSURE WASHER"},
+ {no:"WBP17",cls:"",d:"DENKO KM186F 250BAR DIESEL ENGINE PRESSURE WASHER C/W M"},
+ {no:"WBP18",cls:"",d:"LIFAN 188FE 250 BAR DIESEL ENGINE HIGH PRESSURE CLEANER"},
+ {no:"WBP19",cls:"",d:"LIFAN 188FE 250 BAR DIESEL ENGINE HIGH PRESSURE CLEANER"},
+ {no:"WBP2",cls:"",d:"HYDRAJET 2511CEL"},
+ {no:"WBP20",cls:"",d:"LIFAN 188FE 250 BAR DIESEL ENGINE HIGH PRESSURE CLEANER"},
+ {no:"WBP21",cls:"",d:"LIFAN 188FE 250 BAR DIESEL ENGINE HIGH PRESSURE CLEANER"},
+ {no:"WBP22",cls:"",d:"LIFAN 188FE 250 BAR DIESEL ENGINE HIGH PRESSURE CLEANER"},
+ {no:"WBP3",cls:"",d:"SPECK TRIPLEX PLUNGER PUMP"},
+ {no:"WBP4",cls:"",d:"HYDRAJET 2511CEL H.P CLEANER"},
+ {no:"WBP5",cls:"",d:"NPM1525 COLD WATER JET"},
+ {no:"WBP6",cls:"",d:"NPM1525 COLD WATER JET"},
+ {no:"WBP7",cls:"",d:"NPM1525 COLD WATER JET"},
+ {no:"WBP8",cls:"",d:"AIKO HPW-3WZ-3600DF WASHER"},
+ {no:"WBP9",cls:"",d:"AIKO HPW-3WZ-3600DF WASHER"},
+ {no:"WG300/0186",cls:"Generator/Welder",d:"LED TOWER LIGHT 4 X 1000W ATTACHED WITH GENERATOR (PJ4/"},
+ {no:"WG300/0265",cls:"Generator/Welder",d:"LED TOWER LIGHT 4 X 1000W ATTACHED WITH GENERATOR (PL4/"},
+ {no:"WG300/0271",cls:"Generator/Welder",d:"LED TOWER LIGHT 4 X 1000W ATTACHED WITH GENERATOR (PL4/"},
+ {no:"WG300/0286",cls:"Generator/Welder",d:"LED TOWER LIGHT 4 X 1000W ATTACHED WITH GENERATOR (PL4/"},
+ {no:"WG400D/0204",cls:"Generator/Welder",d:"LED TOWER LIGHT 4 X 1000W ATTACHED WITH GENERATOR (PL4/"},
+ {no:"WG400D/0210",cls:"Generator/Welder",d:"LED TOWER LIGHT 4 X 1000W ATTACHED WITH GENERATOR (PL4/"},
+ {no:"WG400D/0256",cls:"Generator/Welder",d:"LED TOWER LIGHT 4 X 1000W ATTACHED WITH GENERATOR (PL4/"},
+ {no:"WG400D/0259",cls:"Generator/Welder",d:"LED TOWER LIGHT 4 X 1000W ATTACHED WITH GENERATOR (PL4/"},
+ {no:"WG400D/0277",cls:"Generator/Welder",d:"LED TOWER LIGHT 4 X 1000W ATTACHED WITH GENERATOR (PL4/"},
+ {no:"WG400D/0289",cls:"Generator/Welder",d:"LED TOWER LIGHT 4 X 1000W ATTACHED WITH GENERATOR (PL4/"},
+ {no:"WG400D/0292",cls:"Generator/Welder",d:"LED TOWER LIGHT 4 X 1000W ATTACHED WITH GENERATOR (PL4/"},
+ {no:"WG400D/0418",cls:"Generator/Welder",d:"LED TOWER LIGHT 4 X 1000W ATTACHED WITH GENERATOR (PL4/"},
+ {no:"WG400D/0433",cls:"Generator/Welder",d:"LED TOWER LIGHT 4 X 1000W ATTACHED WITH GENERATOR (PL4/"},
+ {no:"WG400D/0518",cls:"Generator/Welder",d:"LED TOWER LIGHT 4 X 1000W ATTACHED WITH GENERATOR (PL4/"},
+ {no:"WG400D/0535",cls:"Generator/Welder",d:"LED TOWER LIGHT 4 X 1000W ATTACHED WITH GENERATOR (PL4/"},
+ {no:"WG400D/213",cls:"Generator/Welder",d:"LED TOWER LIGHT 4 X 1000W ATTACHED WITH GENERATOR (PL4/"},
+ {no:"WG400D/333",cls:"Generator/Welder",d:"LED TOWER LIGHT 4 X 1000W ATTACHED WITH GENERATOR (PL4/"},
+ {no:"WGO400D/0117",cls:"Generator/Welder",d:"LED TOWER LIGHT 4 X 1000W ATTACHED WITH GENERATOR (PL4/"},
+ {no:"WGO400D/0154",cls:"Generator/Welder",d:"LED TOWER LIGHT 4 X 1000W ATTACHED WITH GENERATOR (PL4/"},
+ {no:"WGO400D/0169",cls:"Generator/Welder",d:"LED TOWER LIGHT 4 X 1000W ATTACHED WITH GENERATOR (PL4/"},
+ {no:"WP1",cls:"",d:"WATER PUMP - 8\" MOUNTED ON HEAVY SKID WITH LIFTING BEAM"},
+ {no:"XCMG1",cls:"",d:"XCMG HYDRAULIC EXCAVATOR"},
+ {no:"YN332Y",cls:"",d:"MITSUBISHI 14FT LORRY WITH CANOPY"}
+];
+const ELEMENTS=["","Wall","Boundary wall","Slab on grade","Suspended / roof slab","Slab over U-drain","Approach / apron slab","Drain wall","Drain base slab","Drain top slab","Benching","Sump / manhole","Pipe surround","Box culvert","Railing footing","Footing / pad","Column / beam","Staircase / ramp","Kerb haunch","Other (state in detail)"];
+
+// ---- Structure lock (drains / sumps / culverts): size + chainage are first-class data
+// because productivity is meaningless without them. IW×Depth per m, chainage locates the
+// segment (and is the double-count audit). Same fields link component rows (exc, hardcore,
+// lean, FW, rebar, conc) to the run so the engine can assemble a full build-up per metre.
+const STRUCT_TYPES=["","U-drain","Covered drain (rect)","RCBC box culvert","RCS sump / DIC","Pipe drain"];
+const METHODS=["","CIS","Half precast","Full precast"];
+const DRAIN_ELEMENTS=["Drain wall","Drain base slab","Drain top slab","Slab over U-drain","Box culvert","Sump / manhole","Pipe surround"];
+// defaults [structure, method] by code / by element
+const STRUCT_BY_CODE={"DR-RCU":["U-drain","Full precast"],"DR-PIPE":["Pipe drain","Full precast"],
+ "DR-SCUP":["Pipe drain","Full precast"],"DR-SUMP":["RCS sump / DIC","Full precast"],
+ "DR-BC":["RCBC box culvert","Full precast"],"DR-CONN":["",""]};
+const STRUCT_BY_EL={"Drain wall":["Covered drain (rect)","CIS"],"Drain base slab":["Covered drain (rect)","CIS"],
+ "Drain top slab":["Covered drain (rect)","CIS"],"Slab over U-drain":["U-drain","Half precast"],
+ "Box culvert":["RCBC box culvert","CIS"],"Sump / manhole":["RCS sump / DIC","CIS"],
+ "Pipe surround":["Pipe drain","CIS"]};
+
+// ---- Excavation lock: ground + depth band split the productivity pools (a hard-ground
+// 4m dig and a normal 1m strip must never average into one rate), and spoil destination
+// + the site's own load tally link every excavated m3 to disposal trip tickets (EW-DISP)
+// or stockpile transfers (EW-STK) for office-side reconciliation.
+const EXC_CODES=["EW-EXC","EW-EXCT","EW-EXCP","EW-EXCTD"];
+const GROUNDS=["","Normal soil","Hard (breaker assist)","Waterlogged / mud"];
+const SOILS=["","Good earth","Soft clay","Unsuitable / mixed"];   // material dug - drives the disposal stream; destination is joined office-side from tickets
+const DEPTH_BANDS=["","<1.5m","1.5-3m","3-6m",">6m"];
+const SPOIL_TO=["","Offsite disposal","To stockpile (internal)","Reuse as fill on site","Left in place / trimmed only"];
+
+const $=s=>document.querySelector(s);
+const tasksEl=$("#tasks");
+let seq=0;
+
+function codeOptions(sel){
+  let h='<option value="">— select activity —</option><optgroup label="★ PILOT CODES">';
+  for(const c of CODES) if(c[4]) h+=`<option value="${c[0]}" ${sel===c[0]?"selected":""}>★ ${c[0]} — ${c[2]}</option>`;
+  h+='</optgroup>';
+  let grp="";
+  for(const c of CODES){
+    if(c[1]!==grp){ if(grp)h+='</optgroup>'; grp=c[1]; h+=`<optgroup label="${grp.toUpperCase()}">`; }
+    h+=`<option value="${c[0]}" ${sel===c[0]?"selected":""}>${c[0]} — ${c[2]}</option>`;
+  }
+  return h+'</optgroup>';
+}
+
+function addTask(data){
+  const id="t"+(++seq);
+  const d=data||{};
+  if(d.crew&&(d.crew.GW||d.crew.SL||d.crew.SUB)){   // migrate pre-v2.4 drafts: GW+SL -> WK, SUB heads dropped
+    d.crew.WK=(d.crew.WK||0)+(d.crew.GW||0)+(d.crew.SL||0);
+    delete d.crew.GW; delete d.crew.SL; delete d.crew.SUB;
+  }
+  if(d.loads&&!d.l10&&!d.l12){d.l10=d.loads; delete d.loads;}  // pre-v2.7 drafts: single count -> 10W
+  if(d.zone&&!d.zarea&&!d.zfront){const pz=parseZone(d.zone); d.zarea=pz.a; d.zteam=pz.t; d.zfront=pz.f;}  // pre-v3.1 drafts: split zone
+  const div=document.createElement("div");
+  div.className="task"; div.id=id;
+  div.innerHTML=`
+   <div class="head"><span class="t">ROW ${tasksEl.children.length+1}</span>
+     <button type="button" title="Remove row" data-del>✕</button></div>
+   <div class="body">
+    <label>Activity code</label>
+    <select data-f="code">${codeOptions(d.code)}</select>
+    <div data-elwrap style="display:none">
+      <label data-ellab style="color:var(--accent-ink)">Element (required for RC codes)</label>
+      <select data-f="element">${ELEMENTS.map(e=>`<option ${d.element===e?"selected":""}>${e}</option>`).join("")}</select>
+    </div>
+    <div data-structwrap class="structbox" style="display:none">
+      <span class="st">Structure — size locks productivity</span>
+      <div class="row">
+        <div><label>Structure</label><select data-f="stype">${STRUCT_TYPES.map(x=>`<option ${d.stype===x?"selected":""}>${x}</option>`).join("")}</select></div>
+        <div><label>Method</label><select data-f="method">${METHODS.map(x=>`<option ${d.method===x?"selected":""}>${x}</option>`).join("")}</select></div>
+      </div>
+      <div class="row">
+        <div><label data-iwlab>IW (mm)</label><input data-f="iw" type="number" inputmode="numeric" min="0" step="25" placeholder="e.g. 900" value="${d.iw||""}"></div>
+        <div data-swwrap style="display:none"><label>W (mm)</label><input data-f="sw" type="number" inputmode="numeric" min="0" step="25" placeholder="plan W" value="${d.sw||""}"></div>
+        <div><label>Depth (mm)</label><input data-f="dep" type="number" inputmode="numeric" min="0" step="25" placeholder="e.g. 1050" value="${d.dep||""}"></div>
+        <div data-cellswrap style="display:none"><label>Cells</label><input data-f="cells" type="number" inputmode="numeric" min="1" step="1" value="${d.cells||1}"></div>
+      </div>
+      <div class="row" data-chrow>
+        <div><label>CH from (m)</label><input data-f="ch1" type="number" inputmode="decimal" step="any" placeholder="e.g. 120" value="${d.ch1||""}"></div>
+        <div><label>CH to (m)</label><input data-f="ch2" type="number" inputmode="decimal" step="any" placeholder="e.g. 165" value="${d.ch2||""}"></div>
+      </div>
+      <p class="hint" data-structhint style="margin:6px 0 0">Depth changes along the run? Split into one row per chainage segment.</p>
+    </div>
+    <div data-excwrap class="structbox" style="display:none">
+      <span class="st">Excavation — ground &amp; depth set the rate; spoil links to trucking</span>
+      <div class="row">
+        <div><label>Ground</label><select data-f="ground">${GROUNDS.map(x=>`<option ${d.ground===x?"selected":""}>${x}</option>`).join("")}</select></div>
+        <div><label>Depth band</label><select data-f="dband">${DEPTH_BANDS.map(x=>`<option ${d.dband===x?"selected":""}>${x}</option>`).join("")}</select></div>
+        <div><label>Soil dug</label><select data-f="soil">${SOILS.map(x=>`<option ${d.soil===x?"selected":""}>${x}</option>`).join("")}</select></div>
+      </div>
+      <div class="row">
+        <div><label>Qty reported as</label><select data-f="qbasis"><option ${d.qbasis!=="Loads only"?"selected":""}>Measured m³</option><option ${d.qbasis==="Loads only"?"selected":""}>Loads only</option></select></div>
+        <div><label>Spoil to</label><select data-f="spoil">${SPOIL_TO.map(x=>`<option ${d.spoil===x?"selected":""}>${x}</option>`).join("")}</select></div>
+      </div>
+      <div class="row">
+        <div><label>10W loads</label><input data-f="l10" type="number" inputmode="numeric" min="0" step="1" placeholder="0" value="${d.l10||""}"></div>
+        <div><label>12W loads</label><input data-f="l12" type="number" inputmode="numeric" min="0" step="1" placeholder="0" value="${d.l12||""}"><span class="hint" data-loadhint></span></div>
+      </div>
+      <div data-stagewrap>
+        <label data-stagelab>Stage / level (deep exc — e.g. S3, B1, -7mSHD)</label>
+        <div class="sugwrap"><input data-f="stage" placeholder="stage or dig level" autocomplete="off" value="${d.stage||""}"><div class="suggest"></div></div>
+      </div>
+      <p class="hint" style="margin:6px 0 0">Loads = your own truck count for this dig — office cross-checks it against trip tickets / stockpile records.</p>
+    </div>
+    <div class="row">
+      <div style="flex:1.4">
+        <label data-speclabel>Spec / size / grade</label>
+        <div class="sugwrap" data-specwrap><input data-f="spec" placeholder="e.g. 1200Ø 2.5–3m deep" autocomplete="off" value="${d.spec||""}"><div class="suggest"></div></div>
+      </div>
+    </div>
+    <div class="row">
+      <div style="flex:0.55"><label>Area</label><div class="sugwrap" data-zareawrap><input data-f="zarea" placeholder="B / C2" autocomplete="off" value="${d.zarea||""}"><div class="suggest"></div></div></div>
+      <div style="flex:0.5"><label>Team</label><div class="sugwrap" data-zteamwrap><input data-f="zteam" placeholder="2" autocomplete="off" value="${d.zteam||""}"><div class="suggest"></div></div></div>
+      <div style="flex:1.7"><label>Work front (opening / GL / CH)</label><div class="sugwrap" data-zfrontwrap><input data-f="zfront" placeholder="e.g. GL1-10 B1" autocomplete="off" value="${d.zfront||""}"><div class="suggest"></div></div></div>
+    </div>
+    <div class="row">
+      <div style="display:flex; gap:8px;">
+        <div style="flex:1"><label>Qty done today</label>
+        <input data-f="qty" type="number" inputmode="decimal" min="0" step="any" placeholder="0" value="${d.qty||""}"></div>
+        <span class="unitchip" data-unit>—</span>
+      </div>
+      <div style="display:flex; gap:8px;">
+        <div style="flex:1"><label>From</label><input data-f="t1" type="time" value="${d.t1||"08:00"}"></div>
+        <div style="flex:1"><label>To</label><input data-f="t2" type="time" value="${d.t2||"17:00"}"></div>
+      </div>
+    </div>
+    <label class="tick ${d.lunch?"on":""}"><input type="checkbox" data-f="lunch" ${d.lunch?"checked":""}> Worked through lunch (12–1)<span class="hrschip" data-hrs></span></label>
+    <label class="tick ${d.subc?"on":""}"><input type="checkbox" data-f="subc" ${d.subc?"checked":""}> Subcon on this row</label>
+    <div data-subcwrap style="display:${d.subc?"block":"none"}">
+      <label>Subcon company</label>
+      <div class="sugwrap"><input data-f="subco" placeholder="tap to pick / type new name" autocomplete="off" value="${d.subco||""}"><div class="suggest"></div></div>
+    </div>
+    <label>KKL crew on this activity (own workers only — never count subcon's men)</label>
+    <div class="crewgrid">${TRADES.map(t=>`
+      <div class="crew" data-trade="${t[0]}"><span class="nm">${t[1]}</span>
+        <span class="ctl"><button type="button" data-minus>−</button><output>${(d.crew&&d.crew[t[0]])||0}</output><button type="button" data-plus>＋</button></span>
+      </div>`).join("")}
+    </div>
+    <label>Machines (class · asset no. · hrs)</label>
+    <div data-machines></div>
+    <button class="minor" type="button" data-addmach>＋ machine</button>
+    <details class="adv" ${d.idleH?"open":""}>
+      <summary>Downtime on this row / note</summary>
+      <div class="idlebox">
+        <div class="row">
+          <div><label>Idle hours</label><input data-f="idleH" type="number" inputmode="decimal" min="0" step="0.5" placeholder="0" value="${d.idleH||""}"></div>
+          <div><label>Reason</label><select data-f="idleR">${IDLE_REASONS.map(r=>`<option ${d.idleR===r?"selected":""}>${r}</option>`).join("")}</select></div>
+        </div>
+        <label>Note (optional)</label><input data-f="note" placeholder="—" value="${d.note||""}">
+      </div>
+    </details>
+   </div>`;
+  tasksEl.appendChild(div);
+  const sel=div.querySelector('[data-f=code]');
+  sel.addEventListener("change",()=>{applyCode(div);save();});
+  div.querySelector("[data-f=element]").addEventListener("change",()=>{applyStruct(div);save();});
+  div.querySelector("[data-f=stype]").addEventListener("change",()=>{applyStruct(div);save();});
+  ["ch1","ch2"].forEach(k=>div.querySelector(`[data-f=${k}]`).addEventListener("input",()=>{autoQtyFromCH(div);save();}));
+  const lunchCb=div.querySelector("[data-f=lunch]"), subCb=div.querySelector("[data-f=subc]");
+  const updHrs=()=>{
+    const hw=effHours(div.querySelector("[data-f=t1]").value,div.querySelector("[data-f=t2]").value,lunchCb.checked);
+    div.querySelector("[data-hrs]").textContent=hw?hw+" h":"";
+    lunchCb.closest(".tick").classList.toggle("on",lunchCb.checked);
+  };
+  ["t1","t2"].forEach(k=>div.querySelector(`[data-f=${k}]`).addEventListener("input",updHrs));
+  lunchCb.addEventListener("change",()=>{updHrs();save();});
+  subCb.addEventListener("change",()=>{
+    subCb.closest(".tick").classList.toggle("on",subCb.checked);
+    div.querySelector("[data-subcwrap]").style.display=subCb.checked?"block":"none";
+    if(subCb.checked)div.querySelector("[data-f=subco]").focus();
+    save();
+  });
+  attachSubcoSuggest(div.querySelector("[data-f=subco]"),div.querySelector("[data-subcwrap] .suggest"));
+  STAGES.attach(div.querySelector("[data-f=stage]"),div.querySelector("[data-stagewrap] .suggest"));
+  AREAS.attach(div.querySelector("[data-f=zarea]"),div.querySelector("[data-zareawrap] .suggest"));
+  TEAMS.attach(div.querySelector("[data-f=zteam]"),div.querySelector("[data-zteamwrap] .suggest"));
+  FRONTS.attach(div.querySelector("[data-f=zfront]"),div.querySelector("[data-zfrontwrap] .suggest"));
+  SPECS.attach(div.querySelector("[data-f=spec]"),div.querySelector("[data-specwrap] .suggest"));
+  const updLoads=()=>{   // no volume assumption here - m3 per load is site/soil specific;
+                         // conversion happens in the manager view (editable m3/load factor)
+    const n10=parseFloat(div.querySelector("[data-f=l10]").value)||0;
+    const n12=parseFloat(div.querySelector("[data-f=l12]").value)||0;
+    div.querySelector("[data-loadhint]").textContent=(n10+n12)?`${n10+n12} loads total`:"";
+  };
+  const qbSel=div.querySelector("[data-f=qbasis]");
+  const updQbasis=()=>{
+    const loadsOnly=qbSel.value==="Loads only";
+    const q=div.querySelector("[data-f=qty]");
+    q.disabled=loadsOnly;
+    if(loadsOnly){q.value=""; q.placeholder="office converts from loads";}
+    else q.placeholder="0";
+  };
+  qbSel.addEventListener("change",()=>{updQbasis();save();});
+  ["l10","l12"].forEach(k=>div.querySelector(`[data-f=${k}]`).addEventListener("input",()=>{updLoads();save();}));
+  updQbasis();
+  updLoads();
+  updHrs();
+  div.querySelector("[data-del]").addEventListener("click",()=>{div.remove();renumber();save();});
+  div.querySelector("[data-addmach]").addEventListener("click",()=>addMach(div));
+  div.querySelectorAll("[data-minus],[data-plus]").forEach(b=>b.addEventListener("click",e=>{
+    const out=e.target.closest(".crew").querySelector("output");
+    let v=parseInt(out.textContent)||0;
+    v=Math.max(0,v+(e.target.hasAttribute("data-plus")?1:-1));
+    out.textContent=v;
+    e.target.closest(".crew").classList.toggle("on",v>0);
+    save();
+  }));
+  div.querySelectorAll("input,select").forEach(i=>i.addEventListener("input",save));
+  if(d.mach) d.mach.forEach(m=>addMach(div,m));
+  applyCode(div);
+  div.querySelectorAll(".crew").forEach(c=>{const v=parseInt(c.querySelector("output").textContent)||0; c.classList.toggle("on",v>0);});
+  renumber();
+}
+
+function addMach(div,m){
+  m=m||{};
+  const box=div.querySelector("[data-machines]");
+  const r=document.createElement("div");
+  r.className="machrow";
+  r.innerHTML=`<div class="sugwrap"><input data-m="no" placeholder="machine no. — type EX no." autocomplete="off" value="${m.no||""}"><div class="suggest"></div></div>
+    <select data-m="cls">${MACH.map(x=>`<option ${m.cls===x?"selected":""}>${x}</option>`).join("")}</select>
+    <input data-m="hrs" type="number" inputmode="decimal" min="0" step="0.5" placeholder="hrs" value="${m.hrs||""}">
+    <button type="button" title="remove">✕</button>`;
+  r.querySelector("button").addEventListener("click",()=>{r.remove();save();});
+  r.querySelectorAll("input,select").forEach(i=>i.addEventListener("input",save));
+  attachSuggest(r.querySelector("[data-m=no]"), r.querySelector(".suggest"), r.querySelector("[data-m=cls]"));
+  box.appendChild(r);
+}
+
+function attachSuggest(inp, box, clsSel){
+  function hide(){box.style.display="none";}
+  function show(){
+    const v=inp.value.trim().toLowerCase();
+    if(!v){hide();return;}
+    const hits=MACHINES.filter(m=>m.no.toLowerCase().includes(v)||(m.d&&m.d.toLowerCase().includes(v))).slice(0,8);
+    if(!hits.length){hide();return;}
+    box.innerHTML=hits.map(m=>`<div data-no="${m.no}" data-cls="${m.cls}"><span class="no">${m.no}</span><span class="ds">${m.d||""}</span><span class="cl">${m.cls||""}</span></div>`).join("");
+    box.style.display="block";
+    box.querySelectorAll("div[data-no]").forEach(el=>el.addEventListener("pointerdown",e=>{
+      e.preventDefault();
+      inp.value=el.dataset.no;
+      if(el.dataset.cls) clsSel.value=el.dataset.cls;
+      hide(); save();
+    }));
+  }
+  inp.addEventListener("input",show);
+  inp.addEventListener("focus",show);
+  inp.addEventListener("blur",()=>{
+    setTimeout(hide,200);
+    // machine no. keyed first -> class fills itself from the register:
+    // exact no. match, or a unique partial match (e.g. "828" -> EX828)
+    const v=inp.value.trim().toLowerCase();
+    if(!v)return;
+    let hit=MACHINES.find(m=>m.no.toLowerCase()===v);
+    if(!hit){
+      const part=MACHINES.filter(m=>m.no.toLowerCase().includes(v));
+      if(part.length===1)hit=part[0];
+    }
+    if(hit){inp.value=hit.no; if(hit.cls)clsSel.value=hit.cls; save();}
+  });
+}
+
+function applyCode(div){
+  const code=div.querySelector("[data-f=code]").value;
+  const c=BYCODE[code];
+  div.querySelector("[data-unit]").textContent=c?c[3]:"—";
+  const lab=div.querySelector("[data-speclabel]");
+  const ellab=div.querySelector("[data-ellab]");
+  div.querySelector("[data-elwrap]").style.display=(c&&c[5])?"":"none";
+  if(c&&c[5]===2){ellab.textContent="Element (optional — tag if this work is for a drain / sump / culvert)"; ellab.style.color="";}
+  else {ellab.textContent="Element (required for RC codes)"; ellab.style.color="var(--accent-ink)";}
+  if(c&&c[5]){lab.textContent="Detail (grade / pour no. — optional)"; lab.style.color="";}
+  else if(code==="GN-IDLE"){lab.textContent="What stood down (qty = hours idle)"; lab.style.color="var(--accent-ink)";}
+  else if(code==="EW-EXCTD"){lab.textContent="Detail (optional — e.g. obstruction, panel no., strut level remark)"; lab.style.color="";}
+  else {lab.textContent="Spec / size / grade"; lab.style.color="";}
+  div.querySelector("[data-excwrap]").style.display=EXC_CODES.includes(code)?"":"none";
+  const stlab=div.querySelector("[data-stagelab]");
+  if(code==="EW-EXCTD"){stlab.textContent="Stage / level — REQUIRED for top-down (e.g. S3, B1 strut level)"; stlab.style.color="var(--accent-ink)";}
+  else {stlab.textContent="Stage / level (optional — e.g. S3, B1, -7mSHD)"; stlab.style.color="";}
+  applyStruct(div);
+}
+
+function structActive(div){
+  const code=div.querySelector("[data-f=code]").value;
+  const el=div.querySelector("[data-f=element]").value;
+  return code.startsWith("DR-")||DRAIN_ELEMENTS.includes(el);
+}
+
+function applyStruct(div){
+  const wrap=div.querySelector("[data-structwrap]");
+  const active=structActive(div);
+  wrap.style.display=active?"":"none";
+  if(!active)return;
+  const code=div.querySelector("[data-f=code]").value;
+  const el=div.querySelector("[data-f=element]").value;
+  const stypeSel=div.querySelector("[data-f=stype]"), methSel=div.querySelector("[data-f=method]");
+  if(!stypeSel.value){
+    const def=STRUCT_BY_CODE[code]||STRUCT_BY_EL[el];
+    if(def){stypeSel.value=def[0]; if(!methSel.value)methSel.value=def[1];}
+  }
+  const st=stypeSel.value;
+  const isSump=st==="RCS sump / DIC", isRCBC=st==="RCBC box culvert", isPipe=st==="Pipe drain";
+  div.querySelector("[data-swwrap]").style.display=isSump?"":"none";
+  div.querySelector("[data-cellswrap]").style.display=isRCBC?"":"none";
+  div.querySelector("[data-chrow]").style.display=isSump?"none":"";
+  div.querySelector("[data-iwlab]").textContent=isPipe?"Dia (mm)":(isSump?"L (mm)":"IW (mm)");
+  div.querySelector("[data-structhint]").textContent=isSump
+    ?"Qty = number of sumps set / element qty as usual. Size ties the row to the sump build-up."
+    :"Depth changes along the run? Split into one row per chainage segment.";
+}
+
+function autoQtyFromCH(div){
+  const code=div.querySelector("[data-f=code]").value;
+  const c=BYCODE[code];
+  if(!c||c[3]!=="m")return;                       // auto-fill only for per-metre codes
+  const ch1=parseFloat(div.querySelector("[data-f=ch1]").value);
+  const ch2=parseFloat(div.querySelector("[data-f=ch2]").value);
+  if(isNaN(ch1)||isNaN(ch2))return;
+  div.querySelector("[data-f=qty]").value=Math.round(Math.abs(ch2-ch1)*10)/10;
+}
+
+function renumber(){[...tasksEl.children].forEach((t,i)=>t.querySelector(".t").textContent="ROW "+(i+1));}
+
+// Working hours between t1-t2. Lunch 12:00-13:00 is deducted (only the overlap,
+// so an 08:00-12:00 row loses nothing) unless "worked through lunch" is ticked.
+function effHours(t1,t2,lunch){
+  if(!t1||!t2)return 0;
+  const [h1,m1]=t1.split(":").map(Number),[h2,m2]=t2.split(":").map(Number);
+  const a=h1*60+m1; let b=h2*60+m2;
+  let d=b-a; if(d<0){d+=1440; b+=1440;}
+  const ded=lunch?0:Math.max(0,Math.min(b,780)-Math.max(a,720));
+  return Math.round((d-ded)/6)/10;
+}
+
+// Remembered lists, scoped PER PROJECT (key::PROJECT in localStorage): once the project
+// is keyed, every box recalls what was entered before on this phone for that project.
+// SEED pre-loads known site vocabulary (extracted from the project's historical daily
+// reports) so the lists are useful from day one, before anything has been typed.
+const SEED={"CR108":{
+ "areas":["A","B","C","C1","C2","D"],
+ "teams":["1","2","3","4"],
+ "fronts":["D-WALL","D-WALL / MUCKPIT","ECT1-ECT7 S1 LAYER","ECT7-ECT12 S2 LAYER","ECT8-ECT12 S2 LAYER","ECT13-ECT17 S2 LAYER","ECT17-ECT20 S2 LAYER","ECT20-ECT26 S2 LAYER","ECT20-ECT26 S3 LAYER","ECT26-ECT31 CRL ROOF SLAB","ECT28-ECT36 S3 LAYER","ECT30-ECT36 S3 LAYER CRL ROOF SLAB","ENT 1","ENT 3 GL9-13 S2 LAYER","ENT 4","GL1-10 B1 LEVEL","GL1-7 B1 LEVEL","GL7-10 B1 LEVEL","GL10-13 S2 LAYER","GL13-GL16 S2 LAYER","GL13-GL17 UNDERPINING S2 LAYER","GL17-GL32 S2 LAYER","GL20-GL32 S1 LAYER","GL23-GL25 S1 LAYER","GL26-GL32 S2 LAYER","MUCKPIT/D-WALL","OPENING 0 S5 LAYER","OPENING 1 CRL BASE SLAB","OPENING 2","OPENING 3 S4 LAYER","OPENING 4 S3 LAYER","STOCKPILE","TBM MUCKPIT"],
+ "stages":["B1","S1","S2","S3","S4","S5","S6"]
+}};
+function projKey(){const el=$("#project");return ((el&&el.value)||"").trim().toUpperCase().replace(/\s+/g,"");}
+function memList(key,seedField){
+  const store=()=>key+"::"+projKey();
+  function stored(k){try{return JSON.parse(localStorage.getItem(k))||[];}catch(e){return[];}}
+  function list(){
+    const seen=new Set(),out=[];
+    for(const x of [...stored(store()),...(((SEED[projKey()]||{})[seedField])||[]),...stored(key)]){
+      const k=String(x).toLowerCase();
+      if(x&&!seen.has(k)){seen.add(k);out.push(String(x));}
+    }
+    return out.sort((a,b)=>a.localeCompare(b,undefined,{numeric:true}));
+  }
+  function remember(name){
+    name=(name||"").trim(); if(!name)return;
+    const l=stored(store());
+    if(l.some(x=>String(x).toLowerCase()===name.toLowerCase()))return;
+    l.push(name);
+    try{localStorage.setItem(store(),JSON.stringify(l));}catch(e){}
+  }
+  function attach(inp,box){
+    function hide(){box.style.display="none";}
+    function show(){
+      const v=inp.value.trim().toLowerCase();
+      const hits=list().filter(x=>!v||x.toLowerCase().includes(v)).slice(0,8);
+      if(!hits.length){hide();return;}
+      box.innerHTML=hits.map(x=>`<div data-n="${x.replace(/"/g,"&quot;")}"><span class="no">${x}</span></div>`).join("");
+      box.style.display="block";
+      box.querySelectorAll("div[data-n]").forEach(el=>el.addEventListener("pointerdown",e=>{
+        e.preventDefault(); inp.value=el.dataset.n; hide(); save();
+      }));
+    }
+    inp.addEventListener("input",show);
+    inp.addEventListener("focus",show);
+    inp.addEventListener("blur",()=>{setTimeout(hide,200); remember(inp.value);});
+  }
+  return {list,remember,attach};
+}
+const SUBCO=memList("kkl_dr_subcos","subcos");
+const STAGES=memList("kkl_dr_stages","stages");
+const AREAS=memList("kkl_dr_areas","areas");
+const TEAMS=memList("kkl_dr_teams","teams");
+const FRONTS=memList("kkl_dr_fronts","fronts");
+const SPECS=memList("kkl_dr_specs","specs");
+// Area/Team/Work-front boxes compose into the one zone string the engine and the
+// DDJV renderer already understand: "Area B - Team 2 | GL1-10".
+function composeZone(a,t,fr){
+  a=a.trim().replace(/^area\s*/i,""); t=t.trim().replace(/^team[\s-]*/i,""); fr=fr.trim();
+  let z=a?("Area "+a.toUpperCase()):"";
+  if(t)z+=(z?" - ":"")+"Team "+t;
+  if(fr)z+=(z?" | ":"")+fr;
+  return z;
+}
+function parseZone(z){
+  const m=/^\s*AREA\s+([A-Z][0-9]?)\s*(?:-\s*TEAM\s*([^|]*))?\s*(?:\|\s*(.*))?$/i.exec(z||"");
+  if(m)return {a:m[1].toUpperCase(),t:(m[2]||"").trim(),f:(m[3]||"").trim()};
+  return {a:"",t:"",f:(z||"").trim()};
+}
+const rememberSubco=SUBCO.remember, attachSubcoSuggest=SUBCO.attach;
+
+function collect(){
+  const meta={project:$("#project").value.trim(),date:$("#date").value,shift:$("#shift").value,
+    reporter:$("#reporter").value.trim(),weather:$("#weather").value,remarks:$("#genremark").value.trim()};
+  const rows=[...tasksEl.children].map(div=>{
+    const f=k=>div.querySelector(`[data-f=${k}]`).value;
+    const isStruct=structActive(div);
+    const crew={};
+    div.querySelectorAll(".crew").forEach(c=>{const v=parseInt(c.querySelector("output").textContent)||0; if(v)crew[c.dataset.trade]=v;});
+    const mach=[...div.querySelectorAll(".machrow")].map(r=>({
+      cls:r.querySelector("[data-m=cls]").value,no:r.querySelector("[data-m=no]").value.trim(),
+      hrs:parseFloat(r.querySelector("[data-m=hrs]").value)||0})).filter(m=>m.no||m.hrs);
+    const isExc=EXC_CODES.includes(f("code"));
+    return {code:f("code"),element:f("element"),spec:f("spec").trim(),
+      zarea:f("zarea").trim(),zteam:f("zteam").trim(),zfront:f("zfront").trim(),
+      zone:composeZone(f("zarea"),f("zteam"),f("zfront")),qty:parseFloat(f("qty"))||0,
+      ground:isExc?f("ground"):"",dband:isExc?f("dband"):"",spoil:isExc?f("spoil"):"",
+      l10:isExc?(parseFloat(f("l10"))||""):"",l12:isExc?(parseFloat(f("l12"))||""):"",
+      stage:isExc?f("stage").trim():"",soil:isExc?f("soil"):"",qbasis:isExc?f("qbasis"):"",
+      stype:isStruct?f("stype"):"",method:isStruct?f("method"):"",
+      iw:isStruct?(parseFloat(f("iw"))||""):"",sw:isStruct?(parseFloat(f("sw"))||""):"",
+      dep:isStruct?(parseFloat(f("dep"))||""):"",cells:isStruct?(parseInt(f("cells"))||""):"",
+      ch1:(isStruct&&f("ch1")!=="")?parseFloat(f("ch1")):"",ch2:(isStruct&&f("ch2")!=="")?parseFloat(f("ch2")):"",
+      t1:f("t1"),t2:f("t2"),lunch:div.querySelector("[data-f=lunch]").checked,
+      subc:div.querySelector("[data-f=subc]").checked,subco:f("subco").trim(),
+      crew,mach,idleH:parseFloat(f("idleH"))||0,idleR:f("idleR"),note:f("note").trim()};
+  });
+  return {meta,rows};
+}
+
+function validate(d){
+  const e=[];
+  if(!d.meta.project)e.push("Project is empty.");
+  if(!d.meta.date)e.push("Date is empty.");
+  if(!d.meta.reporter)e.push("Reported by is empty.");
+  if(!d.rows.length)e.push("No activity rows.");
+  d.rows.forEach((r,i)=>{
+    const n=`Row ${i+1}`;
+    if(!r.code){e.push(`${n}: no activity code.`);return;}
+    const c=BYCODE[r.code];
+    const isExcRow=EXC_CODES.includes(r.code), loadsOnly=isExcRow&&r.qbasis==="Loads only";
+    const hasLoads=isExcRow&&((r.l10||0)+(r.l12||0))>0;
+    if(loadsOnly&&!hasLoads)e.push(`${n} (${r.code}): qty basis is "Loads only" — key the 10W/12W loads tally.`);
+    if(!(r.qty>0)&&!hasLoads&&!loadsOnly)e.push(`${n} (${r.code}): qty is empty — this is the number the whole system runs on.${isExcRow?' (Or switch the row to "Loads only" and key the truck tally.)':""}`);
+    if(c[5]===1&&!r.element)e.push(`${n} (${r.code}): pick an Element from the dropdown.`);
+    const structReq=(r.code.startsWith("DR-")&&r.code!=="DR-CONN")||DRAIN_ELEMENTS.includes(r.element);
+    if(structReq){
+      if(!r.stype)e.push(`${n} (${r.code}): pick the Structure type.`);
+      if(!r.method)e.push(`${n} (${r.code}): pick the Method (CIS / half precast / full precast).`);
+      if(!(r.iw>0))e.push(`${n} (${r.code}): size is locked-in data — enter ${r.stype==="Pipe drain"?"Dia":"IW"} (mm).`);
+      if(!(r.dep>0))e.push(`${n} (${r.code}): enter Depth (mm).`);
+      if(r.stype==="RCS sump / DIC"){
+        if(!(r.sw>0))e.push(`${n} (${r.code}): enter sump plan W (mm).`);
+      } else {
+        if(r.ch1===""||r.ch2==="")e.push(`${n} (${r.code}): enter chainage from/to — it locates the segment and stops double-counting.`);
+        else if(!(Math.abs(r.ch2-r.ch1)>0))e.push(`${n} (${r.code}): CH from and CH to are the same.`);
+      }
+    }
+    if(EXC_CODES.includes(r.code)){
+      if(!r.ground)e.push(`${n} (${r.code}): pick the Ground condition — it sets which rate pool this dig feeds.`);
+      if(r.code==="EW-EXCTD"&&!r.stage)e.push(`${n} (EW-EXCTD): key the Stage / level — deep-dig productivity is meaningless without it.`);
+      if(r.code!=="EW-EXCTD"&&!r.dband)e.push(`${n} (${r.code}): pick the Depth band.`);
+      if(!r.spoil)e.push(`${n} (${r.code}): pick where the spoil went — it links this dig to the trucking records.`);
+      if((r.spoil==="Offsite disposal"||r.spoil==="To stockpile (internal)")&&!((r.l10||0)+(r.l12||0)>0))
+        e.push(`${n} (${r.code}): spoil was trucked out — key your 10W/12W loads tally so office can cross-check the tickets.`);
+    }
+    if(r.code==="GN-IDLE"&&!r.idleR&&!r.spec)e.push(`${n} (GN-IDLE): state the reason.`);
+    if(r.idleH>0&&!r.idleR)e.push(`${n}: idle hours entered but no reason.`);
+    if(r.subc&&!r.subco)e.push(`${n} (${r.code}): Subcon is ticked — key in the company name.`);
+    const tot=Object.values(r.crew).reduce((a,b)=>a+b,0);
+    if(!tot&&!r.subc&&r.code!=="GN-IDLE"&&!["RW-MARK","RW-ACBC","RW-ACWC"].includes(r.code))e.push(`${n} (${r.code}): crew is zero. If a subcon did this work, tick "Subcon on this row" instead.`);
+    r.mach.forEach(m=>{if(m.hrs&&!m.no)e.push(`${n}: machine "${m.cls}" has hours but no asset no.`);});
+  });
+  return e;
+}
+
+const CSVHEAD=["date","project","shift","reported_by","weather","zone","activity_code","activity","spec_element","struct","method","iw_mm","w_mm","depth_mm","cells","ch_from_m","ch_to_m","ground","depth_band","stage","soil_type","spoil_to","loads_10w","loads_12w","loads_out","qty","unit","time_start","time_end","worked_lunch","hours_worked","SS","OP","WK","LS","RG","SC","TC","DRV","subcon","crew_total","man_hours","machines","machine_hours","idle_hours","idle_reason","note"];
+function toCSV(d){
+  const esc=v=>{v=String(v==null?"":v); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;};
+  const lines=[CSVHEAD.join(",")];
+  for(const r of d.rows){
+    const c=BYCODE[r.code]||["","","",""];
+    const hw=effHours(r.t1,r.t2,r.lunch);
+    const tot=Object.values(r.crew).reduce((a,b)=>a+b,0);
+    const machS=r.mach.map(m=>`${m.cls} #${m.no||"?"} @${m.hrs||hw}h`).join("; ");
+    const machH=r.mach.reduce((a,m)=>a+(m.hrs||hw),0);
+    const specEl=r.element?(r.element+(r.spec?" | "+r.spec:"")):r.spec;
+    lines.push([d.meta.date,d.meta.project,d.meta.shift,d.meta.reporter,d.meta.weather,r.zone,r.code,c[2],specEl,
+      r.stype,r.method,r.iw,r.sw,r.dep,r.cells,r.ch1,r.ch2,r.ground,r.dband,r.stage,r.soil,r.spoil,
+      r.l10,r.l12,(r.l10||0)+(r.l12||0)||"",r.qty,c[3],
+      r.t1,r.t2,r.lunch?"Y":"",hw,...TRADES.map(t=>r.crew[t[0]]||0),r.subc?r.subco:"",tot,Math.round(tot*hw*10)/10,
+      machS,Math.round(machH*10)/10,r.idleH||0,r.idleR,r.note].map(esc).join(","));
+  }
+  return lines.join("\n");
+}
+
+function download(name,text,type){
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([text],{type}));
+  a.download=name; a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),5000);
+}
+
+function toast(msg,bad){
+  const t=$("#toast"); t.textContent=msg;
+  t.style.background=bad?"var(--bad)":"var(--good)";
+  t.style.display="block"; setTimeout(()=>t.style.display="none",4200);
+}
+
+$("#export").addEventListener("click",()=>{
+  const d=collect(), errs=validate(d), box=$("#errors");
+  if(errs.length){
+    box.style.display="block";
+    box.innerHTML="<b>Fix before export:</b><ul>"+errs.map(e=>`<li>${e}</li>`).join("")+"</ul>";
+    box.scrollIntoView({behavior:"smooth"}); return;
+  }
+  box.style.display="none";
+  d.rows.forEach(r=>{rememberSubco(r.subco); STAGES.remember(r.stage); AREAS.remember(r.zarea);
+    TEAMS.remember(r.zteam); FRONTS.remember(r.zfront); SPECS.remember(r.spec);});
+  const stem=`${d.meta.date}_${d.meta.project.replace(/[^\w-]+/g,"")}_${d.meta.shift}_${d.meta.reporter.replace(/[^\w]+/g,"")||"DR"}_DR`;
+  download(stem+".csv",toCSV(d),"text/csv");
+  setTimeout(()=>download(stem+".json",JSON.stringify(d,null,2),"application/json"),400);
+  toast(`Exported ${d.rows.length} rows — now tap Upload ⇪ and pick both files`);
+});
+
+// OneDrive file-request link for the Site Logs drop folder (upload-only, no login)
+const UPLOAD_URL="https://kklepl-my.sharepoint.com/:f:/g/personal/xwkoh_kkle_com_sg/IgCvpaQsk7gyS7FEkJpVl5sgAQwJvcmJyqkn9sR325brIzs";
+$("#upload").addEventListener("click",()=>window.open(UPLOAD_URL,"_blank"));
+
+$("#addtask").addEventListener("click",()=>{addTask();save();});
+$("#newday").addEventListener("click",()=>{
+  if(!confirm("Clear this report and start a new day?"))return;
+  tasksEl.innerHTML=""; $("#genremark").value="";
+  $("#date").value=new Date().toISOString().slice(0,10);
+  addTask(); save();
+});
+
+function summary(){
+  const d=collect();
+  let mh=0,q=0;
+  d.rows.forEach(r=>{const hw=effHours(r.t1,r.t2,r.lunch);mh+=Object.values(r.crew).reduce((a,b)=>a+b,0)*hw; if(r.qty>0)q++;});
+  $("#summary").innerHTML=`<b>${d.rows.length}</b> rows · <b>${Math.round(mh)}</b> man-hrs · <b>${q}/${d.rows.length}</b> with qty`;
+}
+
+let saveTimer;
+function save(){
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(()=>{
+    try{localStorage.setItem("kkl_dr_draft",JSON.stringify(collect()));}catch(e){}
+    summary();
+  },300);
+}
+document.addEventListener("input",save);
+
+// init
+(function(){
+  $("#date").value=new Date().toISOString().slice(0,10);
+  let draft=null;
+  try{draft=JSON.parse(localStorage.getItem("kkl_dr_draft"));}catch(e){}
+  if(draft&&draft.rows&&draft.rows.length){
+    $("#project").value=draft.meta.project||""; if(draft.meta.date)$("#date").value=draft.meta.date;
+    $("#shift").value=draft.meta.shift||"Day"; $("#reporter").value=draft.meta.reporter||"";
+    $("#weather").value=draft.meta.weather||"Sunny"; $("#genremark").value=draft.meta.remarks||"";
+    draft.rows.forEach(r=>addTask(r));
+  } else addTask();
+  summary();
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<title>KKL DR Verify — Engineer Check</title>
+<style>
+  :root{
+    --paper:#f7f6f3; --ink:#26292b; --ink-soft:#5a5f63; --steel:#46606e;
+    --accent:#c85a10; --accent-ink:#a34a0d; --line:#d9d6cf; --line-strong:#b9b5ac;
+    --card:#ffffff; --field:#fbfaf8; --good:#2e7d4f; --bad:#b3402e; --mark:#fdf3e7;
+  }
+  *{box-sizing:border-box; margin:0;}
+  body{font:15px/1.45 "Segoe UI",system-ui,sans-serif; background:var(--paper); color:var(--ink); padding:14px; max-width:1080px; margin:0 auto;}
+  h1{font-size:19px; border:1.5px solid var(--ink); background:var(--card); padding:10px 14px; display:flex; justify-content:space-between; align-items:baseline;}
+  h1 .tag{font-family:Consolas,monospace; font-size:11px; letter-spacing:.1em; color:var(--ink-soft);}
+  .bar{display:flex; gap:10px; margin:12px 0; flex-wrap:wrap; align-items:end;}
+  label{display:block; font-size:12.5px; font-weight:600; color:var(--ink-soft); margin-bottom:3px;}
+  input[type=text]{font:inherit; padding:8px 10px; border:1px solid var(--line-strong); border-radius:4px; background:var(--field); min-width:200px;}
+  .drop{border:2px dashed var(--line-strong); border-radius:6px; background:var(--card); padding:26px; text-align:center; color:var(--ink-soft); cursor:pointer; margin-bottom:14px;}
+  .drop.on{border-color:var(--accent); background:var(--mark);}
+  .file{border:1.5px solid var(--ink); background:var(--card); border-radius:4px; margin-bottom:16px; overflow:hidden;}
+  .file .head{background:var(--steel); color:#fff; padding:8px 12px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:6px; font-size:13px;}
+  .file .head b{font-family:Consolas,monospace;}
+  .file .body{padding:10px; overflow-x:auto;}
+  table{border-collapse:collapse; width:100%; font-size:13px;}
+  th{background:#eef0ee; text-align:left; padding:5px 7px; border:1px solid var(--line); font-size:11.5px; text-transform:uppercase; letter-spacing:.03em; color:var(--ink-soft); white-space:nowrap;}
+  td{border:1px solid var(--line); padding:5px 7px; vertical-align:top;}
+  td.num{text-align:right; font-family:Consolas,monospace;}
+  tr.ok td{background:#f0f7f2;}
+  tr.q td{background:#fdf0ee;}
+  .rowok{transform:scale(1.3); accent-color:var(--good);}
+  .remark{width:130px; font:inherit; font-size:12px; padding:3px 5px; border:1px solid var(--line-strong); border-radius:3px;}
+  .cellinp{font:inherit; font-size:13px; padding:2px 4px; border:1px solid transparent; border-radius:3px; background:transparent; width:100%; min-width:44px;}
+  .cellinp.num{text-align:right; font-family:Consolas,monospace;}
+  .cellinp:focus{border-color:var(--accent); background:#fff; outline:none;}
+  .cellinp.edited{background:#fff3d6; border-color:var(--accent-ink); font-weight:700;}
+  .actions{display:flex; gap:10px; padding:10px; border-top:1px solid var(--line); align-items:center; flex-wrap:wrap;}
+  button{font:inherit; font-weight:600; border:1.5px solid var(--ink); border-radius:4px; padding:8px 14px; cursor:pointer; background:var(--card);}
+  button.primary{background:var(--accent); border-color:var(--accent-ink); color:#fff;}
+  button.minor{font-size:13px; padding:6px 10px;}
+  button:disabled{opacity:.45; cursor:not-allowed;}
+  .prog{font-size:13px; color:var(--ink-soft); margin-left:auto;}
+  .done{color:var(--good); font-weight:700;}
+  .hint{font-size:12.5px; color:var(--ink-soft); margin:8px 0 14px;}
+</style>
+
+<h1>DR Verify — Engineer Check <span class="tag">countersign before compile</span></h1>
+<div class="bar">
+  <div><label>Engineer name / initials</label><input type="text" id="eng" placeholder="e.g. R. Kumar"></div>
+</div>
+<div class="drop" id="drop">Tap to pick the foremen's exported CSV files for your site (or drag them here)<input type="file" id="pick" accept=".csv" multiple style="display:none"></div>
+<p class="hint">Every row needs a ✓ (correct) or a query remark (wrong / to re-check with the foreman). Export then downloads the countersigned <b>_VERIFIED.csv</b> — upload that to Site Logs; the office compile uses it instead of the raw file.</p>
+<div id="files"></div>
+
+<script>
+"use strict";
+const $=s=>document.querySelector(s);
+// OneDrive file-request link for the Site Logs drop folder (upload-only, no login)
+const UPLOAD_URL="https://kklepl-my.sharepoint.com/:f:/g/personal/xwkoh_kkle_com_sg/IgCvpaQsk7gyS7FEkJpVl5sgAQwJvcmJyqkn9sR325brIzs";
+$("#eng").value=localStorage.getItem("kkl_verify_name")||"";
+$("#eng").addEventListener("input",e=>localStorage.setItem("kkl_verify_name",e.target.value));
+
+function parseCSV(text){
+  const rows=[],re=/(,|\r?\n|^)("(?:[^"]|"")*"|[^",\r\n]*)/g;
+  let row=[],m,first=true;
+  while((m=re.exec(text))){
+    if(!first&&m[1]!==","){rows.push(row);row=[];}
+    let v=m[2];
+    if(v.startsWith('"'))v=v.slice(1,-1).replace(/""/g,'"');
+    row.push(v);first=false;
+    if(re.lastIndex===text.length)break;
+  }
+  if(row.length>1||row[0]!=="")rows.push(row);
+  return rows.filter(r=>r.some(c=>c!==""));
+}
+const esc=v=>{v=String(v==null?"":v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;};
+
+// [field, label, editable?] - engineer can correct editable cells on the spot;
+// every change is auto-logged into check_remark ("edited: qty 52->48").
+// Date/shift/code stay read-only: those errors mean the row must be re-keyed.
+const SHOW=[["date","Date",0],["shift","Shift",0],["zone","Zone / team / front",1],["activity_code","Code",0],
+ ["stage","Stage",1],["soil_type","Soil",1],["spoil_to","Spoil to",1],["loads_10w","10W",1],["loads_12w","12W",1],
+ ["qty","Qty",1],["unit","Unit",0],["SS","SS",1],["OP","OP",1],["WK","WK",1],["SC","SC",1],
+ ["machines","Machines",1],["idle_hours","Idle",1],["idle_reason","Reason",1]];
+const NUMF=["loads_10w","loads_12w","qty","SS","OP","WK","SC","idle_hours"];
+
+$("#drop").addEventListener("click",()=>$("#pick").click());
+$("#drop").addEventListener("dragover",e=>{e.preventDefault();$("#drop").classList.add("on");});
+$("#drop").addEventListener("dragleave",()=>$("#drop").classList.remove("on"));
+$("#drop").addEventListener("drop",e=>{e.preventDefault();$("#drop").classList.remove("on");load(e.dataTransfer.files);});
+$("#pick").addEventListener("change",e=>load(e.target.files));
+
+function load(list){
+  [...list].forEach(f=>{
+    if(!f.name.toLowerCase().endsWith(".csv"))return;
+    const rd=new FileReader();
+    rd.onload=()=>addFile(f.name,rd.result);
+    rd.readAsText(f,"utf-8");
+  });
+}
+
+function addFile(name,text){
+  const grid=parseCSV(text);
+  if(grid.length<2){alert(name+": no data rows");return;}
+  const head=grid[0],rows=grid.slice(1).map(r=>Object.fromEntries(head.map((h,i)=>[h,r[i]??""])));
+  const idx=Object.fromEntries(head.map((h,i)=>[h,i]));
+  const meta=rows[0]||{};
+  const div=document.createElement("div");
+  div.className="file";
+  const loads=rows.reduce((a,r)=>a+(+r.loads_10w||0)+(+r.loads_12w||0)+((+r.loads_10w||+r.loads_12w)?0:(+r.loads_out||0)),0);
+  div.innerHTML=`<div class="head"><span><b>${name}</b></span>
+     <span>${meta.project||"?"} · ${meta.date||"?"} · ${meta.shift||"?"} · keyed by <b>${meta.reported_by||"?"}</b> · ${rows.length} rows · ${loads} loads</span></div>
+   <div class="body"><table><thead><tr><th>#</th>${SHOW.map(c=>`<th>${c[1]}${c[2]?" ✎":""}</th>`).join("")}<th>✓ OK</th><th>Query remark</th></tr></thead>
+   <tbody>${rows.map((r,i)=>`<tr data-i="${i}"><td class="num">${i+1}</td>${SHOW.map(c=>{
+      const v=String(r[c[0]]||"");const numeric=NUMF.includes(c[0]);
+      if(c[2])return `<td class="${numeric?"num":""}"><input class="cellinp ${numeric?"num":""}" data-f="${c[0]}" data-orig="${v.replace(/"/g,"&quot;")}" value="${v.replace(/"/g,"&quot;")}" ${numeric?'inputmode="decimal" size="4"':""}></td>`;
+      return `<td class="${numeric?"num":""}">${v.slice(0,60)}</td>`;}).join("")}
+      <td style="text-align:center"><input type="checkbox" class="rowok"></td>
+      <td><input class="remark" placeholder="—"></td></tr>`).join("")}</tbody></table></div>
+   <div class="actions">
+     <button class="minor" data-all>✓ all correct</button>
+     <button class="primary" data-exp disabled>Export countersigned CSV</button>
+     <button class="minor" data-up>Upload ⇪</button>
+     <span class="prog" data-prog></span>
+   </div>`;
+  $("#files").appendChild(div);
+  const update=()=>{
+    let ok=0,q=0,ed=0;
+    div.querySelectorAll("tbody tr").forEach(tr=>{
+      let changed=false;
+      tr.querySelectorAll(".cellinp").forEach(inp=>{
+        const dirty=inp.value.trim()!==inp.dataset.orig.trim();
+        inp.classList.toggle("edited",dirty);
+        if(dirty)changed=true;
+      });
+      const c=tr.querySelector(".rowok").checked, rm=tr.querySelector(".remark").value.trim();
+      tr.classList.toggle("ok",c); tr.classList.toggle("q",!c&&!!rm);
+      if(c){ok++; if(changed)ed++;} else if(rm)q++;
+    });
+    const total=rows.length, done=ok+q===total;
+    div.querySelector("[data-prog]").innerHTML=done
+      ?`<span class="done">${ok} OK${ed?` (${ed} corrected)`:""} · ${q} queried — ready</span>`
+      :`${ok} OK${ed?` (${ed} corrected)`:""} · ${q} queried · ${total-ok-q} unchecked`;
+    div.querySelector("[data-exp]").disabled=!done||!$("#eng").value.trim();
+  };
+  div.addEventListener("input",update);
+  div.querySelector("[data-all]").addEventListener("click",()=>{
+    div.querySelectorAll(".rowok").forEach(c=>{c.checked=true;});update();
+  });
+  div.querySelector("[data-up]").addEventListener("click",()=>window.open(UPLOAD_URL,"_blank"));
+  div.querySelector("[data-exp]").addEventListener("click",()=>{
+    const eng=$("#eng").value.trim();
+    const today=new Date().toISOString().slice(0,10);
+    const outHead=[...head,"checked_by","checked_date","check_status","check_remark"];
+    const lines=[outHead.map(esc).join(",")];
+    div.querySelectorAll("tbody tr").forEach((tr,i)=>{
+      const c=tr.querySelector(".rowok").checked, rm=tr.querySelector(".remark").value.trim();
+      const vals=head.map(h=>grid[i+1][idx[h]]??"");
+      const edits=[];
+      tr.querySelectorAll(".cellinp").forEach(inp=>{
+        const f=inp.dataset.f, nv=inp.value.trim(), ov=inp.dataset.orig.trim();
+        if(nv!==ov){vals[idx[f]]=nv; edits.push(`${f} ${ov||"(blank)"}→${nv||"(blank)"}`);}
+      });
+      const status=c?(edits.length?"EDITED":"OK"):"QUERY";
+      const remark=[edits.length?"edited: "+edits.join("; "):"",rm].filter(Boolean).join(" | ");
+      lines.push([...vals,eng,today,status,remark].map(esc).join(","));
+    });
+    const a=document.createElement("a");
+    a.href=URL.createObjectURL(new Blob([lines.join("\n")],{type:"text/csv"}));
+    a.download=name.replace(/\.csv$/i,"")+"_VERIFIED.csv";
+    a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href),5000);
+    div.querySelector(".head").style.background="var(--good)";
+  });
+  update();
+}
+</script>
+
+</body>
+</html>
