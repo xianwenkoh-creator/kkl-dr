@@ -46,6 +46,7 @@
   .tick input{width:18px; height:18px; min-height:0; padding:0; margin:0; flex:0 0 auto; accent-color:var(--accent);}
   .tick.on{color:var(--accent-ink);}
   .hrschip{font-family:"Cascadia Mono",Consolas,monospace; font-size:12px; font-weight:700; color:var(--accent-ink); margin-left:auto;}
+  .nightchip{font-size:11px; font-weight:800; letter-spacing:.4px; color:#fff; background:#31456b; border-radius:3px; padding:2px 7px; margin-left:8px;}
 
   .task{border:1.5px solid var(--ink); background:var(--card); border-radius:4px; margin-bottom:14px; overflow:hidden;}
   .task .head{display:flex; justify-content:space-between; align-items:center; background:var(--steel); color:#fff; padding:7px 12px;}
@@ -63,7 +64,14 @@
   .crew output{min-width:26px; text-align:center; font-weight:700; font-variant-numeric:tabular-nums;}
   .crew.on{border-color:var(--accent); background:var(--mark);}
 
-  .machrow{display:grid; grid-template-columns:1.1fr 1fr 54px 34px; gap:6px; margin-top:6px; align-items:center;}
+  .machrow{display:grid; grid-template-columns:1.15fr 1fr 0.72fr 50px 32px; gap:5px; margin-top:6px; align-items:center;}
+  .machrow select[data-m=arm]{background:#fffdf3;}
+  .machrow select[data-m=arm]:invalid,.machrow select[data-m=arm][value=""]{border-color:var(--accent-ink);}
+  @media (max-width:430px){
+    .machrow{gap:4px; grid-template-columns:1.1fr 0.95fr 0.7fr 44px 28px;}
+    .machrow input,.machrow select{padding:6px 3px; font-size:13px;}
+    .machrow button{width:28px;}
+  }
   .sugwrap{position:relative;}
   .suggest{position:absolute; top:calc(100% + 2px); left:0; min-width:280px; max-width:min(92vw,420px); background:var(--card); border:1.5px solid var(--steel); border-radius:4px; z-index:6; max-height:200px; overflow-y:auto; box-shadow:0 6px 14px rgba(0,0,0,.18); display:none;}
   .suggest div{padding:9px 10px; font-size:14px; border-bottom:1px solid var(--line); cursor:pointer; display:flex; justify-content:space-between; gap:10px;}
@@ -77,6 +85,7 @@
   .machrow button{width:34px; height:34px; min-height:34px; border:1px solid var(--line-strong); background:var(--card); color:var(--bad); border-radius:4px; font-size:16px; cursor:pointer; padding:0;}
 
   .addbtn{width:100%; padding:12px; font:inherit; font-weight:650; border:2px dashed var(--line-strong); background:none; color:var(--steel); border-radius:4px; cursor:pointer; margin:2px 0 14px;}
+  .addbtn.stand{border-color:var(--accent-ink); color:var(--accent-ink); margin-top:-8px; padding:10px; font-size:14px;}
   .minor{background:none; border:1px solid var(--line-strong); color:var(--steel); font-size:13px; font-weight:600; border-radius:4px; padding:7px 10px; cursor:pointer; margin-top:6px;}
 
   .footer{position:fixed; left:0; right:0; bottom:0; background:var(--card); border-top:2px solid var(--ink); padding:10px 12px calc(10px + env(safe-area-inset-bottom));}
@@ -107,7 +116,7 @@
 <div class="wrap">
   <header class="app">
     <h1>KKL Daily Report — Site Capture</h1>
-    <span class="tag">v3.1 · one row per crew × activity</span>
+    <span class="tag">v3.3 · night auto-detected · arm type · standing plant</span>
   </header>
 
   <fieldset>
@@ -151,6 +160,8 @@
   <div class="errors" id="errors"></div>
   <div id="tasks"></div>
   <button class="addbtn" id="addtask" type="button">＋ Add activity row</button>
+  <button class="addbtn stand" id="addstand" type="button">＋ Plant stood idle (no output)</button>
+  <p class="hint" style="margin:-10px 0 14px">A team that dug nothing still costs money. Log the machines that stood and why — that is the record if the delay was someone else's.</p>
 
   <fieldset>
     <legend>How to file</legend>
@@ -217,7 +228,31 @@ const BYCODE=Object.fromEntries(CODES.map(c=>[c[0],c]));
 // never counted — the subcon tick + company flags the row; crew here is KKL's own only.
 const TRADES=[["SS","Site Sup"],["OP","Operator"],["WK","Worker"],["LS","Lift Sup"],["RG","Rigger"],["SC","Safety"],["TC","Traffic"],["DRV","Driver"]];
 const MACH=["Mini 5.5t","Exc 8t","Exc 14t","Exc 14t+breaker","Exc 20t","Exc 20t+breaker","Exc 25t SA/LA","Exc 30t","Exc 35-40t","Exc 45t+","Exc telescopic (clamshell)","Exc long arm","Exc standard arm","Exc short arm","Exc standby","Lorry crane","Mobile crane","Roller","Compactor","Concrete pump","Water truck","Tipper","Grader","Paver","Dozer","Wheel loader","Dump truck (ADT)","Crusher/Screener","Forklift","Generator/Welder","Lighting tower","Air compressor","Other"];
-const IDLE_REASONS=["","Rain","No work front","Awaiting MC instruction","Machine breakdown","Awaiting materials","Other"];
+const IDLE_REASONS=["","Rain","No work front","Awaiting MC instruction","Machine breakdown","Awaiting materials","Waiting on another trade/subcon","Awaiting strut / decking","Other"];
+// DDJV's daily report counts excavators by ARM TYPE, not tonnage - and arm type cannot be
+// derived from tonnage (a 14t may be short- or long-arm). Options carry the full text as
+// the value (the report matches on it) but a short label, so the select fits a phone row.
+const ARMS=[["",""],["Telescopic","Tele"],["Long arm","Long"],["Standard arm","Std"],["Short arm","Short"],["N.A.","N.A."]];
+// Seeded from CR108's machinery deployment list - 63 of 67 units state it in the capacity
+// column ("20TON / SHORT"). Anything keyed by hand afterwards is remembered per machine.
+const ARM_SEED={"EX106":"Short arm","EX201":"Short arm","EX336":"Telescopic","EX374":"Telescopic","EX375":"Telescopic","EX376":"Telescopic","EX384":"Telescopic","EX400":"Telescopic","EX402":"Telescopic","EX420":"Short arm","EX425":"Short arm","EX426":"Short arm","EX430":"Short arm","EX431":"Telescopic","EX433":"Telescopic","EX435":"Short arm","EX441":"Telescopic","EX442":"Telescopic","EX457":"Standard arm","EX48":"Short arm","EX488":"Standard arm","EX507":"Short arm","EX509":"Short arm","EX525":"Standard arm","EX538":"Standard arm","EX546":"Standard arm","EX563":"Short arm","EX566":"Standard arm","EX601":"Short arm","EX607":"Short arm","EX613":"Short arm","EX614":"Short arm","EX636":"Standard arm","EX643":"Short arm","EX661":"Standard arm","EX673":"Short arm","EX674":"Short arm","EX675":"Short arm","EX744":"Standard arm","EX745":"Standard arm","EX746":"Standard arm","EX757":"Short arm","EX760":"Short arm","EX771":"Telescopic","EX804":"Standard arm","EX814":"Short arm","EX817":"Short arm","EX820":"Short arm","EX862":"Telescopic","EX872":"Short arm","EX880":"Short arm","EX891":"Short arm","EX893":"Short arm","EX894":"Short arm","EX896":"Standard arm","EX897":"Short arm","EX898":"Short arm","EX900":"Short arm","EX944":"Standard arm","EX945":"Standard arm","EX946":"Standard arm","EX947":"Standard arm","EX948":"Standard arm"};
+const ARM_KEY="dr_arm_map";
+function armStore(){try{return JSON.parse(localStorage.getItem(ARM_KEY)||"{}");}catch(e){return {};}}
+function rememberArm(no,arm){
+  if(!no||!arm)return;
+  const m=armStore(); m[no.trim().toUpperCase()]=arm;
+  try{localStorage.setItem(ARM_KEY,JSON.stringify(m));}catch(e){}
+}
+// EX374B and EX374 are the same machine as far as the arm goes - fall back to the digits.
+function armOf(no){
+  if(!no)return "";
+  const all=Object.assign({},ARM_SEED,armStore()), k=no.trim().toUpperCase();
+  if(all[k])return all[k];
+  const d=k.replace(/\D/g,"");
+  if(!d)return "";
+  const hit=Object.keys(all).find(x=>x.replace(/\D/g,"")===d);
+  return hit?all[hit]:"";
+}
 // Fleet register - 1417 units: Connie Lim's "Machinery Summary (Recovered)_22.10.2025.xlsx" (live SharePoint,
 // snapshot 16.07.2026 via Excel) + PEMA "All project Overview" exports (01 PnL/RC210/Machinery). Plain register nos
 // carry their operational EX code (EX828 = register 828, PEMA convention); W-plate rows merged into base units.
@@ -1699,6 +1734,7 @@ function addTask(data){
   div.className="task"; div.id=id;
   div.innerHTML=`
    <div class="head"><span class="t">ROW ${tasksEl.children.length+1}</span>
+     <span class="nightchip" data-night style="display:none">🌙 NIGHT</span>
      <button type="button" title="Remove row" data-del>✕</button></div>
    <div class="body">
     <label>Activity code</label>
@@ -1780,7 +1816,7 @@ function addTask(data){
         <span class="ctl"><button type="button" data-minus>−</button><output>${(d.crew&&d.crew[t[0]])||0}</output><button type="button" data-plus>＋</button></span>
       </div>`).join("")}
     </div>
-    <label>Machines (class · asset no. · hrs)</label>
+    <label>Machines (asset no. · class · arm · hrs)</label>
     <div data-machines></div>
     <button class="minor" type="button" data-addmach>＋ machine</button>
     <details class="adv" ${d.idleH?"open":""}>
@@ -1802,9 +1838,11 @@ function addTask(data){
   ["ch1","ch2"].forEach(k=>div.querySelector(`[data-f=${k}]`).addEventListener("input",()=>{autoQtyFromCH(div);save();}));
   const lunchCb=div.querySelector("[data-f=lunch]"), subCb=div.querySelector("[data-f=subc]");
   const updHrs=()=>{
-    const hw=effHours(div.querySelector("[data-f=t1]").value,div.querySelector("[data-f=t2]").value,lunchCb.checked);
+    const t1=div.querySelector("[data-f=t1]").value, t2=div.querySelector("[data-f=t2]").value;
+    const hw=effHours(t1,t2,lunchCb.checked);
     div.querySelector("[data-hrs]").textContent=hw?hw+" h":"";
     lunchCb.closest(".tick").classList.toggle("on",lunchCb.checked);
+    div.querySelector("[data-night]").style.display=isNightRow(t1,t2)?"":"none";
   };
   ["t1","t2"].forEach(k=>div.querySelector(`[data-f=${k}]`).addEventListener("input",updHrs));
   lunchCb.addEventListener("change",()=>{updHrs();save();});
@@ -1861,17 +1899,24 @@ function addMach(div,m){
   const box=div.querySelector("[data-machines]");
   const r=document.createElement("div");
   r.className="machrow";
+  const arm0=m.arm||armOf(m.no);
   r.innerHTML=`<div class="sugwrap"><input data-m="no" placeholder="machine no. — type EX no." autocomplete="off" value="${m.no||""}"><div class="suggest"></div></div>
     <select data-m="cls">${MACH.map(x=>`<option ${m.cls===x?"selected":""}>${x}</option>`).join("")}</select>
+    <select data-m="arm" title="Arm type — DDJV counts machines this way">${ARMS.map(a=>`<option value="${a[0]}" ${arm0===a[0]?"selected":""}>${a[1]||"arm?"}</option>`).join("")}</select>
     <input data-m="hrs" type="number" inputmode="decimal" min="0" step="0.5" placeholder="hrs" value="${m.hrs||""}">
     <button type="button" title="remove">✕</button>`;
   r.querySelector("button").addEventListener("click",()=>{r.remove();save();});
   r.querySelectorAll("input,select").forEach(i=>i.addEventListener("input",save));
-  attachSuggest(r.querySelector("[data-m=no]"), r.querySelector(".suggest"), r.querySelector("[data-m=cls]"));
+  // an arm keyed by hand sticks to that machine for every future row, on every project
+  r.querySelector("[data-m=arm]").addEventListener("change",e=>
+    rememberArm(r.querySelector("[data-m=no]").value,e.target.value));
+  attachSuggest(r.querySelector("[data-m=no]"), r.querySelector(".suggest"),
+                r.querySelector("[data-m=cls]"), r.querySelector("[data-m=arm]"));
   box.appendChild(r);
 }
 
-function attachSuggest(inp, box, clsSel){
+function attachSuggest(inp, box, clsSel, armSel){
+  const fillArm=no=>{const a=armOf(no); if(a&&armSel&&!armSel.value)armSel.value=a;};
   function hide(){box.style.display="none";}
   function show(){
     const v=inp.value.trim().toLowerCase();
@@ -1884,6 +1929,7 @@ function attachSuggest(inp, box, clsSel){
       e.preventDefault();
       inp.value=el.dataset.no;
       if(el.dataset.cls) clsSel.value=el.dataset.cls;
+      fillArm(el.dataset.no);
       hide(); save();
     }));
   }
@@ -1900,7 +1946,8 @@ function attachSuggest(inp, box, clsSel){
       const part=MACHINES.filter(m=>m.no.toLowerCase().includes(v));
       if(part.length===1)hit=part[0];
     }
-    if(hit){inp.value=hit.no; if(hit.cls)clsSel.value=hit.cls; save();}
+    if(hit){inp.value=hit.no; if(hit.cls)clsSel.value=hit.cls; fillArm(hit.no); save();}
+    else fillArm(inp.value);
   });
 }
 
@@ -1975,6 +2022,16 @@ function effHours(t1,t2,lunch){
   const ded=lunch?0:Math.max(0,Math.min(b,780)-Math.max(a,720));
   return Math.round((d-ded)/6)/10;
 }
+
+// One foreman often covers BOTH shifts, so the shift set at the top of the form is only a
+// default - each row's real shift comes from its own clock. A row that starts at or after
+// 18:00, or that ends earlier than it starts (crosses midnight), is a night row.
+function isNightRow(t1,t2){
+  if(!t1||!t2)return false;
+  const h1=+t1.slice(0,2), h2=+t2.slice(0,2);
+  return h1>=18 || (h2*60+ +t2.slice(3))<(h1*60+ +t1.slice(3));
+}
+function rowShift(t1,t2,dflt){return isNightRow(t1,t2)?"Night":(dflt||"Day");}
 
 // Remembered lists, scoped PER PROJECT (key::PROJECT in localStorage): once the project
 // is keyed, every box recalls what was entered before on this phone for that project.
@@ -2055,6 +2112,7 @@ function collect(){
     div.querySelectorAll(".crew").forEach(c=>{const v=parseInt(c.querySelector("output").textContent)||0; if(v)crew[c.dataset.trade]=v;});
     const mach=[...div.querySelectorAll(".machrow")].map(r=>({
       cls:r.querySelector("[data-m=cls]").value,no:r.querySelector("[data-m=no]").value.trim(),
+      arm:r.querySelector("[data-m=arm]").value,
       hrs:parseFloat(r.querySelector("[data-m=hrs]").value)||0})).filter(m=>m.no||m.hrs);
     const isExc=EXC_CODES.includes(f("code"));
     return {code:f("code"),element:f("element"),spec:f("spec").trim(),
@@ -2115,7 +2173,13 @@ function validate(d){
     if(r.subc&&!r.subco)e.push(`${n} (${r.code}): Subcon is ticked — key in the company name.`);
     const tot=Object.values(r.crew).reduce((a,b)=>a+b,0);
     if(!tot&&!r.subc&&r.code!=="GN-IDLE"&&!["RW-MARK","RW-ACBC","RW-ACWC"].includes(r.code))e.push(`${n} (${r.code}): crew is zero. If a subcon did this work, tick "Subcon on this row" instead.`);
-    r.mach.forEach(m=>{if(m.hrs&&!m.no)e.push(`${n}: machine "${m.cls}" has hours but no asset no.`);});
+    r.mach.forEach(m=>{
+      if(m.hrs&&!m.no)e.push(`${n}: machine "${m.cls}" has hours but no asset no.`);
+      // DDJV's report is built from arm type - without it the machine cannot be reported
+      if(/^exc/i.test(m.cls)&&!m.arm)e.push(`${n}: machine ${m.no||m.cls} — pick the arm (Tele / Long / Std / Short). DDJV counts machines by arm, and it is remembered for that machine from now on.`);
+    });
+    if(r.code==="GN-IDLE"&&!r.mach.length&&!tot)
+      e.push(`${n} (GN-IDLE): list the plant that stood, or the men — otherwise there is nothing to record.`);
   });
   return e;
 }
@@ -2128,10 +2192,12 @@ function toCSV(d){
     const c=BYCODE[r.code]||["","","",""];
     const hw=effHours(r.t1,r.t2,r.lunch);
     const tot=Object.values(r.crew).reduce((a,b)=>a+b,0);
-    const machS=r.mach.map(m=>`${m.cls} #${m.no||"?"} @${m.hrs||hw}h`).join("; ");
+    // arm goes in brackets after the class: the DDJV renderer matches the arm words, while
+    // the costing lookup strips the bracket and still finds the tonnage class it prices on.
+    const machS=r.mach.map(m=>`${m.cls}${m.arm?` (${m.arm})`:""} #${m.no||"?"} @${m.hrs||hw}h`).join("; ");
     const machH=r.mach.reduce((a,m)=>a+(m.hrs||hw),0);
     const specEl=r.element?(r.element+(r.spec?" | "+r.spec:"")):r.spec;
-    lines.push([d.meta.date,d.meta.project,d.meta.shift,d.meta.reporter,d.meta.weather,r.zone,r.code,c[2],specEl,
+    lines.push([d.meta.date,d.meta.project,rowShift(r.t1,r.t2,d.meta.shift),d.meta.reporter,d.meta.weather,r.zone,r.code,c[2],specEl,
       r.stype,r.method,r.iw,r.sw,r.dep,r.cells,r.ch1,r.ch2,r.ground,r.dband,r.stage,r.soil,r.spoil,
       r.l10,r.l12,(r.l10||0)+(r.l12||0)||"",r.qty,c[3],
       r.t1,r.t2,r.lunch?"Y":"",hw,...TRADES.map(t=>r.crew[t[0]]||0),r.subc?r.subco:"",tot,Math.round(tot*hw*10)/10,
@@ -2163,7 +2229,9 @@ $("#export").addEventListener("click",()=>{
   box.style.display="none";
   d.rows.forEach(r=>{rememberSubco(r.subco); STAGES.remember(r.stage); AREAS.remember(r.zarea);
     TEAMS.remember(r.zteam); FRONTS.remember(r.zfront); SPECS.remember(r.spec);});
-  const stem=`${d.meta.date}_${d.meta.project.replace(/[^\w-]+/g,"")}_${d.meta.shift}_${d.meta.reporter.replace(/[^\w]+/g,"")||"DR"}_DR`;
+  d.rows.forEach(r=>r.mach.forEach(m=>rememberArm(m.no,m.arm)));
+  const shifts=[...new Set(d.rows.map(r=>rowShift(r.t1,r.t2,d.meta.shift)))];
+  const stem=`${d.meta.date}_${d.meta.project.replace(/[^\w-]+/g,"")}_${shifts.length>1?"Mixed":shifts[0]||d.meta.shift}_${d.meta.reporter.replace(/[^\w]+/g,"")||"DR"}_DR`;
   download(stem+".csv",toCSV(d),"text/csv");
   setTimeout(()=>download(stem+".json",JSON.stringify(d,null,2),"application/json"),400);
   toast(`Exported ${d.rows.length} rows — now tap Upload ⇪ and pick both files`);
@@ -2174,6 +2242,19 @@ const UPLOAD_URL="https://kklepl-my.sharepoint.com/:f:/g/personal/xwkoh_kkle_com
 $("#upload").addEventListener("click",()=>window.open(UPLOAD_URL,"_blank"));
 
 $("#addtask").addEventListener("click",()=>{addTask();save();});
+// Standing plant: a pre-set GN-IDLE row. Machines that stood all shift never reached the
+// old daily report at all, so idle machine-days went uncosted and third-party delays
+// (e.g. "waiting on the strut installer") left no evidence behind.
+$("#addstand").addEventListener("click",()=>{
+  addTask({code:"GN-IDLE",idleR:"Waiting on another trade/subcon"});
+  const div=tasksEl.lastElementChild;
+  div.querySelector("[data-f=code]").value="GN-IDLE";
+  applyCode(div);
+  const adv=div.querySelector("details.adv"); if(adv)adv.open=true;
+  addMach(div);
+  div.scrollIntoView({behavior:"smooth",block:"center"});
+  save();
+});
 $("#newday").addEventListener("click",()=>{
   if(!confirm("Clear this report and start a new day?"))return;
   tasksEl.innerHTML=""; $("#genremark").value="";
