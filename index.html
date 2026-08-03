@@ -49,6 +49,9 @@
   .nightchip{font-size:11px; font-weight:800; letter-spacing:.4px; color:#fff; background:#31456b; border-radius:3px; padding:2px 7px; margin-left:8px;}
   .task.standing{border-color:var(--accent-ink); box-shadow:inset 4px 0 0 var(--accent-ink);}
   .task.standing .head .t::after{content:" · PLANT STOOD IDLE"; font-size:11px; letter-spacing:.4px;}
+  /* the reason is the whole point of a standing row - present it as a plain section */
+  .task.standing details.adv>summary{display:none;}
+  .task.standing details.adv{border-color:var(--accent-ink);}
   @keyframes rowflash{0%,100%{background:transparent} 30%{background:#fff3cd}}
   .task.flash{animation:rowflash 1.6s ease-in-out;}
 
@@ -120,7 +123,7 @@
 <div class="wrap">
   <header class="app">
     <h1>KKL Daily Report — Site Capture</h1>
-    <span class="tag">v3.3 · night auto-detected · arm type · standing plant</span>
+    <span class="tag">v3.6 · night auto-detected · arm type · standing plant</span>
   </header>
 
   <fieldset>
@@ -1792,7 +1795,7 @@ function addTask(data){
       </div>
       <p class="hint" style="margin:6px 0 0">Loads = your own truck count for this dig — office cross-checks it against trip tickets / stockpile records.</p>
     </div>
-    <div class="row">
+    <div class="row" data-specrow>
       <div style="flex:1.4">
         <label data-speclabel>Spec / size / grade</label>
         <div class="sugwrap" data-specwrap><input data-f="spec" placeholder="e.g. 1200Ø 2.5–3m deep" autocomplete="off" value="${d.spec||""}"><div class="suggest"></div></div>
@@ -1803,9 +1806,13 @@ function addTask(data){
       <div style="flex:0.5"><label>Team</label><div class="sugwrap" data-zteamwrap><input data-f="zteam" placeholder="2" autocomplete="off" value="${d.zteam||""}"><div class="suggest"></div></div></div>
       <div style="flex:1.7"><label>Work front (opening / GL / CH)</label><div class="sugwrap" data-zfrontwrap><input data-f="zfront" placeholder="e.g. GL1-10 B1" autocomplete="off" value="${d.zfront||""}"><div class="suggest"></div></div></div>
     </div>
-    <div class="row">
+    <div class="row" data-standshift style="display:none">
+      <div style="flex:1"><label>Shift the plant stood</label>
+        <select data-f="shiftov"><option ${d.shiftov==="Night"?"":"selected"}>Day</option><option ${d.shiftov==="Night"?"selected":""}>Night</option></select></div>
+    </div>
+    <div class="row" data-qtyrow>
       <div style="display:flex; gap:8px;">
-        <div style="flex:1"><label>Qty done today</label>
+        <div style="flex:1"><label data-qtylab>Qty done today</label>
         <input data-f="qty" type="number" inputmode="decimal" min="0" step="any" placeholder="0" value="${d.qty||""}"></div>
         <span class="unitchip" data-unit>—</span>
       </div>
@@ -1814,14 +1821,14 @@ function addTask(data){
         <div style="flex:1"><label>To</label><input data-f="t2" type="time" value="${d.t2||"17:00"}"></div>
       </div>
     </div>
-    <label class="tick ${d.lunch?"on":""}"><input type="checkbox" data-f="lunch" ${d.lunch?"checked":""}> Worked through lunch (12–1)<span class="hrschip" data-hrs></span></label>
-    <label class="tick ${d.subc?"on":""}"><input type="checkbox" data-f="subc" ${d.subc?"checked":""}> Subcon on this row</label>
+    <label class="tick ${d.lunch?"on":""}" data-lunchwrap><input type="checkbox" data-f="lunch" ${d.lunch?"checked":""}> Worked through lunch (12–1)<span class="hrschip" data-hrs></span></label>
+    <label class="tick ${d.subc?"on":""}" data-subcrow><input type="checkbox" data-f="subc" ${d.subc?"checked":""}> Subcon on this row</label>
     <div data-subcwrap style="display:${d.subc?"block":"none"}">
       <label>Subcon company</label>
       <div class="sugwrap"><input data-f="subco" placeholder="tap to pick / type new name" autocomplete="off" value="${d.subco||""}"><div class="suggest"></div></div>
     </div>
     <div data-standnote style="display:none">
-      <p class="hint" style="margin:2px 0 8px">Plant only. Men who stood with the machine are already counted on their own team's row — key their lost time as <b>downtime hours</b> there, so the same men aren't paid for twice.</p>
+      <p class="hint" style="margin:2px 0 8px">Plant only — <b>hours go on each machine</b> above; that is what the standing time costs. Men who stood with it are already counted on their own team's row, so key their lost time as <b>downtime hours</b> there rather than here.</p>
       <button class="minor" type="button" data-showcrew>＋ the whole gang stood down too</button>
     </div>
     <div data-crewwrap>
@@ -1839,7 +1846,7 @@ function addTask(data){
       <summary>Downtime on this row / note</summary>
       <div class="idlebox">
         <div class="row">
-          <div><label>Idle hours</label><input data-f="idleH" type="number" inputmode="decimal" min="0" step="0.5" placeholder="0" value="${d.idleH||""}"></div>
+          <div data-idlehwrap><label>Idle hours</label><input data-f="idleH" type="number" inputmode="decimal" min="0" step="0.5" placeholder="0" value="${d.idleH||""}"></div>
           <div><label>Reason</label><select data-f="idleR">${IDLE_REASONS.map(r=>`<option ${d.idleR===r?"selected":""}>${r}</option>`).join("")}</select></div>
         </div>
         <label>Note (optional)</label><input data-f="note" placeholder="—" value="${d.note||""}">
@@ -1858,14 +1865,14 @@ function addTask(data){
     const hw=effHours(t1,t2,lunchCb.checked);
     div.querySelector("[data-hrs]").textContent=hw?hw+" h":"";
     lunchCb.closest(".tick").classList.toggle("on",lunchCb.checked);
-    div.querySelector("[data-night]").style.display=isNightRow(t1,t2)?"":"none";
-    // on a standing-plant row the quantity IS the hours stood - don't make anyone work it out
-    const q=div.querySelector("[data-f=qty]");
-    if(div.classList.contains("standing")&&hw&&(!q.value||div.dataset.autoqty==="1")){
-      q.value=hw; div.dataset.autoqty="1";
-    }
+    if(!div.classList.contains("standing"))
+      div.querySelector("[data-night]").style.display=isNightRow(t1,t2)?"":"none";
   };
-  div.querySelector("[data-f=qty]").addEventListener("input",()=>{div.dataset.autoqty="";});
+  div.querySelector("[data-f=shiftov]").addEventListener("change",e=>{
+    if(div.classList.contains("standing"))
+      div.querySelector("[data-night]").style.display=e.target.value==="Night"?"":"none";
+    save();
+  });
   ["t1","t2"].forEach(k=>div.querySelector(`[data-f=${k}]`).addEventListener("input",updHrs));
   lunchCb.addEventListener("change",()=>{updHrs();save();});
   subCb.addEventListener("change",()=>{
@@ -1983,13 +1990,31 @@ function applyCode(div){
   // A standing-plant row is about PLANT: the machine still costs its ownership rate while it
   // sits, and nothing else in the system records that. Men who stood belong on their own
   // team's row as downtime hours - keying them here as well would pay them twice.
+  // A standing-plant row answers four questions and nothing else: WHERE it stood (area/front),
+  // WHICH shift, WHAT stood and for how long (the machine rows carry their own hours - that IS
+  // the quantity), and WHY. Everything built around men or output is noise here, so it goes:
+  // qty (= sum of machine hours), start/end times (the shift picker replaces them), the lunch
+  // deduction (a machine does not take lunch), spec, subcon, and the separate idle-hours box.
   const standing=code==="GN-IDLE";
   div.classList.toggle("standing",standing);           // also re-marks rows restored from a draft
   const crewHas=[...div.querySelectorAll(".crew output")].some(o=>(parseInt(o.textContent)||0)>0);
+  const hide=(sel,on)=>{const el=div.querySelector(sel); if(el)el.style.display=on?"none":"";};
   div.querySelector("[data-standnote]").style.display=standing?"":"none";
   div.querySelector("[data-crewwrap]").style.display=(!standing||crewHas)?"":"none";
   const showBtn=div.querySelector("[data-showcrew]");
   if(showBtn)showBtn.style.display=crewHas?"none":"";
+  hide("[data-qtyrow]",standing);        // qty + start/end times
+  hide("[data-specrow]",standing);
+  hide("[data-lunchwrap]",standing);
+  hide("[data-subcrow]",standing);
+  hide("[data-idlehwrap]",standing);     // machine hours already say how long it stood
+  if(standing&&!div.querySelector("[data-f=subc]").checked)hide("[data-subcwrap]",true);
+  const shrow=div.querySelector("[data-standshift]");
+  if(shrow)shrow.style.display=standing?"":"none";
+  const adv=div.querySelector("details.adv");
+  if(adv&&standing)adv.open=true;                      // the reason is the row, never hide it
+  if(standing)div.querySelector("[data-night]").style.display=
+    div.querySelector("[data-f=shiftov]").value==="Night"?"":"none";
   div.querySelector("[data-unit]").textContent=c?c[3]:"—";
   const lab=div.querySelector("[data-speclabel]");
   const ellab=div.querySelector("[data-ellab]");
@@ -2067,7 +2092,11 @@ function isNightRow(t1,t2){
   const h1=+t1.slice(0,2), h2=+t2.slice(0,2);
   return h1>=18 || (h2*60+ +t2.slice(3))<(h1*60+ +t1.slice(3));
 }
-function rowShift(t1,t2,dflt){return isNightRow(t1,t2)?"Night":(dflt||"Day");}
+// A standing-plant row has no clock - the foreman picks the shift outright, and that wins.
+function rowShift(t1,t2,dflt,override){
+  if(override)return override;
+  return isNightRow(t1,t2)?"Night":(dflt||"Day");
+}
 
 // Remembered lists, scoped PER PROJECT (key::PROJECT in localStorage): once the project
 // is keyed, every box recalls what was entered before on this phone for that project.
@@ -2163,6 +2192,7 @@ function collect(){
       ch1:(isStruct&&f("ch1")!=="")?parseFloat(f("ch1")):"",ch2:(isStruct&&f("ch2")!=="")?parseFloat(f("ch2")):"",
       t1:f("t1"),t2:f("t2"),lunch:div.querySelector("[data-f=lunch]").checked,
       subc:div.querySelector("[data-f=subc]").checked,subco:f("subco").trim(),
+      shiftov:f("code")==="GN-IDLE"?f("shiftov"):"",
       crew,mach,idleH:parseFloat(f("idleH"))||0,idleR:f("idleR"),note:f("note").trim()};
   });
   return {meta,rows};
@@ -2181,7 +2211,9 @@ function validate(d){
     const isExcRow=EXC_CODES.includes(r.code), loadsOnly=isExcRow&&r.qbasis==="Loads only";
     const hasLoads=isExcRow&&((r.l10||0)+(r.l12||0))>0;
     if(loadsOnly&&!hasLoads)e.push(`${n} (${r.code}): qty basis is "Loads only" — key the 10W/12W loads tally.`);
-    if(!(r.qty>0)&&!hasLoads&&!loadsOnly)e.push(`${n} (${r.code}): qty is empty — this is the number the whole system runs on.${isExcRow?' (Or switch the row to "Loads only" and key the truck tally.)':""}`);
+    const standRow=r.code==="GN-IDLE";   // quantity comes from the machine hours, not a box
+    if(!standRow&&!(r.qty>0)&&!hasLoads&&!loadsOnly)e.push(`${n} (${r.code}): qty is empty — this is the number the whole system runs on.${isExcRow?' (Or switch the row to "Loads only" and key the truck tally.)':""}`);
+    if(standRow&&!r.mach.some(m=>m.hrs>0))e.push(`${n} (GN-IDLE): key the hours each machine stood — that is what the standing time costs.`);
     if(c[5]===1&&!r.element)e.push(`${n} (${r.code}): pick an Element from the dropdown.`);
     const structReq=(r.code.startsWith("DR-")&&r.code!=="DR-CONN")||DRAIN_ELEMENTS.includes(r.element);
     if(structReq){
@@ -2226,18 +2258,25 @@ function toCSV(d){
   const lines=[CSVHEAD.join(",")];
   for(const r of d.rows){
     const c=BYCODE[r.code]||["","","",""];
-    const hw=effHours(r.t1,r.t2,r.lunch);
+    // Standing plant: the quantity IS the machine-hours lost, the clock is meaningless (the
+    // shift was picked outright), and no man-hours were spent - so none are claimed.
+    const stand=r.code==="GN-IDLE";
+    const hw=stand?0:effHours(r.t1,r.t2,r.lunch);
     const tot=Object.values(r.crew).reduce((a,b)=>a+b,0);
     // arm goes in brackets after the class: the DDJV renderer matches the arm words, while
     // the costing lookup strips the bracket and still finds the tonnage class it prices on.
-    const machS=r.mach.map(m=>`${m.cls}${m.arm?` (${m.arm})`:""} #${m.no||"?"} @${m.hrs||hw}h`).join("; ");
-    const machH=r.mach.reduce((a,m)=>a+(m.hrs||hw),0);
+    const mhr=m=>m.hrs||hw;
+    const machS=r.mach.map(m=>`${m.cls}${m.arm?` (${m.arm})`:""} #${m.no||"?"} @${mhr(m)}h`).join("; ");
+    const machH=r.mach.reduce((a,m)=>a+mhr(m),0);
     const specEl=r.element?(r.element+(r.spec?" | "+r.spec:"")):r.spec;
-    lines.push([d.meta.date,d.meta.project,rowShift(r.t1,r.t2,d.meta.shift),d.meta.reporter,d.meta.weather,r.zone,r.code,c[2],specEl,
+    const qtyOut=stand?Math.round(machH*10)/10:r.qty;
+    const unitOut=stand?(tot?"hr":"machine-hr"):c[3];
+    lines.push([d.meta.date,d.meta.project,rowShift(r.t1,r.t2,d.meta.shift,r.shiftov),d.meta.reporter,d.meta.weather,r.zone,r.code,c[2],specEl,
       r.stype,r.method,r.iw,r.sw,r.dep,r.cells,r.ch1,r.ch2,r.ground,r.dband,r.stage,r.soil,r.spoil,
-      r.l10,r.l12,(r.l10||0)+(r.l12||0)||"",r.qty,c[3],
-      r.t1,r.t2,r.lunch?"Y":"",hw,...TRADES.map(t=>r.crew[t[0]]||0),r.subc?r.subco:"",tot,Math.round(tot*hw*10)/10,
-      machS,Math.round(machH*10)/10,r.idleH||0,r.idleR,r.note].map(esc).join(","));
+      r.l10,r.l12,(r.l10||0)+(r.l12||0)||"",qtyOut,unitOut,
+      stand?"":r.t1,stand?"":r.t2,(!stand&&r.lunch)?"Y":"",stand?"":hw,
+      ...TRADES.map(t=>r.crew[t[0]]||0),r.subc?r.subco:"",tot,stand?0:Math.round(tot*hw*10)/10,
+      machS,Math.round(machH*10)/10,stand?Math.round(machH*10)/10:(r.idleH||0),r.idleR,r.note].map(esc).join(","));
   }
   return lines.join("\n");
 }
@@ -2292,7 +2331,6 @@ $("#addstand").addEventListener("click",()=>{
   addMach(div);
   div.classList.add("standing","flash");
   setTimeout(()=>div.classList.remove("flash"),1600);
-  div.querySelector("[data-f=t1]").dispatchEvent(new Event("input",{bubbles:true}));  // seeds qty = hours stood
   goToRow(div);
   toast("Standing-plant row added — key the machines that stood + the reason");
   save();
