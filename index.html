@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
-﻿<title>KKL Daily Report â€” Site Capture</title>
+<title>KKL Daily Report — Site Capture</title>
 <style>
   :root{
     --paper:#f7f6f3; --ink:#26292b; --ink-soft:#5a5f63; --steel:#46606e;
@@ -48,7 +48,7 @@
   .hrschip{font-family:"Cascadia Mono",Consolas,monospace; font-size:12px; font-weight:700; color:var(--accent-ink); margin-left:auto;}
   .nightchip{font-size:11px; font-weight:800; letter-spacing:.4px; color:#fff; background:#31456b; border-radius:3px; padding:2px 7px; margin-left:8px;}
   .task.standing{border-color:var(--accent-ink); box-shadow:inset 4px 0 0 var(--accent-ink);}
-  .task.standing .head .t::after{content:" Â· PLANT STOOD IDLE"; font-size:11px; letter-spacing:.4px;}
+  .task.standing .head .t::after{content:" · PLANT STOOD IDLE"; font-size:11px; letter-spacing:.4px;}
   /* the reason is the whole point of a standing row - present it as a plain section */
   .task.standing details.adv>summary{display:none;}
   .task.standing details.adv{border-color:var(--accent-ink);}
@@ -123,8 +123,8 @@
 <div class="toast" id="toast"></div>
 <div class="wrap">
   <header class="app">
-    <h1>KKL Daily Report â€” Site Capture</h1>
-    <span class="tag">v3.6 Â· night auto-detected Â· arm type Â· standing plant</span>
+    <h1>KKL Daily Report — Site Capture</h1>
+    <span class="tag">v3.7 · night · arm type · standing plant · diesel per machine</span>
   </header>
 
   <fieldset>
@@ -160,20 +160,20 @@
       </div>
       <div>
         <label for="genremark">General remarks (optional)</label>
-        <input id="genremark" placeholder="â€”">
+        <input id="genremark" placeholder="—">
       </div>
     </div>
   </fieldset>
 
   <div class="errors" id="errors"></div>
   <div id="tasks"></div>
-  <button class="addbtn" id="addtask" type="button">ï¼‹ Add activity row</button>
-  <button class="addbtn stand" id="addstand" type="button">ï¼‹ Plant stood idle (no output)</button>
-  <p class="hint" style="margin:-10px 0 14px">A team that dug nothing still costs money. Log the machines that stood and why â€” that is the record if the delay was someone else's.</p>
+  <button class="addbtn" id="addtask" type="button">＋ Add activity row</button>
+  <button class="addbtn stand" id="addstand" type="button">＋ Plant stood idle (no output)</button>
+  <p class="hint" style="margin:-10px 0 14px">A team that dug nothing still costs money. Log the machines that stood and why — that is the record if the delay was someone else's.</p>
 
   <fieldset>
     <legend>How to file</legend>
-    <p class="hint" style="margin:0">Tap <b>Export</b> when the day is done â€” it downloads a CSV and a JSON. Then tap <b>Upload â‡ª</b> and pick both files from Downloads â€” they go straight into the office <span class="mono">Site Logs</span> folder (no login needed, one folder for all projects). One activity = one row; if a gang did two things today, add two rows.</p>
+    <p class="hint" style="margin:0">Tap <b>Export</b> when the day is done — it downloads a CSV and a JSON. Then tap <b>Upload ⇪</b> and pick both files from Downloads — they go straight into the office <span class="mono">Site Logs</span> folder (no login needed, one folder for all projects). One activity = one row; if a gang did two things today, add two rows.</p>
   </fieldset>
 </div>
 
@@ -181,14 +181,14 @@
   <div class="inner">
     <div class="sum" id="summary">0 rows</div>
     <button class="ghost" id="newday" type="button">New day</button>
-    <button class="ghost" id="upload" type="button">Upload â‡ª</button>
-    <button class="primary" id="export" type="button">Export â­³</button>
+    <button class="ghost" id="upload" type="button">Upload ⇪</button>
+    <button class="primary" id="export" type="button">Export ⭳</button>
   </div>
 </div>
 
 <script>
 "use strict";
-// ---- Activity Dictionary v2 (38 codes; pilot=1 shown in â˜… group too; el=1 -> Element mandatory)
+// ---- Activity Dictionary v2 (38 codes; pilot=1 shown in ★ group too; el=1 -> Element mandatory)
 const CODES=[
 ["EW-EXC","Earthworks","Bulk excavation (open cut) incl. load-out & trimming","m3",1,2],
 ["EW-EXCT","Earthworks","Trench excavation (services / non-drain)","m3",1,2],
@@ -208,7 +208,7 @@ const CODES=[
 ["DR-PIPE","Drainage","RC pipe laying (dia & depth in Spec)","m",1,0],
 ["DR-RCU","Drainage","Precast U-drain / RCU-S laying","m",1,0],
 ["DR-SCUP","Drainage","Scupper / connection pipe laying","m",0,0],
-["DR-SUMP","Drainage","Sump / DIC / RCS setting (precast) â€” CIS sumps via RC codes","no",0,0],
+["DR-SUMP","Drainage","Sump / DIC / RCS setting (precast) — CIS sumps via RC codes","no",0,0],
 ["DR-BC","Drainage","Precast box culvert (RCBC) unit laying","m",0,0],
 ["DR-CONN","Drainage","Connection to existing drain","no",0,0],
 ["RW-KERB","Roadworks","Supply & lay kerb incl. haunch","m",1,0],
@@ -233,7 +233,7 @@ const CODES=[
 ["GN-IDLE","General","Idle / standdown (reason required)","hr",1,0]];
 const BYCODE=Object.fromEntries(CODES.map(c=>[c[0],c]));
 // WK = merged Gen Worker + Skilled (sites can't split them reliably). Subcon heads are
-// never counted â€” the subcon tick + company flags the row; crew here is KKL's own only.
+// never counted — the subcon tick + company flags the row; crew here is KKL's own only.
 const TRADES=[["SS","Site Sup"],["OP","Operator"],["WK","Worker"],["LS","Lift Sup"],["RG","Rigger"],["SC","Safety"],["TC","Traffic"],["DRV","Driver"]];
 const MACH=["Mini 5.5t","Exc 8t","Exc 14t","Exc 14t+breaker","Exc 20t","Exc 20t+breaker","Exc 25t SA/LA","Exc 30t","Exc 35-40t","Exc 45t+","Exc telescopic (clamshell)","Exc long arm","Exc standard arm","Exc short arm","Exc standby","Lorry crane","Mobile crane","Roller","Compactor","Concrete pump","Water truck","Tipper","Grader","Paver","Dozer","Wheel loader","Dump truck (ADT)","Crusher/Screener","Forklift","Generator/Welder","Lighting tower","Air compressor","Other"];
 const IDLE_REASONS=["","Rain","No work front","Awaiting MC instruction","Machine breakdown","Awaiting materials","Waiting on another trade/subcon","Awaiting strut / decking","Other"];
@@ -1694,7 +1694,7 @@ const MACHINES=[
 const ELEMENTS=["","Wall","Boundary wall","Slab on grade","Suspended / roof slab","Slab over U-drain","Approach / apron slab","Drain wall","Drain base slab","Drain top slab","Benching","Sump / manhole","Pipe surround","Box culvert","Railing footing","Footing / pad","Column / beam","Staircase / ramp","Kerb haunch","Other (state in detail)"];
 
 // ---- Structure lock (drains / sumps / culverts): size + chainage are first-class data
-// because productivity is meaningless without them. IWÃ—Depth per m, chainage locates the
+// because productivity is meaningless without them. IW×Depth per m, chainage locates the
 // segment (and is the double-count audit). Same fields link component rows (exc, hardcore,
 // lean, FW, rebar, conc) to the run so the engine can assemble a full build-up per metre.
 const STRUCT_TYPES=["","U-drain","Covered drain (rect)","RCBC box culvert","RCS sump / DIC","Pipe drain"];
@@ -1724,13 +1724,13 @@ const tasksEl=$("#tasks");
 let seq=0;
 
 function codeOptions(sel){
-  let h='<option value="">â€” select activity â€”</option><optgroup label="â˜… PILOT CODES">';
-  for(const c of CODES) if(c[4]) h+=`<option value="${c[0]}" ${sel===c[0]?"selected":""}>â˜… ${c[0]} â€” ${c[2]}</option>`;
+  let h='<option value="">— select activity —</option><optgroup label="★ PILOT CODES">';
+  for(const c of CODES) if(c[4]) h+=`<option value="${c[0]}" ${sel===c[0]?"selected":""}>★ ${c[0]} — ${c[2]}</option>`;
   h+='</optgroup>';
   let grp="";
   for(const c of CODES){
     if(c[1]!==grp){ if(grp)h+='</optgroup>'; grp=c[1]; h+=`<optgroup label="${grp.toUpperCase()}">`; }
-    h+=`<option value="${c[0]}" ${sel===c[0]?"selected":""}>${c[0]} â€” ${c[2]}</option>`;
+    h+=`<option value="${c[0]}" ${sel===c[0]?"selected":""}>${c[0]} — ${c[2]}</option>`;
   }
   return h+'</optgroup>';
 }
@@ -1748,8 +1748,8 @@ function addTask(data){
   div.className="task"; div.id=id;
   div.innerHTML=`
    <div class="head"><span class="t">ROW ${tasksEl.children.length+1}</span>
-     <span class="nightchip" data-night style="display:none">ðŸŒ™ NIGHT</span>
-     <button type="button" title="Remove row" data-del>âœ•</button></div>
+     <span class="nightchip" data-night style="display:none">🌙 NIGHT</span>
+     <button type="button" title="Remove row" data-del>✕</button></div>
    <div class="body">
     <label>Activity code</label>
     <select data-f="code">${codeOptions(d.code)}</select>
@@ -1758,7 +1758,7 @@ function addTask(data){
       <select data-f="element">${ELEMENTS.map(e=>`<option ${d.element===e?"selected":""}>${e}</option>`).join("")}</select>
     </div>
     <div data-structwrap class="structbox" style="display:none">
-      <span class="st">Structure â€” size locks productivity</span>
+      <span class="st">Structure — size locks productivity</span>
       <div class="row">
         <div><label>Structure</label><select data-f="stype">${STRUCT_TYPES.map(x=>`<option ${d.stype===x?"selected":""}>${x}</option>`).join("")}</select></div>
         <div><label>Method</label><select data-f="method">${METHODS.map(x=>`<option ${d.method===x?"selected":""}>${x}</option>`).join("")}</select></div>
@@ -1776,14 +1776,14 @@ function addTask(data){
       <p class="hint" data-structhint style="margin:6px 0 0">Depth changes along the run? Split into one row per chainage segment.</p>
     </div>
     <div data-excwrap class="structbox" style="display:none">
-      <span class="st">Excavation â€” ground &amp; depth set the rate; spoil links to trucking</span>
+      <span class="st">Excavation — ground &amp; depth set the rate; spoil links to trucking</span>
       <div class="row">
         <div><label>Ground</label><select data-f="ground">${GROUNDS.map(x=>`<option ${d.ground===x?"selected":""}>${x}</option>`).join("")}</select></div>
         <div><label>Depth band</label><select data-f="dband">${DEPTH_BANDS.map(x=>`<option ${d.dband===x?"selected":""}>${x}</option>`).join("")}</select></div>
         <div><label>Soil dug</label><select data-f="soil">${SOILS.map(x=>`<option ${d.soil===x?"selected":""}>${x}</option>`).join("")}</select></div>
       </div>
       <div class="row">
-        <div><label>Qty reported as</label><select data-f="qbasis"><option ${d.qbasis!=="Loads only"?"selected":""}>Measured mÂ³</option><option ${d.qbasis==="Loads only"?"selected":""}>Loads only</option></select></div>
+        <div><label>Qty reported as</label><select data-f="qbasis"><option ${d.qbasis!=="Loads only"?"selected":""}>Measured m³</option><option ${d.qbasis==="Loads only"?"selected":""}>Loads only</option></select></div>
         <div><label>Spoil to</label><select data-f="spoil">${SPOIL_TO.map(x=>`<option ${d.spoil===x?"selected":""}>${x}</option>`).join("")}</select></div>
       </div>
       <div class="row">
@@ -1791,15 +1791,15 @@ function addTask(data){
         <div><label>12W loads</label><input data-f="l12" type="number" inputmode="numeric" min="0" step="1" placeholder="0" value="${d.l12||""}"><span class="hint" data-loadhint></span></div>
       </div>
       <div data-stagewrap>
-        <label data-stagelab>Stage / level (deep exc â€” e.g. S3, B1, -7mSHD)</label>
+        <label data-stagelab>Stage / level (deep exc — e.g. S3, B1, -7mSHD)</label>
         <div class="sugwrap"><input data-f="stage" placeholder="stage or dig level" autocomplete="off" value="${d.stage||""}"><div class="suggest"></div></div>
       </div>
-      <p class="hint" style="margin:6px 0 0">Loads = your own truck count for this dig â€” office cross-checks it against trip tickets / stockpile records.</p>
+      <p class="hint" style="margin:6px 0 0">Loads = your own truck count for this dig — office cross-checks it against trip tickets / stockpile records.</p>
     </div>
     <div class="row" data-specrow>
       <div style="flex:1.4">
         <label data-speclabel>Spec / size / grade</label>
-        <div class="sugwrap" data-specwrap><input data-f="spec" placeholder="e.g. 1200Ã˜ 2.5â€“3m deep" autocomplete="off" value="${d.spec||""}"><div class="suggest"></div></div>
+        <div class="sugwrap" data-specwrap><input data-f="spec" placeholder="e.g. 1200Ø 2.5–3m deep" autocomplete="off" value="${d.spec||""}"><div class="suggest"></div></div>
       </div>
     </div>
     <div class="row">
@@ -1815,34 +1815,34 @@ function addTask(data){
       <div style="display:flex; gap:8px;">
         <div style="flex:1"><label data-qtylab>Qty done today</label>
         <input data-f="qty" type="number" inputmode="decimal" min="0" step="any" placeholder="0" value="${d.qty||""}"></div>
-        <span class="unitchip" data-unit>â€”</span>
+        <span class="unitchip" data-unit>—</span>
       </div>
       <div style="display:flex; gap:8px;">
         <div style="flex:1"><label>From</label><input data-f="t1" type="time" value="${d.t1||"08:00"}"></div>
         <div style="flex:1"><label>To</label><input data-f="t2" type="time" value="${d.t2||"17:00"}"></div>
       </div>
     </div>
-    <label class="tick ${d.lunch?"on":""}" data-lunchwrap><input type="checkbox" data-f="lunch" ${d.lunch?"checked":""}> Worked through lunch (12â€“1)<span class="hrschip" data-hrs></span></label>
+    <label class="tick ${d.lunch?"on":""}" data-lunchwrap><input type="checkbox" data-f="lunch" ${d.lunch?"checked":""}> Worked through lunch (12–1)<span class="hrschip" data-hrs></span></label>
     <label class="tick ${d.subc?"on":""}" data-subcrow><input type="checkbox" data-f="subc" ${d.subc?"checked":""}> Subcon on this row</label>
     <div data-subcwrap style="display:${d.subc?"block":"none"}">
       <label>Subcon company</label>
       <div class="sugwrap"><input data-f="subco" placeholder="tap to pick / type new name" autocomplete="off" value="${d.subco||""}"><div class="suggest"></div></div>
     </div>
     <div data-standnote style="display:none">
-      <p class="hint" style="margin:2px 0 8px">Plant only â€” <b>hours go on each machine</b> above; that is what the standing time costs. Men who stood with it are already counted on their own team's row, so key their lost time as <b>downtime hours</b> there rather than here.</p>
-      <button class="minor" type="button" data-showcrew>ï¼‹ the whole gang stood down too</button>
+      <p class="hint" style="margin:2px 0 8px">Plant only — <b>hours go on each machine</b> above; that is what the standing time costs. Men who stood with it are already counted on their own team's row, so key their lost time as <b>downtime hours</b> there rather than here.</p>
+      <button class="minor" type="button" data-showcrew>＋ the whole gang stood down too</button>
     </div>
     <div data-crewwrap>
-    <label>KKL crew on this activity (own workers only â€” never count subcon's men)</label>
+    <label>KKL crew on this activity (own workers only — never count subcon's men)</label>
     <div class="crewgrid">${TRADES.map(t=>`
       <div class="crew" data-trade="${t[0]}"><span class="nm">${t[1]}</span>
-        <span class="ctl"><button type="button" data-minus>âˆ’</button><output>${(d.crew&&d.crew[t[0]])||0}</output><button type="button" data-plus>ï¼‹</button></span>
+        <span class="ctl"><button type="button" data-minus>−</button><output>${(d.crew&&d.crew[t[0]])||0}</output><button type="button" data-plus>＋</button></span>
       </div>`).join("")}
     </div>
     </div>
-    <label>Machines (asset no. Â· class Â· arm Â· hrs Â· diesel L)</label>
+    <label>Machines (asset no. · class · arm · hrs · diesel L)</label>
     <div data-machines></div>
-    <button class="minor" type="button" data-addmach>ï¼‹ machine</button>
+    <button class="minor" type="button" data-addmach>＋ machine</button>
     <details class="adv" ${d.idleH?"open":""}>
       <summary>Downtime on this row / note</summary>
       <div class="idlebox">
@@ -1850,7 +1850,7 @@ function addTask(data){
           <div data-idlehwrap><label>Idle hours</label><input data-f="idleH" type="number" inputmode="decimal" min="0" step="0.5" placeholder="0" value="${d.idleH||""}"></div>
           <div><label>Reason</label><select data-f="idleR">${IDLE_REASONS.map(r=>`<option ${d.idleR===r?"selected":""}>${r}</option>`).join("")}</select></div>
         </div>
-        <label>Note (optional)</label><input data-f="note" placeholder="â€”" value="${d.note||""}">
+        <label>Note (optional)</label><input data-f="note" placeholder="—" value="${d.note||""}">
       </div>
     </details>
    </div>`;
@@ -1934,12 +1934,12 @@ function addMach(div,m){
   const r=document.createElement("div");
   r.className="machrow";
   const arm0=m.arm||armOf(m.no);
-  r.innerHTML=`<div class="sugwrap"><input data-m="no" placeholder="machine no. â€” type EX no." autocomplete="off" value="${m.no||""}"><div class="suggest"></div></div>
+  r.innerHTML=`<div class="sugwrap"><input data-m="no" placeholder="machine no. — type EX no." autocomplete="off" value="${m.no||""}"><div class="suggest"></div></div>
     <select data-m="cls">${MACH.map(x=>`<option ${m.cls===x?"selected":""}>${x}</option>`).join("")}</select>
-    <select data-m="arm" title="Arm type â€” DDJV counts machines this way">${ARMS.map(a=>`<option value="${a[0]}" ${arm0===a[0]?"selected":""}>${a[1]||"arm?"}</option>`).join("")}</select>
+    <select data-m="arm" title="Arm type — DDJV counts machines this way">${ARMS.map(a=>`<option value="${a[0]}" ${arm0===a[0]?"selected":""}>${a[1]||"arm?"}</option>`).join("")}</select>
     <input data-m="hrs" type="number" inputmode="decimal" min="0" step="0.5" placeholder="hrs" value="${m.hrs||""}">
-    <input data-m="dsl" type="number" inputmode="decimal" min="0" step="1" placeholder="dsl L" title="Diesel topped up into THIS machine today (litres) â€” leave blank if none" value="${m.dsl||""}">
-    <button type="button" title="remove">âœ•</button>`;
+    <input data-m="dsl" type="number" inputmode="decimal" min="0" step="1" placeholder="dsl L" title="Diesel topped up into THIS machine today (litres) — leave blank if none" value="${m.dsl||""}">
+    <button type="button" title="remove">✕</button>`;
   r.querySelector("button").addEventListener("click",()=>{r.remove();save();});
   r.querySelectorAll("input,select").forEach(i=>i.addEventListener("input",save));
   // an arm keyed by hand sticks to that machine for every future row, on every project
@@ -2017,20 +2017,20 @@ function applyCode(div){
   if(adv&&standing)adv.open=true;                      // the reason is the row, never hide it
   if(standing)div.querySelector("[data-night]").style.display=
     div.querySelector("[data-f=shiftov]").value==="Night"?"":"none";
-  div.querySelector("[data-unit]").textContent=c?c[3]:"â€”";
+  div.querySelector("[data-unit]").textContent=c?c[3]:"—";
   const lab=div.querySelector("[data-speclabel]");
   const ellab=div.querySelector("[data-ellab]");
   div.querySelector("[data-elwrap]").style.display=(c&&c[5])?"":"none";
-  if(c&&c[5]===2){ellab.textContent="Element (optional â€” tag if this work is for a drain / sump / culvert)"; ellab.style.color="";}
+  if(c&&c[5]===2){ellab.textContent="Element (optional — tag if this work is for a drain / sump / culvert)"; ellab.style.color="";}
   else {ellab.textContent="Element (required for RC codes)"; ellab.style.color="var(--accent-ink)";}
-  if(c&&c[5]){lab.textContent="Detail (grade / pour no. â€” optional)"; lab.style.color="";}
+  if(c&&c[5]){lab.textContent="Detail (grade / pour no. — optional)"; lab.style.color="";}
   else if(code==="GN-IDLE"){lab.textContent="What stood down (qty = hours idle)"; lab.style.color="var(--accent-ink)";}
-  else if(code==="EW-EXCTD"){lab.textContent="Detail (optional â€” e.g. obstruction, panel no., strut level remark)"; lab.style.color="";}
+  else if(code==="EW-EXCTD"){lab.textContent="Detail (optional — e.g. obstruction, panel no., strut level remark)"; lab.style.color="";}
   else {lab.textContent="Spec / size / grade"; lab.style.color="";}
   div.querySelector("[data-excwrap]").style.display=EXC_CODES.includes(code)?"":"none";
   const stlab=div.querySelector("[data-stagelab]");
-  if(code==="EW-EXCTD"){stlab.textContent="Stage / level â€” REQUIRED for top-down (e.g. S3, B1 strut level)"; stlab.style.color="var(--accent-ink)";}
-  else {stlab.textContent="Stage / level (optional â€” e.g. S3, B1, -7mSHD)"; stlab.style.color="";}
+  if(code==="EW-EXCTD"){stlab.textContent="Stage / level — REQUIRED for top-down (e.g. S3, B1 strut level)"; stlab.style.color="var(--accent-ink)";}
+  else {stlab.textContent="Stage / level (optional — e.g. S3, B1, -7mSHD)"; stlab.style.color="";}
   applyStruct(div);
 }
 
@@ -2213,44 +2213,44 @@ function validate(d){
     const c=BYCODE[r.code];
     const isExcRow=EXC_CODES.includes(r.code), loadsOnly=isExcRow&&r.qbasis==="Loads only";
     const hasLoads=isExcRow&&((r.l10||0)+(r.l12||0))>0;
-    if(loadsOnly&&!hasLoads)e.push(`${n} (${r.code}): qty basis is "Loads only" â€” key the 10W/12W loads tally.`);
+    if(loadsOnly&&!hasLoads)e.push(`${n} (${r.code}): qty basis is "Loads only" — key the 10W/12W loads tally.`);
     const standRow=r.code==="GN-IDLE";   // quantity comes from the machine hours, not a box
-    if(!standRow&&!(r.qty>0)&&!hasLoads&&!loadsOnly)e.push(`${n} (${r.code}): qty is empty â€” this is the number the whole system runs on.${isExcRow?' (Or switch the row to "Loads only" and key the truck tally.)':""}`);
-    if(standRow&&!r.mach.some(m=>m.hrs>0))e.push(`${n} (GN-IDLE): key the hours each machine stood â€” that is what the standing time costs.`);
+    if(!standRow&&!(r.qty>0)&&!hasLoads&&!loadsOnly)e.push(`${n} (${r.code}): qty is empty — this is the number the whole system runs on.${isExcRow?' (Or switch the row to "Loads only" and key the truck tally.)':""}`);
+    if(standRow&&!r.mach.some(m=>m.hrs>0))e.push(`${n} (GN-IDLE): key the hours each machine stood — that is what the standing time costs.`);
     if(c[5]===1&&!r.element)e.push(`${n} (${r.code}): pick an Element from the dropdown.`);
     const structReq=(r.code.startsWith("DR-")&&r.code!=="DR-CONN")||DRAIN_ELEMENTS.includes(r.element);
     if(structReq){
       if(!r.stype)e.push(`${n} (${r.code}): pick the Structure type.`);
       if(!r.method)e.push(`${n} (${r.code}): pick the Method (CIS / half precast / full precast).`);
-      if(!(r.iw>0))e.push(`${n} (${r.code}): size is locked-in data â€” enter ${r.stype==="Pipe drain"?"Dia":"IW"} (mm).`);
+      if(!(r.iw>0))e.push(`${n} (${r.code}): size is locked-in data — enter ${r.stype==="Pipe drain"?"Dia":"IW"} (mm).`);
       if(!(r.dep>0))e.push(`${n} (${r.code}): enter Depth (mm).`);
       if(r.stype==="RCS sump / DIC"){
         if(!(r.sw>0))e.push(`${n} (${r.code}): enter sump plan W (mm).`);
       } else {
-        if(r.ch1===""||r.ch2==="")e.push(`${n} (${r.code}): enter chainage from/to â€” it locates the segment and stops double-counting.`);
+        if(r.ch1===""||r.ch2==="")e.push(`${n} (${r.code}): enter chainage from/to — it locates the segment and stops double-counting.`);
         else if(!(Math.abs(r.ch2-r.ch1)>0))e.push(`${n} (${r.code}): CH from and CH to are the same.`);
       }
     }
     if(EXC_CODES.includes(r.code)){
-      if(!r.ground)e.push(`${n} (${r.code}): pick the Ground condition â€” it sets which rate pool this dig feeds.`);
-      if(r.code==="EW-EXCTD"&&!r.stage)e.push(`${n} (EW-EXCTD): key the Stage / level â€” deep-dig productivity is meaningless without it.`);
+      if(!r.ground)e.push(`${n} (${r.code}): pick the Ground condition — it sets which rate pool this dig feeds.`);
+      if(r.code==="EW-EXCTD"&&!r.stage)e.push(`${n} (EW-EXCTD): key the Stage / level — deep-dig productivity is meaningless without it.`);
       if(r.code!=="EW-EXCTD"&&!r.dband)e.push(`${n} (${r.code}): pick the Depth band.`);
-      if(!r.spoil)e.push(`${n} (${r.code}): pick where the spoil went â€” it links this dig to the trucking records.`);
+      if(!r.spoil)e.push(`${n} (${r.code}): pick where the spoil went — it links this dig to the trucking records.`);
       if((r.spoil==="Offsite disposal"||r.spoil==="To stockpile (internal)")&&!((r.l10||0)+(r.l12||0)>0))
-        e.push(`${n} (${r.code}): spoil was trucked out â€” key your 10W/12W loads tally so office can cross-check the tickets.`);
+        e.push(`${n} (${r.code}): spoil was trucked out — key your 10W/12W loads tally so office can cross-check the tickets.`);
     }
     if(r.code==="GN-IDLE"&&!r.idleR&&!r.spec)e.push(`${n} (GN-IDLE): state the reason.`);
     if(r.idleH>0&&!r.idleR)e.push(`${n}: idle hours entered but no reason.`);
-    if(r.subc&&!r.subco)e.push(`${n} (${r.code}): Subcon is ticked â€” key in the company name.`);
+    if(r.subc&&!r.subco)e.push(`${n} (${r.code}): Subcon is ticked — key in the company name.`);
     const tot=Object.values(r.crew).reduce((a,b)=>a+b,0);
     if(!tot&&!r.subc&&r.code!=="GN-IDLE"&&!["RW-MARK","RW-ACBC","RW-ACWC"].includes(r.code))e.push(`${n} (${r.code}): crew is zero. If a subcon did this work, tick "Subcon on this row" instead.`);
     r.mach.forEach(m=>{
       if(m.hrs&&!m.no)e.push(`${n}: machine "${m.cls}" has hours but no asset no.`);
       // DDJV's report is built from arm type - without it the machine cannot be reported
-      if(/^exc/i.test(m.cls)&&!m.arm)e.push(`${n}: machine ${m.no||m.cls} â€” pick the arm (Tele / Long / Std / Short). DDJV counts machines by arm, and it is remembered for that machine from now on.`);
+      if(/^exc/i.test(m.cls)&&!m.arm)e.push(`${n}: machine ${m.no||m.cls} — pick the arm (Tele / Long / Std / Short). DDJV counts machines by arm, and it is remembered for that machine from now on.`);
     });
     if(r.code==="GN-IDLE"&&!r.mach.length)
-      e.push(`${n} (GN-IDLE): list the plant that stood â€” that is the whole point of this row. Men who stood belong on their own team's row as downtime hours.`);
+      e.push(`${n} (GN-IDLE): list the plant that stood — that is the whole point of this row. Men who stood belong on their own team's row as downtime hours.`);
   });
   return e;
 }
@@ -2315,7 +2315,7 @@ $("#export").addEventListener("click",()=>{
   const stem=`${d.meta.date}_${d.meta.project.replace(/[^\w-]+/g,"")}_${shifts.length>1?"Mixed":shifts[0]||d.meta.shift}_${d.meta.reporter.replace(/[^\w]+/g,"")||"DR"}_DR`;
   download(stem+".csv",toCSV(d),"text/csv");
   setTimeout(()=>download(stem+".json",JSON.stringify(d,null,2),"application/json"),400);
-  toast(`Exported ${d.rows.length} rows â€” now tap Upload â‡ª and pick both files`);
+  toast(`Exported ${d.rows.length} rows — now tap Upload ⇪ and pick both files`);
 });
 
 // OneDrive file-request link for the Site Logs drop folder (upload-only, no login)
@@ -2338,7 +2338,7 @@ $("#addstand").addEventListener("click",()=>{
   div.classList.add("standing","flash");
   setTimeout(()=>div.classList.remove("flash"),1600);
   goToRow(div);
-  toast("Standing-plant row added â€” key the machines that stood + the reason");
+  toast("Standing-plant row added — key the machines that stood + the reason");
   save();
 });
 
@@ -2361,7 +2361,7 @@ function summary(){
   const d=collect();
   let mh=0,q=0;
   d.rows.forEach(r=>{const hw=effHours(r.t1,r.t2,r.lunch);mh+=Object.values(r.crew).reduce((a,b)=>a+b,0)*hw; if(r.qty>0)q++;});
-  $("#summary").innerHTML=`<b>${d.rows.length}</b> rows Â· <b>${Math.round(mh)}</b> man-hrs Â· <b>${q}/${d.rows.length}</b> with qty`;
+  $("#summary").innerHTML=`<b>${d.rows.length}</b> rows · <b>${Math.round(mh)}</b> man-hrs · <b>${q}/${d.rows.length}</b> with qty`;
 }
 
 let saveTimer;
