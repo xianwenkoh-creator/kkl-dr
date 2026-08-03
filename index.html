@@ -47,6 +47,10 @@
   .tick.on{color:var(--accent-ink);}
   .hrschip{font-family:"Cascadia Mono",Consolas,monospace; font-size:12px; font-weight:700; color:var(--accent-ink); margin-left:auto;}
   .nightchip{font-size:11px; font-weight:800; letter-spacing:.4px; color:#fff; background:#31456b; border-radius:3px; padding:2px 7px; margin-left:8px;}
+  .task.standing{border-color:var(--accent-ink); box-shadow:inset 4px 0 0 var(--accent-ink);}
+  .task.standing .head .t::after{content:" · PLANT STOOD IDLE"; font-size:11px; letter-spacing:.4px;}
+  @keyframes rowflash{0%,100%{background:transparent} 30%{background:#fff3cd}}
+  .task.flash{animation:rowflash 1.6s ease-in-out;}
 
   .task{border:1.5px solid var(--ink); background:var(--card); border-radius:4px; margin-bottom:14px; overflow:hidden;}
   .task .head{display:flex; justify-content:space-between; align-items:center; background:var(--steel); color:#fff; padding:7px 12px;}
@@ -233,9 +237,12 @@ const IDLE_REASONS=["","Rain","No work front","Awaiting MC instruction","Machine
 // derived from tonnage (a 14t may be short- or long-arm). Options carry the full text as
 // the value (the report matches on it) but a short label, so the select fits a phone row.
 const ARMS=[["",""],["Telescopic","Tele"],["Long arm","Long"],["Standard arm","Std"],["Short arm","Short"],["N.A.","N.A."]];
-// Seeded from CR108's machinery deployment list - 63 of 67 units state it in the capacity
-// column ("20TON / SHORT"). Anything keyed by hand afterwards is remembered per machine.
-const ARM_SEED={"EX106":"Short arm","EX201":"Short arm","EX336":"Telescopic","EX374":"Telescopic","EX375":"Telescopic","EX376":"Telescopic","EX384":"Telescopic","EX400":"Telescopic","EX402":"Telescopic","EX420":"Short arm","EX425":"Short arm","EX426":"Short arm","EX430":"Short arm","EX431":"Telescopic","EX433":"Telescopic","EX435":"Short arm","EX441":"Telescopic","EX442":"Telescopic","EX457":"Standard arm","EX48":"Short arm","EX488":"Standard arm","EX507":"Short arm","EX509":"Short arm","EX525":"Standard arm","EX538":"Standard arm","EX546":"Standard arm","EX563":"Short arm","EX566":"Standard arm","EX601":"Short arm","EX607":"Short arm","EX613":"Short arm","EX614":"Short arm","EX636":"Standard arm","EX643":"Short arm","EX661":"Standard arm","EX673":"Short arm","EX674":"Short arm","EX675":"Short arm","EX744":"Standard arm","EX745":"Standard arm","EX746":"Standard arm","EX757":"Short arm","EX760":"Short arm","EX771":"Telescopic","EX804":"Standard arm","EX814":"Short arm","EX817":"Short arm","EX820":"Short arm","EX862":"Telescopic","EX872":"Short arm","EX880":"Short arm","EX891":"Short arm","EX893":"Short arm","EX894":"Short arm","EX896":"Standard arm","EX897":"Short arm","EX898":"Short arm","EX900":"Short arm","EX944":"Standard arm","EX945":"Standard arm","EX946":"Standard arm","EX947":"Standard arm","EX948":"Standard arm"};
+// Two sources, both already in the business: CR108's machinery deployment list states it as
+// "EXCAVATOR (LONG ARM)" or in the capacity column ("20TON / SHORT", "38TON / 40M" = telescopic,
+// "25TON / 60FT" = long arm), and the company fleet register states it in the description
+// ("KATO HD512-R5 SHORT REACH"). Every excavator on CR108 is covered; where the two disagree
+// the site list wins, because that is how the machine is rigged there now.
+const ARM_SEED={"EX106":"Short arm","EX2":"Short arm","EX201":"Short arm","EX300B":"Short arm","EX301B":"Short arm","EX302B":"Short arm","EX327":"Short arm","EX336":"Telescopic","EX350B":"Telescopic","EX373B":"Telescopic","EX374":"Telescopic","EX374B":"Telescopic","EX375":"Telescopic","EX375B":"Telescopic","EX376":"Telescopic","EX376B":"Telescopic","EX384":"Telescopic","EX398":"Telescopic","EX400":"Telescopic","EX402":"Telescopic","EX403":"Telescopic","EX404":"Telescopic","EX420":"Short arm","EX425":"Short arm","EX426":"Short arm","EX430":"Short arm","EX431":"Telescopic","EX433":"Telescopic","EX435":"Short arm","EX441":"Telescopic","EX442":"Telescopic","EX446":"Short arm","EX447":"Short arm","EX448":"Short arm","EX454":"Long arm","EX457":"Standard arm","EX469":"Long arm","EX48":"Short arm","EX488":"Standard arm","EX50":"Short arm","EX507":"Short arm","EX509":"Short arm","EX51B":"Short arm","EX52":"Short arm","EX525":"Standard arm","EX53":"Short arm","EX538":"Standard arm","EX54":"Short arm","EX546":"Standard arm","EX55":"Short arm","EX56":"Short arm","EX563":"Short arm","EX566":"Standard arm","EX594":"Short arm","EX595":"Short arm","EX596":"Short arm","EX597":"Short arm","EX598":"Short arm","EX601":"Short arm","EX602":"Short arm","EX603":"Short arm","EX604":"Short arm","EX605":"Short arm","EX606":"Short arm","EX607":"Short arm","EX608":"Short arm","EX610":"Short arm","EX611":"Short arm","EX612":"Short arm","EX613":"Short arm","EX614":"Short arm","EX615":"Short arm","EX616":"Short arm","EX617":"Short arm","EX618":"Short arm","EX620":"Short arm","EX621":"Short arm","EX622":"Short arm","EX623":"Short arm","EX624":"Short arm","EX625":"Short arm","EX626":"Short arm","EX627":"Short arm","EX628":"Short arm","EX636":"Standard arm","EX643":"Short arm","EX644":"Short arm","EX645":"Short arm","EX646":"Short arm","EX661":"Standard arm","EX667":"Telescopic","EX668":"Telescopic","EX673":"Short arm","EX674":"Short arm","EX675":"Short arm","EX677":"Long arm","EX67B":"Short arm","EX68B":"Short arm","EX70":"Short arm","EX71":"Short arm","EX72":"Short arm","EX728":"Short arm","EX73":"Short arm","EX730":"Short arm","EX731":"Short arm","EX732":"Short arm","EX74":"Short arm","EX744":"Standard arm","EX745":"Standard arm","EX746":"Standard arm","EX75":"Short arm","EX756":"Short arm","EX757":"Short arm","EX758":"Short arm","EX76":"Standard arm","EX760":"Short arm","EX761":"Short arm","EX762":"Short arm","EX77":"Standard arm","EX771":"Telescopic","EX790":"Short arm","EX791":"Short arm","EX792":"Short arm","EX793":"Short arm","EX794":"Short arm","EX795":"Short arm","EX796":"Short arm","EX797":"Short arm","EX798":"Short arm","EX800":"Short arm","EX801":"Short arm","EX802":"Short arm","EX803":"Short arm","EX804":"Standard arm","EX805":"Short arm","EX812":"Short arm","EX813":"Short arm","EX814":"Short arm","EX815":"Short arm","EX816":"Short arm","EX817":"Short arm","EX818":"Short arm","EX820":"Short arm","EX821":"Short arm","EX822":"Short arm","EX823":"Short arm","EX862":"Telescopic","EX872":"Short arm","EX880":"Short arm","EX891":"Short arm","EX893":"Short arm","EX894":"Short arm","EX896":"Standard arm","EX897":"Short arm","EX898":"Short arm","EX900":"Short arm","EX944":"Standard arm","EX945":"Standard arm","EX946":"Standard arm","EX947":"Standard arm","EX948":"Standard arm"};
 const ARM_KEY="dr_arm_map";
 function armStore(){try{return JSON.parse(localStorage.getItem(ARM_KEY)||"{}");}catch(e){return {};}}
 function rememberArm(no,arm){
@@ -1017,6 +1024,9 @@ const MACHINES=[
  {no:"EX944",cls:"Exc 14t",d:"KOMATSU PC138US-8 HYDRAULIC EXCAVATOR (PIPING)"},
  {no:"EX945",cls:"Exc 14t",d:"KOMATSU PC138US-8 HYDRAULIC EXCAVATOR (PIPING)"},
  {no:"EX946",cls:"Exc 14t",d:"KOMATSU PC138US-8 HYDRAULIC EXCAVATOR (PIPING)"},
+ // on CR108's deployment list (Area B, 14TON / STANDARD) but missing from the fleet master -
+ // added here so the class fills itself; Connie's register still needs updating.
+ {no:"EX948",cls:"Exc 14t",d:"KOMATSU PC138US-8 HYDRAULIC EXCAVATOR"},
  {no:"EX954",cls:"Dozer",d:"KOMATSU D85PX-15R BULLDOZER"},
  {no:"EX955",cls:"Dozer",d:"KOMATSU D85PX-15R BULLDOZER"},
  {no:"EX1635",cls:"Generator/Welder",d:"Model: SDG150S Generator 125KVA"},
@@ -1954,6 +1964,7 @@ function attachSuggest(inp, box, clsSel, armSel){
 function applyCode(div){
   const code=div.querySelector("[data-f=code]").value;
   const c=BYCODE[code];
+  div.classList.toggle("standing",code==="GN-IDLE");   // also re-marks rows restored from a draft
   div.querySelector("[data-unit]").textContent=c?c[3]:"—";
   const lab=div.querySelector("[data-speclabel]");
   const ellab=div.querySelector("[data-ellab]");
@@ -2245,6 +2256,8 @@ $("#addtask").addEventListener("click",()=>{addTask();save();});
 // Standing plant: a pre-set GN-IDLE row. Machines that stood all shift never reached the
 // old daily report at all, so idle machine-days went uncosted and third-party delays
 // (e.g. "waiting on the strut installer") left no evidence behind.
+// New rows are appended to #tasks, which sits ABOVE these buttons - on a phone the row lands
+// off-screen and the tap looks like it did nothing. So: say so, mark the row, and go to it.
 $("#addstand").addEventListener("click",()=>{
   addTask({code:"GN-IDLE",idleR:"Waiting on another trade/subcon"});
   const div=tasksEl.lastElementChild;
@@ -2252,9 +2265,21 @@ $("#addstand").addEventListener("click",()=>{
   applyCode(div);
   const adv=div.querySelector("details.adv"); if(adv)adv.open=true;
   addMach(div);
-  div.scrollIntoView({behavior:"smooth",block:"center"});
+  div.classList.add("standing","flash");
+  setTimeout(()=>div.classList.remove("flash"),1600);
+  goToRow(div);
+  toast("Standing-plant row added — key the machines that stood + the reason");
   save();
 });
+
+function goToRow(div){
+  try{div.scrollIntoView({behavior:"smooth",block:"center"});}
+  catch(e){div.scrollIntoView();}                     // older iOS Safari: no options object
+  setTimeout(()=>{                                    // and if smooth scrolling is off, jump
+    const r=div.getBoundingClientRect();
+    if(r.top<0||r.top>innerHeight-80)div.scrollIntoView();
+  },500);
+}
 $("#newday").addEventListener("click",()=>{
   if(!confirm("Clear this report and start a new day?"))return;
   tasksEl.innerHTML=""; $("#genremark").value="";
