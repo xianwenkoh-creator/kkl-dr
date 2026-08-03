@@ -1820,11 +1820,17 @@ function addTask(data){
       <label>Subcon company</label>
       <div class="sugwrap"><input data-f="subco" placeholder="tap to pick / type new name" autocomplete="off" value="${d.subco||""}"><div class="suggest"></div></div>
     </div>
+    <div data-standnote style="display:none">
+      <p class="hint" style="margin:2px 0 8px">Plant only. Men who stood with the machine are already counted on their own team's row — key their lost time as <b>downtime hours</b> there, so the same men aren't paid for twice.</p>
+      <button class="minor" type="button" data-showcrew>＋ the whole gang stood down too</button>
+    </div>
+    <div data-crewwrap>
     <label>KKL crew on this activity (own workers only — never count subcon's men)</label>
     <div class="crewgrid">${TRADES.map(t=>`
       <div class="crew" data-trade="${t[0]}"><span class="nm">${t[1]}</span>
         <span class="ctl"><button type="button" data-minus>−</button><output>${(d.crew&&d.crew[t[0]])||0}</output><button type="button" data-plus>＋</button></span>
       </div>`).join("")}
+    </div>
     </div>
     <label>Machines (asset no. · class · arm · hrs)</label>
     <div data-machines></div>
@@ -1853,7 +1859,13 @@ function addTask(data){
     div.querySelector("[data-hrs]").textContent=hw?hw+" h":"";
     lunchCb.closest(".tick").classList.toggle("on",lunchCb.checked);
     div.querySelector("[data-night]").style.display=isNightRow(t1,t2)?"":"none";
+    // on a standing-plant row the quantity IS the hours stood - don't make anyone work it out
+    const q=div.querySelector("[data-f=qty]");
+    if(div.classList.contains("standing")&&hw&&(!q.value||div.dataset.autoqty==="1")){
+      q.value=hw; div.dataset.autoqty="1";
+    }
   };
+  div.querySelector("[data-f=qty]").addEventListener("input",()=>{div.dataset.autoqty="";});
   ["t1","t2"].forEach(k=>div.querySelector(`[data-f=${k}]`).addEventListener("input",updHrs));
   lunchCb.addEventListener("change",()=>{updHrs();save();});
   subCb.addEventListener("change",()=>{
@@ -1889,6 +1901,10 @@ function addTask(data){
   updHrs();
   div.querySelector("[data-del]").addEventListener("click",()=>{div.remove();renumber();save();});
   div.querySelector("[data-addmach]").addEventListener("click",()=>addMach(div));
+  div.querySelector("[data-showcrew]").addEventListener("click",e=>{
+    div.querySelector("[data-crewwrap]").style.display="";
+    e.target.style.display="none";
+  });
   div.querySelectorAll("[data-minus],[data-plus]").forEach(b=>b.addEventListener("click",e=>{
     const out=e.target.closest(".crew").querySelector("output");
     let v=parseInt(out.textContent)||0;
@@ -1964,7 +1980,16 @@ function attachSuggest(inp, box, clsSel, armSel){
 function applyCode(div){
   const code=div.querySelector("[data-f=code]").value;
   const c=BYCODE[code];
-  div.classList.toggle("standing",code==="GN-IDLE");   // also re-marks rows restored from a draft
+  // A standing-plant row is about PLANT: the machine still costs its ownership rate while it
+  // sits, and nothing else in the system records that. Men who stood belong on their own
+  // team's row as downtime hours - keying them here as well would pay them twice.
+  const standing=code==="GN-IDLE";
+  div.classList.toggle("standing",standing);           // also re-marks rows restored from a draft
+  const crewHas=[...div.querySelectorAll(".crew output")].some(o=>(parseInt(o.textContent)||0)>0);
+  div.querySelector("[data-standnote]").style.display=standing?"":"none";
+  div.querySelector("[data-crewwrap]").style.display=(!standing||crewHas)?"":"none";
+  const showBtn=div.querySelector("[data-showcrew]");
+  if(showBtn)showBtn.style.display=crewHas?"none":"";
   div.querySelector("[data-unit]").textContent=c?c[3]:"—";
   const lab=div.querySelector("[data-speclabel]");
   const ellab=div.querySelector("[data-ellab]");
@@ -2189,8 +2214,8 @@ function validate(d){
       // DDJV's report is built from arm type - without it the machine cannot be reported
       if(/^exc/i.test(m.cls)&&!m.arm)e.push(`${n}: machine ${m.no||m.cls} — pick the arm (Tele / Long / Std / Short). DDJV counts machines by arm, and it is remembered for that machine from now on.`);
     });
-    if(r.code==="GN-IDLE"&&!r.mach.length&&!tot)
-      e.push(`${n} (GN-IDLE): list the plant that stood, or the men — otherwise there is nothing to record.`);
+    if(r.code==="GN-IDLE"&&!r.mach.length)
+      e.push(`${n} (GN-IDLE): list the plant that stood — that is the whole point of this row. Men who stood belong on their own team's row as downtime hours.`);
   });
   return e;
 }
@@ -2267,6 +2292,7 @@ $("#addstand").addEventListener("click",()=>{
   addMach(div);
   div.classList.add("standing","flash");
   setTimeout(()=>div.classList.remove("flash"),1600);
+  div.querySelector("[data-f=t1]").dispatchEvent(new Event("input",{bubbles:true}));  // seeds qty = hours stood
   goToRow(div);
   toast("Standing-plant row added — key the machines that stood + the reason");
   save();
