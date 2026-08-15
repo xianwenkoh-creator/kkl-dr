@@ -5,122 +5,187 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#f4f4f8" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#131320" media="(prefers-color-scheme: dark)">
-<title>KKL Site Safety CMS</title>
+<meta name="theme-color" content="#1e2933" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#10161b" media="(prefers-color-scheme: dark)">
+<title>SKYTOPIA Site Safety</title>
 <style>
+  /* SKYTOPIA Site Safety — Procore-inspired UI (CORE palette: orange-60 action, blue-65 links, gray h200) */
   :root{
-    --bg:#f4f4f8; --card:#ffffff; --field:#fafafd;
-    --ink:#1f2130; --sub:#676b7c; --line:#e5e5ee; --line2:#c9c9d8;
-    --acc:#4636b8; --acc-soft:#edeafc; --btn-ink:#ffffff; --badge:#e02d2d;
-    --good-ink:#086e08; --good-bg:rgba(12,163,12,.13);
-    --warn-ink:#8a5b00; --warn-bg:rgba(250,178,25,.18);
-    --bad-ink:#b32222;  --bad-bg:rgba(208,59,59,.13);
-    --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a;
-    --viz-grid:#e1e0d9; --viz-axis:#c3c2b7; --viz-muted:#898781;
+    --bg:#f2f3f5; --card:#ffffff; --field:#ffffff;
+    --ink:#282828; --sub:#68757d; --line:#dfe3e6; --line2:#c3cbd0;
+    --acc:#f47e42; --acc-h:#e2662a; --acc-soft:#fdece1; --btn-ink:#ffffff; --badge:#d62c2f;
+    --blue:#006ddf; --blue-soft:#f0f6fe;
+    --good-ink:#177c1f; --good-bg:#eafaea;
+    --warn-ink:#8a5b00; --warn-bg:#fff7d9;
+    --bad-ink:#d62c2f;  --bad-bg:#fff0f0;
+    --hdr:#1e2933; --hdr-ink:#ffffff; --hdr-sub:#9fb0bc;
+    --s1:#2a78d6; --s2:#f47e42; --s3:#1baf7a;
+    --viz-grid:#e3e6e8; --viz-axis:#c6ccd0; --viz-muted:#8b969d;
   }
   @media (prefers-color-scheme: dark){
     :root:not([data-theme="light"]){
-      --bg:#131320; --card:#1d1d2e; --field:#252538;
-      --ink:#e9e8f2; --sub:#a0a0b4; --line:#2e2e44; --line2:#45455e;
-      --acc:#a99bf5; --acc-soft:#2b2650; --btn-ink:#17172a; --badge:#e04b4b;
-      --good-ink:#4fce6a; --good-bg:rgba(12,163,12,.22);
-      --warn-ink:#f3b73f; --warn-bg:rgba(250,178,25,.16);
-      --bad-ink:#ef8080;  --bad-bg:rgba(230,103,103,.18);
-      --s1:#3987e5; --s2:#d95926; --s3:#199e70;
-      --viz-grid:#2c2c2a; --viz-axis:#383835; --viz-muted:#898781;
+      --bg:#15191d; --card:#1e242a; --field:#242b31;
+      --ink:#e8ebed; --sub:#98a5ad; --line:#2e363d; --line2:#48535b;
+      --acc:#f47e42; --acc-h:#ff8f55; --acc-soft:#37281d; --btn-ink:#ffffff; --badge:#e04b4b;
+      --blue:#5aa2f0; --blue-soft:#1c2836;
+      --good-ink:#4fce6a; --good-bg:rgba(30,160,60,.16);
+      --warn-ink:#f3b73f; --warn-bg:rgba(250,178,25,.14);
+      --bad-ink:#ef8080;  --bad-bg:rgba(230,103,103,.16);
+      --hdr:#10161b; --hdr-ink:#ffffff; --hdr-sub:#8b9aa5;
+      --s1:#3987e5; --s2:#f47e42; --s3:#1baf7a;
+      --viz-grid:#2b3238; --viz-axis:#3d464d; --viz-muted:#8b969d;
     }
   }
   :root[data-theme="dark"]{
-    --bg:#131320; --card:#1d1d2e; --field:#252538;
-    --ink:#e9e8f2; --sub:#a0a0b4; --line:#2e2e44; --line2:#45455e;
-    --acc:#a99bf5; --acc-soft:#2b2650; --btn-ink:#17172a; --badge:#e04b4b;
-    --good-ink:#4fce6a; --good-bg:rgba(12,163,12,.22);
-    --warn-ink:#f3b73f; --warn-bg:rgba(250,178,25,.16);
-    --bad-ink:#ef8080;  --bad-bg:rgba(230,103,103,.18);
-    --s1:#3987e5; --s2:#d95926; --s3:#199e70;
-    --viz-grid:#2c2c2a; --viz-axis:#383835; --viz-muted:#898781;
+    --bg:#15191d; --card:#1e242a; --field:#242b31;
+    --ink:#e8ebed; --sub:#98a5ad; --line:#2e363d; --line2:#48535b;
+    --acc:#f47e42; --acc-h:#ff8f55; --acc-soft:#37281d; --btn-ink:#ffffff; --badge:#e04b4b;
+    --blue:#5aa2f0; --blue-soft:#1c2836;
+    --good-ink:#4fce6a; --good-bg:rgba(30,160,60,.16);
+    --warn-ink:#f3b73f; --warn-bg:rgba(250,178,25,.14);
+    --bad-ink:#ef8080;  --bad-bg:rgba(230,103,103,.16);
+    --hdr:#10161b; --hdr-ink:#ffffff; --hdr-sub:#8b9aa5;
+    --s1:#3987e5; --s2:#f47e42; --s3:#1baf7a;
+    --viz-grid:#2b3238; --viz-axis:#3d464d; --viz-muted:#8b969d;
   }
 
   *{box-sizing:border-box;}
   html{background:var(--bg);}
-  body{margin:0; font-family:system-ui,-apple-system,"Segoe UI",sans-serif; font-size:16px; line-height:1.45; color:var(--ink); background:var(--bg);
+  body{margin:0; font-family:"Helvetica Neue",system-ui,-apple-system,"Segoe UI",Arial,sans-serif; font-size:15px; line-height:1.45; color:var(--ink); background:var(--bg);
        padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);}
-  .wrap{max-width:720px; margin:0 auto; padding:10px 14px 60px;}
 
-  header.top{display:flex; align-items:center; gap:8px; padding:10px 0 14px; position:sticky; top:0; background:var(--bg); z-index:5;}
-  header.top h1{font-size:19px; font-weight:700; margin:0; letter-spacing:.01em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  /* ===== app shell: dark top bar + tool sidebar (Procore-style) ===== */
+  .appbar{position:fixed; top:0; left:0; right:0; height:48px; z-index:40; background:var(--hdr); color:var(--hdr-ink);
+          display:flex; align-items:center; gap:2px; padding:0 10px 0 6px;}
+  .appbar .iconbtn{color:var(--hdr-ink); width:38px; height:38px; border-radius:4px;}
+  .appbar .iconbtn:hover{background:rgba(255,255,255,.1);}
+  .brand{display:flex; align-items:center; gap:8px; text-decoration:none; color:var(--hdr-ink); padding:4px 8px 4px 4px; border-radius:4px;}
+  .brand:hover{background:rgba(255,255,255,.08);}
+  .bmark{display:flex; align-items:center; justify-content:center; width:24px; height:24px; border-radius:4px;
+         background:var(--acc); color:#fff; font-size:14px; font-weight:800;}
+  .bword{font-size:14.5px; font-weight:750; letter-spacing:.14em;}
+  .bdiv{width:1px; height:22px; background:rgba(255,255,255,.25); margin:0 8px;}
+  .projsel{display:flex; align-items:center; gap:6px; max-width:44vw; background:none; border:none; color:var(--hdr-ink);
+           font:inherit; font-size:13.5px; font-weight:600; padding:6px 8px; border-radius:4px; cursor:pointer;}
+  .projsel:hover{background:rgba(255,255,255,.1);}
+  .projsel span{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .projsel svg{width:14px; height:14px; flex:0 0 auto; color:var(--hdr-sub);}
+  .abadge{position:absolute; top:3px; right:3px; min-width:16px; height:16px; padding:0 4px; border-radius:8px;
+          background:var(--badge); color:#fff; font-size:10.5px; font-weight:700; line-height:16px;}
+
+  .shell{display:flex; padding-top:48px; min-height:100vh;}
+  .sidenav{position:fixed; top:48px; bottom:0; left:0; width:230px; z-index:30; overflow-y:auto; overscroll-behavior:contain;
+           background:var(--card); border-right:1px solid var(--line); padding:6px 0 30px;}
+  .sn-home{margin-top:6px;}
+  .sn-group{font-size:10.5px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--sub); padding:16px 16px 5px;}
+  .sn-item{display:flex; align-items:center; gap:10px; padding:7.5px 14px 7.5px 13px; border-left:3px solid transparent;
+           font-size:13.5px; font-weight:600; color:var(--ink); text-decoration:none;}
+  .sn-item svg{width:17px; height:17px; color:var(--sub); flex:0 0 auto;}
+  .sn-item:hover{background:var(--bg);}
+  .sn-item.on{border-left-color:var(--acc); background:var(--acc-soft);}
+  .sn-item.on svg{color:var(--acc);}
+  .sn-item .sbdg{margin-left:auto; min-width:20px; text-align:center; padding:0 6px; border-radius:9px;
+                 background:var(--badge); color:#fff; font-size:11px; font-weight:700; line-height:18px;}
+  .scrim{display:none; position:fixed; inset:48px 0 0 0; z-index:25; background:rgba(15,22,27,.45);}
+  .content{flex:1; margin-left:230px; min-width:0;}
+  .wrap{max-width:1060px; margin:0 auto; padding:0 22px 60px;}
+  .burger{display:none;}
+  @media (max-width:940px){
+    .sidenav{transform:translateX(-102%); transition:transform .18s ease; box-shadow:4px 0 18px rgba(0,0,0,.18);}
+    .sidenav.open{transform:none;}
+    .scrim.open{display:block;}
+    .content{margin-left:0;}
+    .burger{display:block;}
+    .bword{display:none;}
+    .wrap{padding:0 14px 60px;}
+  }
+
+  header.top{display:flex; align-items:center; gap:8px; padding:14px 0 12px; position:sticky; top:48px; background:var(--bg); z-index:5;
+             border-bottom:1px solid var(--line); margin-bottom:14px;}
+  header.top h1{font-size:20px; font-weight:650; margin:0; letter-spacing:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
   header.top .spacer{flex:1;}
-  .iconbtn{background:none; border:none; color:var(--ink); width:40px; height:40px; padding:7px; cursor:pointer; border-radius:10px; flex:0 0 auto;}
+  .iconbtn{background:none; border:none; color:var(--ink); width:38px; height:38px; padding:7px; cursor:pointer; border-radius:4px; flex:0 0 auto;}
+  .iconbtn:hover{background:var(--acc-soft);}
   .iconbtn:active{background:var(--acc-soft);}
   .iconbtn svg{width:100%; height:100%;}
 
-  .brandrule{height:3px; border:none; border-radius:2px; margin:-8px 0 16px;
-             background:linear-gradient(90deg, var(--acc) 0%, var(--acc) 30%, transparent 100%);}
-  h2.sect{display:flex; align-items:center; gap:10px; font-size:12px; font-weight:800; letter-spacing:.16em;
-          text-transform:uppercase; color:var(--acc); margin:24px 0 14px;}
+  .brandrule{display:none;}
+  h2.sect{display:flex; align-items:center; gap:10px; font-size:11px; font-weight:800; letter-spacing:.14em;
+          text-transform:uppercase; color:var(--sub); margin:22px 0 10px;}
   h2.sect::after{content:''; flex:1; height:1px; background:var(--line);}
-  .grid{display:grid; grid-template-columns:repeat(3,1fr); gap:18px 8px;}
-  .tile{text-align:center; text-decoration:none; color:var(--ink); -webkit-tap-highlight-color:transparent;}
-  .tile .ic{position:relative; width:64px; height:64px; margin:0 auto 8px; border-radius:20px;
-            background:var(--acc-soft); display:flex; align-items:center; justify-content:center;}
-  .tile .ic svg{width:30px; height:30px; color:var(--acc);}
-  .tile:active .ic{outline:2px solid var(--acc);}
+  .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(148px,1fr)); gap:10px;}
+  .tile{display:block; text-align:center; text-decoration:none; color:var(--ink); -webkit-tap-highlight-color:transparent;
+        background:var(--card); border:1px solid var(--line); border-radius:6px; padding:16px 8px 13px;}
+  .tile:hover{border-color:var(--line2); box-shadow:0 1px 4px rgba(20,33,43,.10);}
+  .tile .ic{position:relative; width:46px; height:46px; margin:0 auto 8px; border-radius:6px;
+            background:none; display:flex; align-items:center; justify-content:center;}
+  .tile .ic svg{width:30px; height:30px; color:var(--sub);}
+  .tile:hover .ic svg{color:var(--acc);}
+  .tile:active .ic{outline:none;}
   .tile .tl{display:block; font-size:12.5px; font-weight:650; color:var(--ink);}
-  .tile .bdg{position:absolute; top:-6px; right:-8px; min-width:22px; padding:1px 6px; border-radius:11px;
-             background:var(--badge); color:#fff; font-size:12px; font-weight:700; line-height:1.5;}
+  .tile .bdg{position:absolute; top:-4px; right:-6px; min-width:20px; padding:0 6px; border-radius:10px;
+             background:var(--badge); color:#fff; font-size:11.5px; font-weight:700; line-height:1.6;}
 
-  .card{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px; margin-bottom:12px;}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:6px; padding:16px; margin-bottom:12px;}
   .foot{margin-top:26px; font-size:12px; color:var(--sub); text-align:center;}
 
-  /* list */
+  /* list — Procore log-table look */
   .searchwrap{margin-bottom:10px;}
-  .searchwrap input{width:100%;}
-  .lrow{display:flex; align-items:center; gap:10px; background:var(--card); border:1px solid var(--line); border-radius:12px;
-        border-left:3px solid var(--line2); padding:11px 13px 11px 11px; margin-bottom:8px; cursor:pointer;}
-  .lrow:active{background:var(--acc-soft); border-left-color:var(--acc);}
+  .searchwrap input{width:100%; max-width:420px;}
+  .lrow{display:flex; align-items:center; gap:10px; background:var(--card); border:1px solid var(--line); border-radius:0;
+        border-left:none; border-right:none; padding:10px 13px; margin-bottom:-1px; cursor:pointer;}
+  .lrow:first-child{border-top-left-radius:6px; border-top-right-radius:6px; border-left:1px solid var(--line); border-right:1px solid var(--line);}
+  .lrow{border-left:1px solid var(--line); border-right:1px solid var(--line);}
+  .lrow:last-child{border-bottom-left-radius:6px; border-bottom-right-radius:6px; margin-bottom:8px;}
+  .lrow:hover{background:var(--blue-soft);}
+  .lrow:active{background:var(--blue-soft);}
   .lmain{flex:1; min-width:0;}
-  .lt{font-size:15px; font-weight:650; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .lt{font-size:14px; font-weight:650; color:var(--blue); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
   .ls{font-size:12.5px; color:var(--sub); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin-top:1px;}
   .lmeta{flex:0 0 auto; text-align:right; max-width:40%;}
-  .empty{text-align:center; color:var(--sub); font-size:14px; padding:34px 16px; line-height:1.6;}
+  .empty{text-align:center; color:var(--sub); font-size:14px; padding:34px 16px; line-height:1.6;
+         background:var(--card); border:1px dashed var(--line2); border-radius:6px;}
   .empty .btn{margin-top:12px;}
 
-  .chip{display:inline-block; font-size:11px; font-weight:700; padding:2.5px 9px; border-radius:11px;
-        background:var(--acc-soft); color:var(--acc); white-space:nowrap; margin-left:3px;}
+  .chip{display:inline-block; font-size:11px; font-weight:700; padding:2px 8px; border-radius:3px;
+        background:var(--blue-soft); color:var(--blue); white-space:nowrap; margin-left:3px;}
   .chip.g{background:var(--good-bg); color:var(--good-ink);}
   .chip.w{background:var(--warn-bg); color:var(--warn-ink);}
   .chip.b{background:var(--bad-bg); color:var(--bad-ink);}
-  .chip.n{background:var(--field); color:var(--sub); border:1px solid var(--line);}
+  .chip.n{background:var(--bg); color:var(--sub); border:1px solid var(--line);}
   a.chip.lnk{text-decoration:none;}
 
   /* forms */
   label{display:block; font-size:12.5px; font-weight:650; color:var(--sub); margin:12px 0 4px;}
   input,select,textarea{width:100%; font:inherit; font-size:16px; color:var(--ink); background:var(--field);
-        border:1px solid var(--line2); border-radius:8px; padding:9px 11px; min-height:44px;}
+        border:1px solid var(--line2); border-radius:4px; padding:8px 10px; min-height:42px;}
   textarea{min-height:0;}
-  input:focus,select:focus,textarea:focus,button:focus-visible{outline:2px solid var(--acc); outline-offset:1px;}
+  input:focus,select:focus,textarea:focus,button:focus-visible{outline:2px solid var(--blue); outline-offset:1px;}
   input.err,select.err,textarea.err{border-color:var(--bad-ink); outline:2px solid var(--bad-ink);}
   .hint{font-size:12px; color:var(--sub); margin-top:4px;}
   .fgrid{display:grid; grid-template-columns:1fr 1fr; gap:0 10px;}
   .fgrid .fld{grid-column:1/-1; min-width:0;}
   .fgrid .fld.half{grid-column:auto;}
 
-  .btn{display:inline-block; font:inherit; font-size:15px; font-weight:700; color:var(--btn-ink); background:var(--acc);
-       border:none; border-radius:12px; padding:12px 20px; cursor:pointer; min-height:46px;}
-  .btn.ghost{background:none; color:var(--acc); border:1.5px solid var(--acc);}
-  .btn svg{width:20px; height:20px; vertical-align:-4px;}
-  .btn.danger{background:none; color:var(--bad-ink); border:1.5px solid var(--bad-ink);}
+  .btn{display:inline-block; font:inherit; font-size:14px; font-weight:650; color:var(--btn-ink); background:var(--acc);
+       border:1px solid var(--acc); border-radius:4px; padding:10px 18px; cursor:pointer; min-height:42px;}
+  .btn:hover{background:var(--acc-h); border-color:var(--acc-h);}
+  .btn.ghost{background:var(--card); color:var(--ink); border:1px solid var(--line2);}
+  .btn.ghost:hover{background:var(--bg);}
+  .btn svg{width:19px; height:19px; vertical-align:-4px;}
+  .btn.danger{background:var(--card); color:var(--bad-ink); border:1px solid var(--bad-ink);}
+  .btn.danger:hover{background:var(--bad-bg);}
   .btnrow{display:flex; gap:10px; margin-top:18px;}
   .btnrow .btn:first-child{flex:1;}
-  .minor{background:none; border:1.5px dashed var(--line2); color:var(--acc); font-size:13.5px; font-weight:650;
-         border-radius:8px; padding:9px 12px; cursor:pointer; width:100%; margin-top:8px;}
+  .minor{background:none; border:1.5px dashed var(--line2); color:var(--blue); font-size:13.5px; font-weight:650;
+         border-radius:4px; padding:9px 12px; cursor:pointer; width:100%; margin-top:8px;}
+  .minor:hover{background:var(--blue-soft);}
 
   /* repeating sub-rows */
   .rowswrap{display:flex; flex-direction:column; gap:8px;}
-  .subrow{position:relative; border:1px solid var(--line); border-radius:10px; background:var(--field); padding:10px 34px 10px 10px;}
+  .subrow{position:relative; border:1px solid var(--line); border-radius:4px; background:var(--bg); padding:10px 34px 10px 10px;}
   .subrow .rm{position:absolute; top:6px; right:6px; width:26px; height:26px; border:none; background:none;
-              color:var(--bad-ink); font-size:17px; line-height:1; cursor:pointer; border-radius:6px; padding:0;}
+              color:var(--bad-ink); font-size:17px; line-height:1; cursor:pointer; border-radius:4px; padding:0;}
   .sub-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:7px;}
   .cell{min-width:0;}
   .cell.full{grid-column:1/-1;}
@@ -131,42 +196,47 @@
   /* member picker */
   .pickgrid{display:grid; grid-template-columns:repeat(2,1fr); gap:6px;}
   @media(min-width:520px){.pickgrid{grid-template-columns:repeat(3,1fr);}}
-  .pick{display:flex; align-items:center; gap:7px; border:1px solid var(--line); border-radius:8px; background:var(--field);
+  @media(min-width:900px){.pickgrid{grid-template-columns:repeat(4,1fr);}}
+  .pick{display:flex; align-items:center; gap:7px; border:1px solid var(--line); border-radius:4px; background:var(--field);
         padding:7px 9px; font-size:13.5px; font-weight:600; color:var(--sub); cursor:pointer; margin:0; user-select:none;}
   .pick input{width:17px; height:17px; min-height:0; padding:0; margin:0; flex:0 0 auto; accent-color:var(--acc);}
   .pick:has(input:checked){border-color:var(--acc); background:var(--acc-soft); color:var(--ink);}
   .pick span{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
 
   /* cert expiry */
-  .exphead{font-size:13px; font-weight:750; letter-spacing:.05em; text-transform:uppercase; margin:20px 0 8px;}
+  .exphead{font-size:12.5px; font-weight:750; letter-spacing:.05em; text-transform:uppercase; margin:20px 0 8px;}
   .exphead.b{color:var(--bad-ink);} .exphead.w{color:var(--warn-ink);} .exphead.g{color:var(--good-ink);} .exphead.n{color:var(--sub);}
 
-  /* statistics */
-  .tiles{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:12px;}
-  .stile{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:11px 12px;}
-  .stile .v{font-size:22px; font-weight:750; line-height:1.2;}
-  .stile .l{font-size:10.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--sub); margin-top:2px;}
-  .charthead{font-size:14px; font-weight:700; margin:2px 0 4px;}
+  /* statistics + home overview */
+  .tiles{display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:10px; margin-bottom:12px;}
+  .stile{background:var(--card); border:1px solid var(--line); border-radius:6px; padding:12px 13px;}
+  .stile .v{font-size:23px; font-weight:700; line-height:1.2;}
+  .stile .l{font-size:10.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--sub); margin-top:3px;}
+  a.stile{display:block; text-decoration:none; color:var(--ink);}
+  a.stile:hover{border-color:var(--line2); box-shadow:0 1px 4px rgba(20,33,43,.10);}
+  .stile .v.b{color:var(--bad-ink);} .stile .v.w{color:var(--warn-ink);} .stile .v.g{color:var(--good-ink);}
+  .charthead{font-size:14.5px; font-weight:700; margin:2px 0 4px;}
   .legend{display:flex; gap:14px; flex-wrap:wrap; font-size:12px; color:var(--sub); font-weight:600; margin:2px 0 6px;}
-  .legend i{display:inline-block; width:10px; height:10px; border-radius:3px; margin-right:5px; vertical-align:-1px;}
+  .legend i{display:inline-block; width:10px; height:10px; border-radius:2px; margin-right:5px; vertical-align:-1px;}
   .chartwrap{overflow-x:auto;}
   .chartwrap svg{display:block; width:100%; height:auto; min-width:480px;}
   .bar{cursor:pointer;}
   .bar:hover{opacity:.82;}
   .tip{position:fixed; display:none; z-index:50; background:var(--ink); color:var(--bg); font-size:12.5px; font-weight:600;
-       padding:5px 9px; border-radius:7px; pointer-events:none; max-width:240px;}
+       padding:5px 9px; border-radius:4px; pointer-events:none; max-width:240px;}
   .dtable{width:100%; border-collapse:collapse; font-size:12.5px; margin-top:6px;}
-  .dtable th,.dtable td{border-bottom:1px solid var(--line); padding:4px 6px; text-align:right; font-variant-numeric:tabular-nums;}
+  .dtable th,.dtable td{border-bottom:1px solid var(--line); padding:5px 6px; text-align:right; font-variant-numeric:tabular-nums;}
   .dtable th:first-child,.dtable td:first-child{text-align:left;}
-  .dtable th{color:var(--sub); font-weight:700;}
-  details summary{cursor:pointer; font-size:13.5px; font-weight:650; color:var(--acc);}
+  .dtable th{color:var(--sub); font-weight:700; font-size:11px; letter-spacing:.04em; text-transform:uppercase;}
+  details summary{cursor:pointer; font-size:13.5px; font-weight:650; color:var(--blue);}
   .mhgrid{display:grid; grid-template-columns:repeat(3,1fr); gap:7px; margin-top:10px;}
+  @media(min-width:700px){.mhgrid{grid-template-columns:repeat(6,1fr);}}
   .mh span{display:block; font-size:11px; font-weight:700; color:var(--sub); margin-bottom:2px;}
   .mh input{min-height:38px; padding:6px 8px; font-size:14px;}
 
   /* photos */
   .thumbs{display:flex; gap:8px; flex-wrap:wrap;}
-  .thumb{position:relative; width:86px; height:86px; border:1px solid var(--line2); border-radius:8px; overflow:hidden; flex:0 0 auto;}
+  .thumb{position:relative; width:86px; height:86px; border:1px solid var(--line2); border-radius:4px; overflow:hidden; flex:0 0 auto;}
   .thumb img{width:100%; height:100%; object-fit:cover; display:block;}
   .thumb .rmp{position:absolute; top:3px; right:3px; width:22px; height:22px; border:none; border-radius:50%;
               background:rgba(0,0,0,.55); color:#fff; font-size:13px; line-height:1; cursor:pointer; padding:0;}
@@ -175,27 +245,51 @@
   .hbar{margin:8px 0;}
   .hbar .hlab{font-size:12.5px; color:var(--sub); font-weight:600; display:flex; justify-content:space-between; gap:10px;}
   .hbar .hlab b{color:var(--ink); font-variant-numeric:tabular-nums; white-space:nowrap;}
-  .hbar .htrack{background:var(--field); border:1px solid var(--line); border-radius:4px; height:14px; margin-top:3px; overflow:hidden;}
-  .hbar .hfill{height:100%; background:var(--s1); border-radius:3px; min-width:2px;}
+  .hbar .htrack{background:var(--bg); border:1px solid var(--line); border-radius:3px; height:14px; margin-top:3px; overflow:hidden;}
+  .hbar .hfill{height:100%; background:var(--s2); border-radius:2px; min-width:2px;}
 
   /* monthly report */
   .repmeta{font-size:13px; color:var(--sub); line-height:1.7;}
   .repmeta b{color:var(--ink);}
 
+  /* toast */
+  .toast{position:fixed; left:50%; bottom:22px; transform:translateX(-50%) translateY(80px); z-index:60; max-width:88vw;
+         background:var(--hdr); color:#fff; font-size:13.5px; font-weight:600; padding:11px 18px; border-radius:6px;
+         box-shadow:0 4px 18px rgba(0,0,0,.3); opacity:0; transition:all .22s ease; pointer-events:none;}
+  .toast.show{transform:translateX(-50%); opacity:1;}
+  .toast.bad{background:#8f1f1f;}
+
   select{appearance:auto;}
-  @media (max-width:390px){ .grid{gap:16px 4px;} .tile .ic{width:60px;height:60px;} .tiles{grid-template-columns:repeat(2,1fr);} }
+  @media (max-width:390px){ .grid{grid-template-columns:repeat(3,1fr); gap:8px 6px;} .tile .ic{width:40px;height:40px;} .tiles{grid-template-columns:repeat(2,1fr);} }
   @media print{
     body{background:#fff;}
+    .appbar,.sidenav,.scrim,.toast{display:none !important;}
+    .shell{padding-top:0;}
+    .content{margin-left:0;}
     .wrap{max-width:none; padding:0;}
-    header.top{position:static;}
+    header.top{position:static; border-bottom:none;}
     .iconbtn,.searchwrap,.btn,.minor,.noprint{display:none !important;}
     .card,.stile{break-inside:avoid; border-color:#bbb;}
   }
 </style>
 </head>
 <body>
-<div class="wrap" id="app"></div>
+<div class="appbar">
+  <button class="iconbtn burger" id="navBtn" aria-label="Menu"></button>
+  <a class="brand" href="#/"><span class="bmark">S</span><span class="bword">SKYTOPIA</span></a>
+  <span class="bdiv"></span>
+  <button class="projsel" id="projSel" title="Project settings"><span id="projName">Site Safety</span></button>
+  <div class="spacer" style="flex:1"></div>
+  <button class="iconbtn" id="bellBtn" aria-label="Cert expiry alerts" style="position:relative"></button>
+  <button class="iconbtn" id="gearBtn" aria-label="Settings"></button>
+</div>
+<div class="shell">
+  <nav class="sidenav" id="sidenav" aria-label="Tools"></nav>
+  <div class="scrim" id="scrim"></div>
+  <div class="content"><div class="wrap" id="app"></div></div>
+</div>
 <div class="tip" id="tip"></div>
+<div class="toast" id="toast"></div>
 <script>
 'use strict';
 /* ============ helpers ============ */
@@ -217,6 +311,91 @@ function downloadText(name, text, mime){
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; a.click();
   setTimeout(()=>URL.revokeObjectURL(a.href),5000);
 }
+function downloadRaw(name, text, mime){
+  const blob=new Blob([text],{type:mime||'text/plain'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),5000);
+}
+
+/* ============ SKYTOPIA Safety folder (File System Access API) ============
+   Reports & exports save straight into the connected Safety folder
+   (OneDrive\Skytopia\Safety), each type into its own subfolder.        */
+const DIRMAP={contacts:'Registers',members:'Registers',equipment:'Registers',documents:'Registers',certexp:'Registers',
+  tbm:'TBM',inspections:'Inspections',observations:'Observations',checklists:'Checklists',ra:'RA-SWP',training:'Training',
+  meetings:'Meetings',incidents:'Incidents',defects:'Quality Defects',report:'Monthly Reports',backup:'Backups'};
+function idbOpen(){ return new Promise((res,rej)=>{ const r=indexedDB.open('kkl-cms-fs',1);
+  r.onupgradeneeded=()=>r.result.createObjectStore('kv');
+  r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); }); }
+async function idbGet(k){ const d=await idbOpen(); return new Promise((res,rej)=>{
+  const t=d.transaction('kv').objectStore('kv').get(k); t.onsuccess=()=>res(t.result); t.onerror=()=>rej(t.error); }); }
+async function idbSet(k,v){ const d=await idbOpen(); return new Promise((res,rej)=>{
+  const t=d.transaction('kv','readwrite').objectStore('kv').put(v,k); t.onsuccess=()=>res(); t.onerror=()=>rej(t.error); }); }
+async function idbDel(k){ const d=await idbOpen(); return new Promise((res,rej)=>{
+  const t=d.transaction('kv','readwrite').objectStore('kv').delete(k); t.onsuccess=()=>res(); t.onerror=()=>rej(t.error); }); }
+function fsSupported(){ return !!window.showDirectoryPicker; }
+async function getSafetyDir(ask){
+  let h=null; try{ h=await idbGet('safetyDir'); }catch(e){}
+  if(!h) return null;
+  try{
+    let q=await h.queryPermission({mode:'readwrite'});
+    if(q!=='granted' && ask) q=await h.requestPermission({mode:'readwrite'});
+    return q==='granted'?h:null;
+  }catch(e){ return null; }
+}
+let toastTimer=null;
+function toast(msg, bad){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.toggle('bad',!!bad); t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'), 4200);
+}
+async function saveToSafety(cat, name, text, mime){
+  if(!fsSupported()) return false;
+  let root;
+  try{ root=await getSafetyDir(true); }catch(e){ return false; }
+  if(!root) return false;
+  try{
+    const dir=await root.getDirectoryHandle(cat,{create:true});
+    const fh=await dir.getFileHandle(name,{create:true});
+    const w=await fh.createWritable();
+    const bom=(mime||'').includes('csv')?'﻿':'';
+    await w.write(new Blob([bom+text],{type:mime||'text/plain'}));
+    await w.close();
+    toast('Saved: '+root.name+' \\ '+cat+' \\ '+name);
+    return true;
+  }catch(e){ console.warn('folder save failed',e); toast('Folder save failed — downloading instead', true); return false; }
+}
+async function saveOrDownload(cat, name, text, mime){
+  if(await saveToSafety(cat,name,text,mime)) return;
+  if((mime||'').includes('csv')) downloadText(name,text,mime); else downloadRaw(name,text,mime);
+}
+/* self-contained HTML report file (printable) for the Safety folder */
+function reportDocHtml(title, bodyHtml){
+  const s=db.settings;
+  return '<!doctype html><html><head><meta charset="utf-8"><title>'+esc(title)+'</title><style>'+
+    'body{font-family:"Helvetica Neue",system-ui,Arial,sans-serif;font-size:14px;color:#282828;margin:28px auto;max-width:800px;padding:0 20px;line-height:1.5}'+
+    '.card{border:1px solid #dfe3e6;border-radius:6px;padding:18px;margin-bottom:14px}'+
+    '.charthead{font-size:16px;font-weight:700;margin:2px 0 6px}'+
+    '.repmeta{font-size:13px;color:#68757d;line-height:1.7}.repmeta b{color:#282828}'+
+    '.dtable{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:6px}'+
+    '.dtable th,.dtable td{border-bottom:1px solid #dfe3e6;padding:5px 6px;text-align:right}'+
+    '.dtable th:first-child,.dtable td:first-child{text-align:left}.dtable th{color:#68757d;font-size:11px;text-transform:uppercase}'+
+    '.thumbs{display:flex;gap:8px;flex-wrap:wrap}.thumb{width:150px;height:150px;border:1px solid #c3cbd0;border-radius:4px;overflow:hidden}'+
+    '.thumb img{width:100%;height:100%;object-fit:cover}'+
+    '.hbar{margin:8px 0}.hlab{font-size:12.5px;color:#68757d;font-weight:600;display:flex;justify-content:space-between}.hlab b{color:#282828}'+
+    '.htrack{background:#f2f3f5;border:1px solid #dfe3e6;border-radius:3px;height:14px;margin-top:3px;overflow:hidden}'+
+    '.hfill{height:100%;background:#f47e42;min-width:2px}'+
+    '.chip{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:3px;background:#f0f6fe;color:#006ddf;margin-left:3px}'+
+    '.hint{font-size:12px;color:#68757d}.noprint{display:none}label{display:none}input,select{display:none}'+
+    '.rephead{display:flex;align-items:center;gap:10px;border-bottom:3px solid #f47e42;padding-bottom:10px;margin-bottom:16px}'+
+    '.rmark{width:26px;height:26px;border-radius:4px;background:#f47e42;color:#fff;font-weight:800;font-size:15px;display:flex;align-items:center;justify-content:center}'+
+    '.rtitle{font-size:17px;font-weight:750;letter-spacing:.02em}.rsub{font-size:12px;color:#68757d;margin-left:auto;text-align:right}'+
+    '@media print{body{margin:0;max-width:none}}'+
+    '</style></head><body>'+
+    '<div class="rephead"><div class="rmark">S</div><div class="rtitle">SKYTOPIA Site Safety</div>'+
+    '<div class="rsub">'+esc([s.project,s.company].filter(Boolean).join(' — '))+'<br>Generated '+esc(today())+'</div></div>'+
+    bodyHtml+'</body></html>';
+}
+function fileStamp(s){ return String(s||'').replace(/[\\/:*?"<>|]+/g,'-').replace(/\s+/g,' ').trim().slice(0,60); }
 function compressImage(file, cb){
   const img=new Image();
   img.onload=()=>{
@@ -267,7 +446,12 @@ const ICONS={
   dl:'<path d="M12 4v11M7.5 11l4.5 4.5L16.5 11"/><path d="M4.5 19.5h15"/>',
   act:'<path d="M9.5 5.5H20M9.5 12H20M9.5 18.5H20"/><path d="M3.5 5l1.4 1.4L7.5 3.8M3.5 11.5l1.4 1.4 2.6-2.6M3.5 18l1.4 1.4 2.6-2.6"/>',
   defect:'<rect x="3" y="5.5" width="18" height="13" rx="1.5"/><path d="M3 12h18"/><path d="M9 5.5V12M15 5.5V12"/><path d="M6 12v6.5M12 12v6.5M18 12v6.5"/>',
-  print:'<path d="M7 8V3.5h10V8"/><rect x="4" y="8" width="16" height="8" rx="1.5"/><path d="M7 13h10v7H7z"/>'
+  print:'<path d="M7 8V3.5h10V8"/><rect x="4" y="8" width="16" height="8" rx="1.5"/><path d="M7 13h10v7H7z"/>',
+  menu:'<path d="M4 6.5h16M4 12h16M4 17.5h16"/>',
+  bell:'<path d="M12 4a5.5 5.5 0 0 0-5.5 5.5c0 4-1.5 5.5-2.5 6.5h16c-1-1-2.5-2.5-2.5-6.5A5.5 5.5 0 0 0 12 4z"/><path d="M10 19.5a2 2 0 0 0 4 0"/>',
+  chev:'<path d="M8 10l4 4 4-4"/>',
+  home:'<path d="M4 11.5L12 4.5l8 7"/><path d="M6 10v9.5h12V10"/><path d="M10 19.5v-5h4v5"/>',
+  folder:'<path d="M3.5 6.5A1.5 1.5 0 0 1 5 5h4.5l2 2.5H19A1.5 1.5 0 0 1 20.5 9v9A1.5 1.5 0 0 1 19 19.5H5A1.5 1.5 0 0 1 3.5 18z"/>'
 };
 const ic = n => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+(ICONS[n]||'')+'</svg>';
 
@@ -413,16 +597,73 @@ function header(title, back, right){
 }
 function goBack(){ if(history.length>1) history.back(); else location.hash='#/'; }
 
+/* ============ app shell (Procore-style top bar + tool sidebar) ============ */
+const NAV=[
+ {group:'Site',    items:[['contacts','Contacts','contact'],['members','Member(s)','members'],['equipment','Equipment','equip'],
+                          ['certexp','Cert Expiry','cert'],['documents','Documents','doc'],['actions','Actions','act']]},
+ {group:'Safety',  items:[['tbm','Toolbox Meetings','tbm'],['inspections','Inspections','insp'],['observations','Observations','obs'],
+                          ['checklists','Checklists','check'],['ra','RA / SWP','ra'],['training','Training','train'],
+                          ['meetings','Meetings','meet'],['incidents','Incidents','incid']]},
+ {group:'Quality', items:[['defects','Defects','defect']]},
+ {group:'Reports', items:[['stats','Statistics','stats'],['report','Monthly Report','print']]}
+];
+function buildNav(){
+  const nav=document.getElementById('sidenav');
+  nav.innerHTML =
+    '<a class="sn-item sn-home" href="#/" data-nav="">'+ic('home')+'Project Home</a>'+
+    NAV.map(g=>'<div class="sn-group">'+g.group+'</div>'+
+      g.items.map(t=>'<a class="sn-item" href="#/'+t[0]+'" data-nav="'+t[0]+'">'+ic(t[2])+t[1]+
+        '<span class="sbdg" data-bdg="'+t[0]+'" style="display:none"></span></a>').join('')).join('')+
+    '<div class="sn-group">Admin</div>'+
+    '<a class="sn-item" href="#/settings" data-nav="settings">'+ic('gear')+'Settings</a>';
+}
+function syncShell(cur){
+  document.getElementById('projName').textContent = db.settings.project || 'Site Safety';
+  document.querySelectorAll('#sidenav .sn-item').forEach(a=>a.classList.toggle('on', a.dataset.nav===cur));
+  const nb=certBadgeCount(), ob=openActionCounts().overdue;
+  const bell=document.getElementById('bellBadge');
+  if(bell){ bell.style.display=nb?'':'none'; bell.textContent=nb; }
+  const set=(k,v)=>{ const el=document.querySelector('[data-bdg="'+k+'"]'); if(el){ el.style.display=v?'':'none'; el.textContent=v; } };
+  set('certexp',nb); set('actions',ob);
+  document.getElementById('sidenav').classList.remove('open');
+  document.getElementById('scrim').classList.remove('open');
+}
+function initShell(){
+  document.getElementById('navBtn').innerHTML=ic('menu');
+  document.getElementById('bellBtn').innerHTML=ic('bell')+'<span class="abadge" id="bellBadge" style="display:none"></span>';
+  document.getElementById('gearBtn').innerHTML=ic('gear');
+  document.getElementById('projSel').insertAdjacentHTML('beforeend', ic('chev'));
+  document.getElementById('projSel').onclick=()=>location.hash='#/settings';
+  document.getElementById('bellBtn').onclick=()=>location.hash='#/certexp';
+  document.getElementById('gearBtn').onclick=()=>location.hash='#/settings';
+  const nav=document.getElementById('sidenav'), scrim=document.getElementById('scrim');
+  document.getElementById('navBtn').onclick=()=>{ nav.classList.toggle('open'); scrim.classList.toggle('open', nav.classList.contains('open')); };
+  scrim.onclick=()=>{ nav.classList.remove('open'); scrim.classList.remove('open'); };
+  buildNav();
+}
+
 function renderHome(){
   const s=db.settings;
   const nb=certBadgeCount();
   const tile=(href,label,icon,badge)=>'<a class="tile" href="#/'+href+'"><span class="ic">'+ic(icon)+
     (badge?'<span class="bdg">'+badge+'</span>':'')+'</span><span class="tl">'+label+'</span></a>';
   const ob=openActionCounts();
+  const yr=new Date().getFullYear();
+  const incYtd=db.incidents.filter(r=>r.date&&+r.date.slice(0,4)===yr).length;
+  const eqIn=db.equipment.filter(e=>!e.status||e.status==='In service').length;
+  const ov=(href,v,l,cls)=>'<a class="stile" href="#/'+href+'"><div class="v'+(cls&&v?' '+cls:'')+'">'+v+'</div><div class="l">'+l+'</div></a>';
   app.innerHTML =
-    '<header class="top"><h1>'+esc(s.project||'SKYTOPIA Site Safety')+'</h1><div class="spacer"></div>'+
+    '<header class="top"><h1>'+esc(s.project||'Project Home')+'</h1><div class="spacer"></div>'+
     '<button class="iconbtn" aria-label="Settings" onclick="location.hash=\'#/settings\'">'+ic('gear')+'</button></header>'+
-    '<hr class="brandrule">'+
+    '<h2 class="sect">Project overview</h2>'+
+    '<div class="tiles">'+
+      ov('actions',ob.total,'Open actions','w')+
+      ov('actions',ob.overdue,'Overdue actions','b')+
+      ov('certexp',nb,'Certs due &le;30d','b')+
+      ov('members',db.members.length,'Members')+
+      ov('equipment',eqIn,'Equipment in service')+
+      ov('incidents',incYtd,'Incidents '+yr)+
+    '</div>'+
     '<h2 class="sect">Site</h2>'+
     '<div class="grid">'+
       tile('contacts','Contacts','contact')+
@@ -514,6 +755,7 @@ function route(){
   const p=location.hash.replace(/^#\/?/,'').split('/').filter(Boolean);
   window.scrollTo(0,0);
   curEdit=null;
+  syncShell(p[0]||'');
   if(!p.length) return renderHome();
   const key=p[0], sub=p[1];
   if(key==='certexp')  return renderCertExp();
@@ -1072,7 +1314,16 @@ function renderRecordPrint(key, id){
         '<div style="flex:1;border-top:1px solid var(--line2);padding-top:5px;font-size:12px;color:var(--sub)">Verified by / date</div>'+
       '</div>'+
     '</div>'+
-    '<div class="btnrow noprint"><button class="btn" onclick="window.print()">Print / save as PDF</button></div>';
+    '<div class="btnrow noprint"><button class="btn" onclick="window.print()">Print / save as PDF</button>'+
+    '<button class="btn ghost" onclick="saveRecordHtml(\''+key+'\',\''+id+'\')">Save to Safety folder</button></div>';
+}
+function saveRecordHtml(key, id){
+  const mod=MODULES[key];
+  const item=db[mod.store].find(x=>x.id===id); if(!item) return;
+  const card=app.querySelector('.card'); if(!card) return;
+  const cl=card.cloneNode(true); cl.querySelectorAll('.noprint').forEach(e=>e.remove());
+  const name=mod.store+'-'+(item.date||today())+'-'+fileStamp(item.id)+'.html';
+  saveOrDownload(DIRMAP[key]||'Registers', name, reportDocHtml(mod.title+' Report', cl.outerHTML), 'text/html');
 }
 
 /* ============ cert expiry dashboard ============ */
@@ -1130,7 +1381,7 @@ function exportModuleCsv(key){
   });
   const lines=[heads.map(csvEsc).join(',')]
     .concat(items.map(i=>getters.map(g=>csvEsc(g(i))).join(',')));
-  downloadText(mod.store+'-'+today()+'.csv', lines.join('\r\n'));
+  saveOrDownload(DIRMAP[key]||'Registers', mod.store+'-'+today()+'.csv', lines.join('\r\n'), 'text/csv;charset=utf-8');
 }
 
 /* ============ statistics ============ */
@@ -1325,6 +1576,7 @@ function renderReport(){
     '</div>'+
     '<div class="btnrow noprint">'+
       '<button class="btn" onclick="window.print()">Print / save as PDF</button>'+
+      '<button class="btn ghost" onclick="saveReportHtml()">Save to Safety folder</button>'+
       '<button class="btn ghost" onclick="exportReportCsv()">Export CSV (Excel)</button>'+
     '</div>'+
     '<div class="hint noprint" style="margin-top:10px">Underlying observation data is tabulated in the CSV export, as required for HDB statistical analysis. Bulk SFTP data transfer to HDB (Appendix X) is a server-side process outside this app.</div>';
@@ -1355,7 +1607,15 @@ function exportReportCsv(){
     const dur=(o.closedDate&&o.date)?Math.max(0,Math.round((new Date(o.closedDate)-new Date(o.date))/864e5)):'';
     L.push([i+1,o.block,o.storey,o.unit,o.location,o.initiator,o.subcon,o.trade,o.category,o.subitem,o.desc,o.severity,o.date,o.time,o.status,o.rectifiedDate,o.verifiedDate,o.closedDate,dur]);
   });
-  downloadText('safety-report-'+mk+'.csv', L.map(r=>r.map(csvEsc).join(',')).join('\r\n'));
+  saveOrDownload('Monthly Reports', 'safety-report-'+mk+'.csv', L.map(r=>r.map(csvEsc).join(',')).join('\r\n'), 'text/csv;charset=utf-8');
+}
+function saveReportHtml(){
+  const mk=repMonth;
+  const cards=[...app.querySelectorAll('.card')].map(c=>{
+    const cl=c.cloneNode(true); cl.querySelectorAll('.noprint,input,select,label').forEach(e=>e.remove()); return cl.outerHTML;
+  }).join('');
+  saveOrDownload('Monthly Reports', 'safety-report-'+mk+'.html',
+    reportDocHtml('Monthly Safety Report '+mk, cards), 'text/html');
 }
 
 /* ============ settings ============ */
@@ -1372,6 +1632,12 @@ function renderSettings(){
       '<div class="fld"><label>Precinct</label><input id="setPrecinct" value="'+esc(s.precinct||'')+'"></div>'+
     '</div><div class="hint">The HDB fields appear on the monthly safety data report header.</div>'+
     '<div class="btnrow"><button class="btn" id="setSave">Save</button></div></div>'+
+    '<div class="card"><label style="margin-top:0">SKYTOPIA Safety folder</label>'+
+      '<p class="hint">Connect your <b>Skytopia \\ Safety</b> folder (OneDrive) so reports, CSV exports and backups save straight into it — each report type goes to its own subfolder (Inspections, Observations, Monthly Reports, &hellip;). Works in Chrome / Edge.</p>'+
+      '<p class="hint" id="fsStatus">Checking&hellip;</p>'+
+      '<div class="btnrow" style="margin-top:10px"><button class="btn ghost" id="fsPick">Connect folder</button>'+
+      '<button class="btn danger" id="fsForget" style="display:none">Disconnect</button></div>'+
+    '</div>'+
     '<div class="card"><label style="margin-top:0">Backup &amp; restore</label>'+
       '<p class="hint">Data lives only in this browser. Export a backup file regularly and keep it somewhere safe; import it to restore or to move to another device.</p>'+
       '<p class="hint">Storage used: ~'+Math.round(JSON.stringify(db).length/1024).toLocaleString()+' KB of a ~5,000 KB browser limit. Photos use the most space.</p>'+
@@ -1393,12 +1659,25 @@ function renderSettings(){
     save(); location.hash='#/';
   };
   document.getElementById('expBtn').onclick=()=>{
-    const blob=new Blob([JSON.stringify(db,null,1)],{type:'application/json'});
-    const a=document.createElement('a');
-    a.href=URL.createObjectURL(blob);
-    a.download='cms-backup-'+today()+'.json';
-    a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),5000);
+    saveOrDownload('Backups', 'cms-backup-'+today()+'.json', JSON.stringify(db,null,1), 'application/json');
   };
+  const fsStatus=document.getElementById('fsStatus'), fsPick=document.getElementById('fsPick'), fsForget=document.getElementById('fsForget');
+  async function fsRefresh(){
+    if(!fsSupported()){ fsStatus.innerHTML='Not supported in this browser — files will download to your Downloads folder instead.'; fsPick.style.display='none'; return; }
+    let h=null; try{ h=await idbGet('safetyDir'); }catch(e){}
+    if(h){ fsStatus.innerHTML='Connected: <b>'+esc(h.name)+'</b> — reports save into its subfolders.'; fsPick.textContent='Change folder'; fsForget.style.display=''; }
+    else{ fsStatus.innerHTML='<b>Not connected</b> — reports currently download to your Downloads folder.'; fsPick.textContent='Connect folder'; fsForget.style.display='none'; }
+  }
+  fsPick.onclick=async()=>{
+    try{
+      const h=await window.showDirectoryPicker({mode:'readwrite'});
+      await idbSet('safetyDir', h);
+      toast('Safety folder connected: '+h.name);
+      fsRefresh();
+    }catch(e){ /* user cancelled */ }
+  };
+  fsForget.onclick=async()=>{ await idbDel('safetyDir').catch(()=>{}); fsRefresh(); };
+  fsRefresh();
   const impFile=document.getElementById('impFile');
   document.getElementById('impBtn').onclick=()=>impFile.click();
   impFile.onchange=()=>{
@@ -1423,6 +1702,7 @@ function renderSettings(){
   };
 }
 
+initShell();
 route();
 </script>
 </body>
