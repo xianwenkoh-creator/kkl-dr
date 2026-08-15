@@ -5,14 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#f5f6f8" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#111417" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f4f8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#131320" media="(prefers-color-scheme: dark)">
 <title>KKL Site Safety CMS</title>
 <style>
   :root{
-    --bg:#f5f6f8; --card:#ffffff; --field:#fafbfc;
-    --ink:#1d2226; --sub:#6a7278; --line:#e3e6e9; --line2:#c9cfd4;
-    --acc:#0e8ba0; --acc-soft:#e0f2f5; --badge:#e02d2d;
+    --bg:#f4f4f8; --card:#ffffff; --field:#fafafd;
+    --ink:#1f2130; --sub:#676b7c; --line:#e5e5ee; --line2:#c9c9d8;
+    --acc:#4636b8; --acc-soft:#edeafc; --btn-ink:#ffffff; --badge:#e02d2d;
     --good-ink:#086e08; --good-bg:rgba(12,163,12,.13);
     --warn-ink:#8a5b00; --warn-bg:rgba(250,178,25,.18);
     --bad-ink:#b32222;  --bad-bg:rgba(208,59,59,.13);
@@ -21,9 +21,9 @@
   }
   @media (prefers-color-scheme: dark){
     :root:not([data-theme="light"]){
-      --bg:#111417; --card:#1b1f23; --field:#22262b;
-      --ink:#e8eaec; --sub:#9aa3a9; --line:#2b3136; --line2:#3f474d;
-      --acc:#4cc3d0; --acc-soft:#11333a; --badge:#e04b4b;
+      --bg:#131320; --card:#1d1d2e; --field:#252538;
+      --ink:#e9e8f2; --sub:#a0a0b4; --line:#2e2e44; --line2:#45455e;
+      --acc:#a99bf5; --acc-soft:#2b2650; --btn-ink:#17172a; --badge:#e04b4b;
       --good-ink:#4fce6a; --good-bg:rgba(12,163,12,.22);
       --warn-ink:#f3b73f; --warn-bg:rgba(250,178,25,.16);
       --bad-ink:#ef8080;  --bad-bg:rgba(230,103,103,.18);
@@ -32,9 +32,9 @@
     }
   }
   :root[data-theme="dark"]{
-    --bg:#111417; --card:#1b1f23; --field:#22262b;
-    --ink:#e8eaec; --sub:#9aa3a9; --line:#2b3136; --line2:#3f474d;
-    --acc:#4cc3d0; --acc-soft:#11333a; --badge:#e04b4b;
+    --bg:#131320; --card:#1d1d2e; --field:#252538;
+    --ink:#e9e8f2; --sub:#a0a0b4; --line:#2e2e44; --line2:#45455e;
+    --acc:#a99bf5; --acc-soft:#2b2650; --btn-ink:#17172a; --badge:#e04b4b;
     --good-ink:#4fce6a; --good-bg:rgba(12,163,12,.22);
     --warn-ink:#f3b73f; --warn-bg:rgba(250,178,25,.16);
     --bad-ink:#ef8080;  --bad-bg:rgba(230,103,103,.18);
@@ -55,27 +55,30 @@
   .iconbtn:active{background:var(--acc-soft);}
   .iconbtn svg{width:100%; height:100%;}
 
-  h2.sect{font-size:20px; font-weight:700; margin:22px 0 14px;}
-  .grid{display:grid; grid-template-columns:repeat(3,1fr); gap:20px 8px;}
+  .brandrule{height:3px; border:none; border-radius:2px; margin:-8px 0 16px;
+             background:linear-gradient(90deg, var(--acc) 0%, var(--acc) 30%, transparent 100%);}
+  h2.sect{display:flex; align-items:center; gap:10px; font-size:12px; font-weight:800; letter-spacing:.16em;
+          text-transform:uppercase; color:var(--acc); margin:24px 0 14px;}
+  h2.sect::after{content:''; flex:1; height:1px; background:var(--line);}
+  .grid{display:grid; grid-template-columns:repeat(3,1fr); gap:18px 8px;}
   .tile{text-align:center; text-decoration:none; color:var(--ink); -webkit-tap-highlight-color:transparent;}
-  .tile .ic{position:relative; width:66px; height:66px; margin:0 auto 8px; border-radius:50%;
-            background:var(--card); border:1px solid var(--line); box-shadow:0 1px 3px rgba(0,0,0,.05);
-            display:flex; align-items:center; justify-content:center;}
-  .tile .ic svg{width:32px; height:32px; color:var(--acc);}
-  .tile:active .ic{background:var(--acc-soft);}
-  .tile .tl{display:block; font-size:11.5px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--ink);}
-  .tile .bdg{position:absolute; top:-5px; right:-8px; min-width:22px; padding:1px 6px; border-radius:11px;
+  .tile .ic{position:relative; width:64px; height:64px; margin:0 auto 8px; border-radius:20px;
+            background:var(--acc-soft); display:flex; align-items:center; justify-content:center;}
+  .tile .ic svg{width:30px; height:30px; color:var(--acc);}
+  .tile:active .ic{outline:2px solid var(--acc);}
+  .tile .tl{display:block; font-size:12.5px; font-weight:650; color:var(--ink);}
+  .tile .bdg{position:absolute; top:-6px; right:-8px; min-width:22px; padding:1px 6px; border-radius:11px;
              background:var(--badge); color:#fff; font-size:12px; font-weight:700; line-height:1.5;}
 
-  .card{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px; margin-bottom:12px;}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px; margin-bottom:12px;}
   .foot{margin-top:26px; font-size:12px; color:var(--sub); text-align:center;}
 
   /* list */
   .searchwrap{margin-bottom:10px;}
   .searchwrap input{width:100%;}
   .lrow{display:flex; align-items:center; gap:10px; background:var(--card); border:1px solid var(--line); border-radius:12px;
-        padding:11px 13px; margin-bottom:8px; cursor:pointer;}
-  .lrow:active{background:var(--acc-soft);}
+        border-left:3px solid var(--line2); padding:11px 13px 11px 11px; margin-bottom:8px; cursor:pointer;}
+  .lrow:active{background:var(--acc-soft); border-left-color:var(--acc);}
   .lmain{flex:1; min-width:0;}
   .lt{font-size:15px; font-weight:650; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
   .ls{font-size:12.5px; color:var(--sub); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin-top:1px;}
@@ -103,9 +106,10 @@
   .fgrid .fld{grid-column:1/-1; min-width:0;}
   .fgrid .fld.half{grid-column:auto;}
 
-  .btn{display:inline-block; font:inherit; font-size:15px; font-weight:700; color:#fff; background:var(--acc);
-       border:none; border-radius:9px; padding:12px 20px; cursor:pointer; min-height:46px;}
+  .btn{display:inline-block; font:inherit; font-size:15px; font-weight:700; color:var(--btn-ink); background:var(--acc);
+       border:none; border-radius:12px; padding:12px 20px; cursor:pointer; min-height:46px;}
   .btn.ghost{background:none; color:var(--acc); border:1.5px solid var(--acc);}
+  .btn svg{width:20px; height:20px; vertical-align:-4px;}
   .btn.danger{background:none; color:var(--bad-ink); border:1.5px solid var(--bad-ink);}
   .btnrow{display:flex; gap:10px; margin-top:18px;}
   .btnrow .btn:first-child{flex:1;}
@@ -229,7 +233,7 @@ function compressImage(file, cb){
 
 /* ============ storage ============ */
 const KEY='kkl-cms-v1';
-const BLANK={contacts:[],members:[],equipment:[],documents:[],tbm:[],inspections:[],observations:[],checklists:[],ra:[],training:[],meetings:[],incidents:[],manhours:{},mandays:{},settings:{project:'',company:'',hdbContract:'',siteRef:'',estate:'',neighbourhood:'',precinct:''}};
+const BLANK={contacts:[],members:[],equipment:[],documents:[],tbm:[],inspections:[],observations:[],checklists:[],ra:[],training:[],meetings:[],incidents:[],defects:[],manhours:{},mandays:{},settings:{project:'',company:'',hdbContract:'',siteRef:'',estate:'',neighbourhood:'',precinct:''}};
 function load(){ try{ const raw=localStorage.getItem(KEY);
     if(raw){ const d=JSON.parse(raw); const out=structuredClone(BLANK);
       for(const k in out){ if(d[k]!==undefined) out[k]=d[k]; } return out; }
@@ -260,7 +264,10 @@ const ICONS={
   incid:'<path d="M7.5 16.5h-1a3.5 3.5 0 0 1-.4-7A5 5 0 0 1 16 8.3a4 4 0 0 1 1.6 7.6"/><path d="M12.7 11l-2.2 3.7h3l-2.2 3.8"/>',
   stats:'<path d="M4.5 19.5h15"/><path d="M7 16.5V12M11 16.5v-7M15 16.5v-5M19 16.5V8"/><path d="M5.5 9L10 5l3.5 2.5L18 3.5"/><path d="M15.8 3.5H18V5.7"/>',
   obs:'<path d="M2.5 12s3.5-6.2 9.5-6.2S21.5 12 21.5 12s-3.5 6.2-9.5 6.2S2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/>',
-  dl:'<path d="M12 4v11M7.5 11l4.5 4.5L16.5 11"/><path d="M4.5 19.5h15"/>'
+  dl:'<path d="M12 4v11M7.5 11l4.5 4.5L16.5 11"/><path d="M4.5 19.5h15"/>',
+  act:'<path d="M9.5 5.5H20M9.5 12H20M9.5 18.5H20"/><path d="M3.5 5l1.4 1.4L7.5 3.8M3.5 11.5l1.4 1.4 2.6-2.6M3.5 18l1.4 1.4 2.6-2.6"/>',
+  defect:'<rect x="3" y="5.5" width="18" height="13" rx="1.5"/><path d="M3 12h18"/><path d="M9 5.5V12M15 5.5V12"/><path d="M6 12v6.5M12 12v6.5M18 12v6.5"/>',
+  print:'<path d="M7 8V3.5h10V8"/><rect x="4" y="8" width="16" height="8" rx="1.5"/><path d="M7 13h10v7H7z"/>'
 };
 const ic = n => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+(ICONS[n]||'')+'</svg>';
 
@@ -411,15 +418,19 @@ function renderHome(){
   const nb=certBadgeCount();
   const tile=(href,label,icon,badge)=>'<a class="tile" href="#/'+href+'"><span class="ic">'+ic(icon)+
     (badge?'<span class="bdg">'+badge+'</span>':'')+'</span><span class="tl">'+label+'</span></a>';
+  const ob=openActionCounts();
   app.innerHTML =
-    '<header class="top"><h1>'+esc(s.project||'Site Safety CMS')+'</h1><div class="spacer"></div>'+
+    '<header class="top"><h1>'+esc(s.project||'SKYTOPIA Site Safety')+'</h1><div class="spacer"></div>'+
     '<button class="iconbtn" aria-label="Settings" onclick="location.hash=\'#/settings\'">'+ic('gear')+'</button></header>'+
+    '<hr class="brandrule">'+
+    '<h2 class="sect">Site</h2>'+
     '<div class="grid">'+
       tile('contacts','Contacts','contact')+
       tile('members','Member(s)','members')+
       tile('equipment','Equipment','equip')+
       tile('certexp','Cert Expiry','cert',nb||'')+
       tile('documents','Document','doc')+
+      tile('actions','Actions','act',ob.overdue||'')+
     '</div>'+
     '<h2 class="sect">Safety</h2>'+
     '<div class="grid">'+
@@ -432,6 +443,10 @@ function renderHome(){
       tile('meetings','Meeting','meet')+
       tile('incidents','Incident','incid')+
       tile('stats','Statistics','stats')+
+    '</div>'+
+    '<h2 class="sect">Quality</h2>'+
+    '<div class="grid">'+
+      tile('defects','Defects','defect')+
     '</div>'+
     '<div class="foot">All data stays on this device (browser storage).<br>Back up regularly from Settings &rarr; Export.</div>';
 }
@@ -476,6 +491,7 @@ function renderEdit(key, id){
       return fieldHtml(f, v);
     }).join('')+
     '</div><div class="btnrow"><button class="btn" id="saveBtn">Save</button>'+
+    (item?'<button class="btn ghost" title="Print / PDF report" onclick="location.hash=\'#/'+key+'/'+id+'/print\'" style="padding:12px 14px">'+ic('print')+'</button>':'')+
     (item?'<button class="btn danger" id="delBtn">Delete</button>':'')+'</div></div>';
   document.getElementById('saveBtn').onclick=()=>{
     const obj=collectForm(mod); if(!obj) return;
@@ -503,10 +519,12 @@ function route(){
   if(key==='certexp')  return renderCertExp();
   if(key==='stats')    return renderStats();
   if(key==='report')   return renderReport();
+  if(key==='actions')  return renderActions();
   if(key==='settings') return renderSettings();
   if(MODULES[key]){
     if(!sub) return renderList(key);
     if(sub==='new') return renderEdit(key,null);
+    if(p[2]==='print') return renderRecordPrint(key,sub);
     return renderEdit(key,sub);
   }
   renderHome();
@@ -942,8 +960,120 @@ const MODULES={
     let out='<span class="chip '+(sev[i.type]||'n')+'">'+esc((i.type||'').split(' ')[0])+'</span>';
     if(i.status!=='Closed') out+='<span class="chip w">'+esc(i.status||'Open')+'</span>';
     return out; },
-  empty:'Incident & near-miss register with investigation and CAPA tracking — feeds LTIFR in Statistics.'}
+  empty:'Incident & near-miss register with investigation and CAPA tracking — feeds LTIFR in Statistics.'},
+
+ defects:{ title:'Defects', store:'defects',
+  fields:[
+   {k:'date',label:'Date reported',type:'date',req:1,def:'today',half:1},
+   {k:'reportedBy',label:'Reported by',req:1,half:1},
+   {k:'block',label:'Block / zone',half:1},
+   {k:'storey',label:'Storey',half:1},
+   {k:'unit',label:'Unit',half:1},
+   {k:'area',label:'Area',half:1,list:['Internal Unit','Common Area','Void Deck','Lift Lobby','Rooftop','External Works','Staircase','Carpark']},
+   {k:'location',label:'Exact location (e.g. kitchen, near unit door)'},
+   {k:'element',label:'Element',half:1,list:['Floor','Wall','Ceiling','Door','Window','Component','M&E Services','Roof','External Works','Others']},
+   {k:'grouping',label:'Grouping',half:1,list:['Finishing','Crack & Damage','Hollowness / Delamination','Jointing','Alignment & Evenness','Stains','Functionality','Roughness','Others']},
+   {k:'desc',label:'Defect description',type:'textarea',req:1},
+   {k:'severity',label:'Severity',type:'select',opts:SEVHDB,half:1},
+   {k:'trade',label:'Trade',half:1,list:['Tiling Works','RC Works','Painting','Plastering','Waterproofing','Carpentry','Aluminium / Glazing','M&E Works','Precast','Others']},
+   {k:'subcon',label:'Subcontractor',list:companyList},
+   {k:'due',label:'Due date to rectify',type:'date',half:1},
+   {k:'status',label:'Status',type:'select',opts:['Open','Rectified','Verified','Closed'],def:'Open',half:1},
+   {k:'rectifiedBy',label:'Rectified by',half:1},
+   {k:'rectifiedDate',label:'Rectified date',type:'date',half:1},
+   {k:'verifiedBy',label:'Verified by',half:1},
+   {k:'verifiedDate',label:'Verified date',type:'date',half:1},
+   {k:'closedDate',label:'Closed date',type:'date',half:1},
+   {k:'beforePhotos',label:'Before photos',type:'photos',hint:'Before and after photos are mandatory fields per HDB Appendix III.'},
+   {k:'afterPhotos',label:'After photos (on rectification)',type:'photos'}],
+  line1:i=>esc([i.element,i.grouping].filter(Boolean).join(' — ')||i.desc||'Defect'),
+  line2:i=>fmtD(i.date)+esc([i.block?' · Blk '+i.block:'',i.unit?' #'+i.unit:'',i.subcon?' · '+i.subcon:''].join('')),
+  meta:i=>{ let out='';
+    if(i.severity) out+='<span class="chip '+(i.severity==='Critical'?'b':i.severity==='Major'?'w':'n')+'">'+esc(i.severity)+'</span>';
+    const d=daysTo(i.due);
+    if(i.status!=='Closed'&&d!==null&&d<0) out+='<span class="chip b">overdue</span>';
+    out+='<span class="chip '+(i.status==='Closed'?'g':'w')+'">'+esc(i.status||'Open')+'</span>';
+    return out; },
+  empty:'Quality defect register per HDB Appendix IV — element, grouping, location, photos, and the rectify → verify → close workflow.'}
 };
+
+/* ============ open-actions hub ============ */
+function allOpenActions(){
+  const out=[];
+  const add=(due,label,detail,link,src)=>out.push({due:due||'', days:daysTo(due), label, detail, link, src});
+  db.observations.forEach(o=>{ if(o.kind!==OBS_POS && o.status!=='Closed')
+    add(o.due, o.category||'Observation', [o.subitem||o.desc, o.subcon].filter(Boolean).join(' · '), '#/observations/'+o.id, 'Observation'); });
+  db.defects.forEach(o=>{ if(o.status!=='Closed')
+    add(o.due, [o.element,o.grouping].filter(Boolean).join(' — ')||'Defect', [o.desc, o.subcon].filter(Boolean).join(' · '), '#/defects/'+o.id, 'Defect'); });
+  db.inspections.forEach(i=>(i.findings||[]).forEach(f=>{ if(f.status!=='Closed' && (f.desc||f.action))
+    add(f.due, f.desc||'Finding', [f.action, f.by].filter(Boolean).join(' · '), '#/inspections/'+i.id, 'Inspection'); }));
+  db.incidents.forEach(i=>(i.actions||[]).forEach(a=>{ if(a.status!=='Closed' && (a.desc||a.by))
+    add(a.due, a.desc||'Incident action', [a.by, fmtD(i.date)].filter(Boolean).join(' · '), '#/incidents/'+i.id, 'Incident'); }));
+  db.meetings.forEach(m=>(m.agenda||[]).forEach(a=>{ if(a.status!=='Closed' && (a.item||a.action))
+    add(a.due, a.action||a.item, [a.by, fmtD(m.date)].filter(Boolean).join(' · '), '#/meetings/'+m.id, 'Meeting'); }));
+  return out.sort((a,b)=>(a.days??9e9)-(b.days??9e9));
+}
+function openActionCounts(){
+  const acts=allOpenActions();
+  return { total:acts.length, overdue:acts.filter(a=>a.days!==null&&a.days<0).length };
+}
+function renderActions(){
+  const acts=allOpenActions();
+  const groups=[
+   {t:'Overdue', c:'b', f:a=>a.days!==null&&a.days<0},
+   {t:'Due within 7 days', c:'w', f:a=>a.days!==null&&a.days>=0&&a.days<=7},
+   {t:'Later / no due date', c:'n', f:a=>a.days===null||a.days>7}];
+  const row=a=>'<div class="lrow" onclick="location.hash=\''+a.link+'\'">'+
+    '<div class="lmain"><div class="lt">'+esc(a.label)+'</div>'+
+    '<div class="ls">'+esc(a.detail||'')+'</div></div>'+
+    '<div class="lmeta"><span class="chip">'+a.src+'</span>'+(a.due?'<br><span class="chip '+(a.days<0?'b':a.days<=7?'w':'n')+'">'+fmtD(a.due)+'</span>':'')+'</div></div>';
+  app.innerHTML = header('Open Actions', true)+
+    (acts.length
+      ? groups.map(g=>{ const gr=acts.filter(g.f); if(!gr.length) return '';
+          return '<div class="exphead '+g.c+'">'+g.t+' ('+gr.length+')</div>'+gr.map(row).join(''); }).join('')
+      : '<div class="empty">No open corrective actions.<br>Actions from observations, inspections, incidents, meetings and defects all roll up here.</div>');
+}
+
+/* ============ per-record report (print / PDF) ============ */
+function renderRecordPrint(key, id){
+  const mod=MODULES[key];
+  const item=db[mod.store].find(x=>x.id===id);
+  if(!item){ location.hash='#/'+key; return; }
+  const s=db.settings;
+  const val=f=>{
+    const v=item[f.k];
+    if(v===undefined||v===null||v===''||(Array.isArray(v)&&!v.length)) return '';
+    if(f.type==='photos') return '<div class="thumbs">'+v.map(d=>'<div class="thumb"><img src="'+d+'"></div>').join('')+'</div>';
+    if(f.type==='members'){
+      const names=v.map(idm=>{const m=db.members.find(x=>x.id===idm); return m?esc(m.name):'';}).filter(Boolean);
+      return names.length? names.join(', ') : '';
+    }
+    if(f.type==='rows'){
+      return '<table class="dtable" style="margin:4px 0"><tr>'+f.cols.map(c=>'<th style="text-align:left">'+esc(c.label)+'</th>').join('')+'</tr>'+
+        v.map(r=>'<tr>'+f.cols.map(c=>'<td style="text-align:left">'+esc(r[c.k]||'')+'</td>').join('')+'</tr>').join('')+'</table>';
+    }
+    if(f.type==='textarea') return esc(v).replace(/\n/g,'<br>');
+    if(f.type==='date') return fmtD(v);
+    return esc(v);
+  };
+  const rows=mod.fields.map(f=>{ const v=val(f); if(!v) return '';
+    return '<div style="margin-bottom:9px"><div style="font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--sub)">'+esc(f.label)+'</div>'+
+      '<div style="font-size:14.5px">'+v+'</div></div>'; }).join('');
+  const proj=[['Project',s.project],['Contractor',s.company],['HDB contract no.',s.hdbContract],['Site ref',s.siteRef]]
+    .filter(x=>x[1]).map(x=>x[0]+': <b>'+esc(x[1])+'</b>').join(' &nbsp;·&nbsp; ');
+  app.innerHTML = header(mod.title+' Report', true)+
+    '<div class="card">'+
+      '<div class="charthead">'+esc(mod.title)+' Report</div>'+
+      (proj?'<div class="repmeta" style="margin-bottom:10px">'+proj+'</div>':'')+
+      '<div class="repmeta" style="margin-bottom:12px">Record ID: <b>'+esc(item.id)+'</b> &nbsp;·&nbsp; Generated: <b>'+fmtD(today())+'</b></div>'+
+      rows+
+      '<div style="display:flex;gap:24px;margin-top:26px">'+
+        '<div style="flex:1;border-top:1px solid var(--line2);padding-top:5px;font-size:12px;color:var(--sub)">Prepared by / date</div>'+
+        '<div style="flex:1;border-top:1px solid var(--line2);padding-top:5px;font-size:12px;color:var(--sub)">Verified by / date</div>'+
+      '</div>'+
+    '</div>'+
+    '<div class="btnrow noprint"><button class="btn" onclick="window.print()">Print / save as PDF</button></div>';
+}
 
 /* ============ cert expiry dashboard ============ */
 function certRows(){
@@ -1078,9 +1208,7 @@ function renderStats(){
   const ltifr=mh?(lti*1e6/mh):null;
   const afr=mh?(acc*1e6/mh):null;
   const openObs=db.observations.filter(o=>o.kind!==OBS_POS&&o.status!=='Closed').length;
-  const openF=db.inspections.flatMap(i=>i.findings||[]).filter(f=>f.status!=='Closed'&&(f.desc||f.action)).length
-             +db.incidents.flatMap(i=>i.actions||[]).filter(a=>a.status!=='Closed'&&(a.desc||a.by)).length
-             +db.meetings.flatMap(m=>m.agenda||[]).filter(a=>a.status!=='Closed'&&(a.item||a.action)).length;
+  const openF=openActionCounts().total;
   const tbmN=db.tbm.filter(r=>inYear(r,yr)).length;
 
   const tile=(v,l)=>'<div class="stile"><div class="v">'+v+'</div><div class="l">'+l+'</div></div>';
