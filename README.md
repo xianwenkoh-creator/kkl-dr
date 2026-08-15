@@ -2,7 +2,12 @@
 Internal site-capture tools. index.html = DR Capture, verify.html = Engineer Verify.
 
 safety.html = Site Safety CMS — contacts, member & equipment registers, cert-expiry
-dashboard, document register, TBM, inspections, checklists, RA/SWP, training,
-meetings, incident register and statistics (LTIFR). Data is stored in the browser
-(localStorage); back up via Settings → Export. PTW is handled separately in the
-SKYTOPIA app and is not part of this tool.
+dashboard, document register, TBM, inspections, HDB-format site observations
+(Appendix VII categories, before/after photos, rectify→verify→close workflow),
+checklists, RA/SWP, training, meetings, incident register, statistics (AFR/LTIFR)
+and the HDB monthly safety data report (Appendix VI) with ranked trade/subcon
+breakdowns, CSV/Excel export and print-to-PDF. Crane LM/LG certs, HDB Material
+List, AE inspections and servicing are tracked with the HDB-specified reminder
+lead times. Data is stored in the browser (localStorage); back up via
+Settings → Export. PTW is handled separately in the SKYTOPIA app; bulk SFTP data
+transfer to HDB (Appendix X) is server-side and outside this tool.
