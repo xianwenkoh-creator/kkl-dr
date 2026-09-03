@@ -1,0 +1,74 @@
+[
+ {
+  "file": "sample_markups.pdf",
+  "page": 1,
+  "kind": "Line",
+  "subject": "DR-PIPE 300 dia",
+  "author": "QS Tan",
+  "vertices_pt": [
+   [
+    120.0,
+    221.89
+   ],
+   [
+    420.0,
+    221.89
+   ]
+  ],
+  "scale_m_per_pt": 0.176389,
+  "value": 52.92,
+  "unit": "m"
+ },
+ {
+  "file": "sample_markups.pdf",
+  "page": 1,
+  "kind": "PolyLine",
+  "subject": "DR-RCU 600x600",
+  "author": "QS Tan",
+  "vertices_pt": [
+   [
+    120.0,
+    581.89
+   ],
+   [
+    760.0,
+    581.89
+   ],
+   [
+    760.0,
+    461.89
+   ]
+  ],
+  "scale_m_per_pt": 0.176389,
+  "value": 134.06,
+  "unit": "m"
+ },
+ {
+  "file": "sample_markups.pdf",
+  "page": 1,
+  "kind": "Polygon",
+  "subject": "RW-ACWC asphalt",
+  "author": "QS Lim",
+  "vertices_pt": [
+   [
+    180.0,
+    411.89
+   ],
+   [
+    700.0,
+    411.89
+   ],
+   [
+    700.0,
+    281.89
+   ],
+   [
+    180.0,
+    281.89
+   ]
+  ],
+  "scale_m_per_pt": 0.176389,
+  "value": 2103.2,
+  "unit": "m2"
+ }
+]
