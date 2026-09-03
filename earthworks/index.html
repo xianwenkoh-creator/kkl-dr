@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KKL Earthworks — Cut and Fill from PDF</title>
+<style>
+  :root{
+    --paper:#f7f6f3; --ink:#26292b; --ink-soft:#5a5f63; --steel:#46606e;
+    --accent:#c85a10; --accent-ink:#a34a0d; --line:#d9d6cf; --line-strong:#b9b5ac;
+    --card:#ffffff; --field:#fbfaf8; --good:#2e7d4f; --bad:#b3402e; --mark:#fdf1e3; --thead:#eef0ee; --cut:#c85a10; --fill:#2f6fb0;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){ --paper:#1e2022; --ink:#e6e3dc; --ink-soft:#a8aaa9; --steel:#93aebc;
+      --accent:#e8823a; --accent-ink:#e8823a; --line:#3a3d3f; --line-strong:#55585a;
+      --card:#26292b; --field:#2c2f31; --good:#5cb884; --bad:#e07a63; --mark:#3a2f24; --thead:#2c3033; --cut:#e8823a; --fill:#6fa3dc; }
+  }
+  :root[data-theme="dark"]{ --paper:#1e2022; --ink:#e6e3dc; --ink-soft:#a8aaa9; --steel:#93aebc;
+      --accent:#e8823a; --accent-ink:#e8823a; --line:#3a3d3f; --line-strong:#55585a;
+      --card:#26292b; --field:#2c2f31; --good:#5cb884; --bad:#e07a63; --mark:#3a2f24; --thead:#2c3033; --cut:#e8823a; --fill:#6fa3dc; }
+  *{box-sizing:border-box;}
+  html{background:var(--paper);}
+  body{font-family:"Segoe UI",system-ui,-apple-system,sans-serif; color:var(--ink); background:var(--paper); margin:0; font-size:14px; line-height:1.4;}
+  .mono{font-family:"Cascadia Mono",Consolas,"JetBrains Mono",monospace;}
+  header.app{border:2px solid var(--ink); background:var(--card); padding:8px 14px; margin:12px 12px 0; display:flex; justify-content:space-between; align-items:center; gap:8px;}
+  header.app h1{font-size:16px; margin:0; font-weight:650;}
+  header.app .tag{font-family:"Cascadia Mono",Consolas,monospace; font-size:10px; letter-spacing:.12em; color:var(--ink-soft); text-transform:uppercase; margin-left:10px;}
+  main.wrap{padding:12px; display:grid; grid-template-columns:340px minmax(0,1fr); gap:12px; align-items:start; height:calc(100vh - 62px);}
+  aside{overflow-y:auto; max-height:100%; padding-right:2px;}
+  fieldset{border:1px solid var(--line-strong); background:var(--card); margin:0 0 10px; padding:10px; border-radius:4px; min-width:0;}
+  legend{font-family:"Cascadia Mono",Consolas,monospace; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent-ink); font-weight:700; padding:0 6px;}
+  label{display:block; font-size:12px; font-weight:600; color:var(--ink-soft); margin:8px 0 3px;}
+  input,select{width:100%; font:inherit; font-size:13px; color:var(--ink); background:var(--field); border:1px solid var(--line-strong); border-radius:4px; padding:6px 8px; min-height:34px;}
+  input[type=file]{padding:4px;}
+  button{font:inherit; font-weight:600; border:1.5px solid var(--ink); border-radius:4px; padding:6px 10px; cursor:pointer; background:var(--card); color:var(--ink); font-size:13px;}
+  button.primary{background:var(--accent); border-color:var(--accent-ink); color:#fff;}
+  button.on{background:var(--steel); color:#fff; border-color:var(--steel);}
+  button.tiny{font-size:11px; padding:2px 6px; border-width:1px;}
+  button:disabled{opacity:.45; cursor:not-allowed;}
+  .row{display:flex; gap:6px; flex-wrap:wrap; align-items:center;}
+  .row>*{flex:1; min-width:0;} .row>button{flex:0 0 auto;}
+  .hint{font-size:11.5px; color:var(--ink-soft); margin-top:4px;}
+  .stat{font-family:"Cascadia Mono",Consolas,monospace; font-size:11.5px; color:var(--ink-soft); margin:6px 0;}
+  .stat b{color:var(--accent-ink);}
+  table{border-collapse:collapse; width:100%; font-size:12px;}
+  th{background:var(--thead); text-align:left; padding:4px 6px; border:1px solid var(--line); font-size:10.5px; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-soft); white-space:nowrap;}
+  td{border:1px solid var(--line); padding:4px 6px; vertical-align:top;}
+  td.num{text-align:right; font-family:"Cascadia Mono",Consolas,monospace; font-variant-numeric:tabular-nums; white-space:nowrap;}
+  tr.sel td{background:var(--mark);}
+  tr.total td{font-weight:700; border-top:2px solid var(--ink);}
+  .tablewrap{overflow-x:auto;}
+  .list{max-height:160px; overflow:auto; border:1px solid var(--line); border-radius:4px; background:var(--field); font-size:12px;}
+  .list div{display:flex; justify-content:space-between; gap:6px; padding:3px 6px; border-bottom:1px solid var(--line); align-items:center;}
+  .list span{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .list button{flex:0 0 auto; white-space:nowrap;}
+  label.row{flex:0 0 auto; white-space:nowrap; gap:4px;}
+  /* viewer */
+  section.view{display:flex; flex-direction:column; height:100%; min-width:0;}
+  .toolbar{display:flex; gap:6px; align-items:center; margin-bottom:6px; flex-wrap:wrap;}
+  .toolbar .mode{font-family:"Cascadia Mono",Consolas,monospace; font-size:11px; color:var(--accent-ink); font-weight:700; margin-left:auto;}
+  .toolbar .xy{font-family:"Cascadia Mono",Consolas,monospace; font-size:11px; color:var(--ink-soft);}
+  #viewer{flex:1; overflow:auto; border:1.5px solid var(--ink); background:#8a8f93; position:relative; min-height:400px;}
+  #inner{position:relative; transform-origin:0 0;}
+  #pg{display:block; background:#fff;}
+  #ov{position:absolute; left:0; top:0;}
+  #ov .lvl{fill:var(--cut); stroke:#fff; stroke-width:.6;} #ov .lvl.text{fill:#7a5c3a;} #ov .lvl.excl{fill:#999; opacity:.5;} #ov .lvl.manual{fill:var(--fill);}
+  #ov text.lab{font:6.5px "Cascadia Mono",Consolas,monospace; fill:#8a3a05; pointer-events:none;}
+  #ov .zone{fill:rgba(47,111,176,.10); stroke:#1f4f86; stroke-width:1.6;} #ov .zone.sel{fill:rgba(200,90,16,.12); stroke:var(--accent);}
+  #ov text.zl{font:700 11px "Segoe UI",system-ui,sans-serif; fill:#1f4f86; paint-order:stroke; stroke:#fff; stroke-width:3;}
+  #ov .draft{fill:none; stroke:var(--accent); stroke-width:1.4; stroke-dasharray:4 3;}
+  #ov .calib{fill:none; stroke:#2e7d4f; stroke-width:1.6;}
+  #ov .cell{stroke:none;}
+  .legendbar{display:flex; gap:10px; font-size:11px; color:var(--ink-soft); align-items:center; margin-top:4px;}
+  .swatch{display:inline-block; width:34px; height:9px; border-radius:2px;}
+  .checked{font-size:12px; font-weight:700; color:var(--good);}
+  @media (max-width:980px){ main.wrap{grid-template-columns:1fr; height:auto;} aside{max-height:none;} #viewer{height:70vh;} }
+</style>
+</head>
+<body>
+<header class="app">
+  <div><h1>KKL Earthworks</h1><span class="tag">spot levels · zones · cut and fill by depth band</span></div>
+  <div class="row"><span class="stat" id="tstat">no sheet loaded</span></div>
+</header>
+<main class="wrap">
+<aside>
+  <fieldset>
+    <legend>Sheets</legend>
+    <label>Topographical survey PDF (spot levels)</label>
+    <div class="row"><input type="file" id="topoFile" accept=".pdf,application/pdf"><select id="topoPage" style="flex:0 0 74px" title="page"></select></div>
+    <label>Design or excavation PDF (levels to read off)</label>
+    <div class="row"><input type="file" id="designFile" accept=".pdf,application/pdf"><select id="designPage" style="flex:0 0 74px" title="page"></select></div>
+    <div class="row" style="margin-top:6px"><button class="tiny on" id="showTopo">Show topo</button><button class="tiny" id="showDesign" disabled>Show design</button></div>
+    <div class="stat" id="designStat"></div>
+    <div class="list" id="designLevels" hidden></div>
+    <p class="hint">Levels found on the design sheet are listed with their text; press “→ FEL” to use one for the selected zone.</p>
+  </fieldset>
+  <fieldset>
+    <legend>Scale</legend>
+    <div class="stat" id="scaleStat">not set</div>
+    <div class="row"><input type="number" id="declared" placeholder="declared scale, e.g. 500" min="50" step="1"><button id="useDeclared">Use 1:n</button></div>
+    <div class="row" style="margin-top:6px"><input type="number" id="calibDist" placeholder="known distance, m" step="0.01"><button id="calibBtn">Calibrate: 2 clicks</button></div>
+    <p class="hint">Best: an E/N coordinate grid on the sheet (read automatically). Otherwise use the declared scale, then check with two clicks across a known dimension or grid interval.</p>
+  </fieldset>
+  <fieldset>
+    <legend>Spot levels</legend>
+    <div class="row"><input type="number" id="lvMin" value="0" step="0.1" title="minimum plausible level"><input type="number" id="lvMax" value="200" step="0.1" title="maximum plausible level"><button id="reparse">Re-read</button></div>
+    <div class="stat" id="lvStat">—</div>
+    <div class="row"><label class="row" style="margin:0"><input type="checkbox" id="showLabels" style="width:16px;min-height:0" checked> labels</label><button class="tiny" id="modeExcl">Exclude / include</button><button class="tiny" id="modeAdd">Add level</button><input type="number" id="manualVal" placeholder="value" step="0.01" style="flex:0 0 80px"></div>
+    <p class="hint">Click a dot in exclude mode to drop a wrong level (kerb tops, manhole covers, tree heights). In add mode click a point and type its level for scans or missing text.</p>
+  </fieldset>
+  <fieldset>
+    <legend>Zones and final excavation levels</legend>
+    <div class="row"><button id="drawZone">Draw zone</button><button id="finishZone" disabled>Finish</button><button class="tiny" id="cancelZone" disabled>Cancel</button></div>
+    <div class="tablewrap" style="margin-top:6px"><table id="zoneTable"><thead><tr><th>Zone</th><th>FEL m</th><th>Note</th><th></th></tr></thead><tbody></tbody></table></div>
+    <div id="zoneEdit" hidden>
+      <div class="row"><div><label>Name</label><input id="zName"></div><div><label>FEL (m)</label><input type="number" id="zFel" step="0.001"></div></div>
+      <label>Derive FEL from a reference level less deductions (mm)</label>
+      <div class="row"><input type="number" id="zRef" placeholder="SSL / PL" step="0.001"><input type="number" id="zSlab" placeholder="slab" step="1"><input type="number" id="zBlind" placeholder="blinding" step="1"><input type="number" id="zHard" placeholder="hardcore" step="1"><button class="tiny" id="zDerive">Derive</button></div>
+      <label>Note (where the level came from)</label><input id="zNote" placeholder="e.g. C-102 Rev B note 1: SSL 99.000 - 400 - 50 - 50">
+    </div>
+    <p class="hint">Draw a zone by clicking its corners on the topo sheet; double-click or Finish to close. Every zone needs one final excavation level; use several zones for stepped levels.</p>
+  </fieldset>
+  <fieldset>
+    <legend>Method</legend>
+    <div class="row"><div><label>Surface</label><select id="surface"><option value="proximity">Proximity: mean of nearest levels</option><option value="idw">Inverse distance weighting</option><option value="tin">TIN (triangulated) with proximity outside</option></select></div></div>
+    <div class="row"><div><label>Nearest K</label><input type="number" id="kNear" value="4" min="1" max="12"></div><div><label>Radius m</label><input type="number" id="radius" value="25" min="1" step="1"></div><div><label>Cell m</label><select id="cell"><option>1</option><option>2</option><option>5</option></select></div></div>
+    <div class="row"><div><label>Depth bands</label><select id="bands"><option value="1.5,3,6">DR Capture: 1.5 / 3 / 6</option><option value="2,4,6">Contract: 2 / 4 / 6</option><option value="custom">Custom…</option></select></div><div><label>Custom edges</label><input id="bandsCustom" placeholder="e.g. 0.25,0.5,0.75"></div></div>
+    <div class="row"><div><label>Cell level</label><select id="sample"><option value="corners">Mean of 4 corners</option><option value="centre">Cell centre</option></select></div><div><label>Batter (H per 1 V, 0 = vertical)</label><input type="number" id="batter" value="0" step="0.25" min="0"></div></div>
+    <div class="row" style="margin-top:8px"><button class="primary" id="compute">Compute cut and fill</button><label class="row" style="margin:0;flex:0 0 auto"><input type="checkbox" id="showCells" style="width:16px;min-height:0" checked> show cells</label></div>
+  </fieldset>
+  <fieldset>
+    <legend>Results</legend>
+    <div class="tablewrap"><table id="results"><thead></thead><tbody></tbody></table></div>
+    <div class="stat" id="resStat"></div>
+    <div class="row" style="margin-top:6px"><button class="tiny" id="csvSummary" disabled>CSV summary</button><button class="tiny" id="csvCells" disabled>CSV cells</button><button class="tiny" id="saveProj">Save project</button><input type="file" id="loadProj" accept=".json" style="flex:0 0 130px;padding:3px" title="load project"></div>
+    <div class="row" style="margin-top:6px"><input id="checker" placeholder="Initials" style="flex:0 0 90px"><button class="tiny" id="markChecked">Mark checked</button><span id="checkedTag" class="checked"></span></div>
+  </fieldset>
+</aside>
+<section class="view">
+  <div class="toolbar"><button class="tiny" id="zoomOut">−</button><button class="tiny" id="zoomIn">+</button><button class="tiny" id="zoomFit">Fit</button><span class="xy" id="xy"></span><span class="mode" id="modeTag">PAN</span></div>
+  <div id="viewer"><div id="inner"><canvas id="pg"></canvas><svg id="ov"></svg></div></div>
+  <div class="legendbar"><span>cut</span><span class="swatch" style="background:linear-gradient(90deg,#fde3c8,#c85a10)"></span><span>fill</span><span class="swatch" style="background:linear-gradient(90deg,#d5e4f5,#2f6fb0)"></span><span id="legendNote"></span></div>
+</section>
+</main>
+
+<script type="module">
+"use strict";
+import * as pdfjsLib from "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs";
+import { levelsInText, parseSpotLevels, clusterMarkers, associateMarkers, georeferenceFromGrid, declaredScaleFromText, scaleFromDeclared, calibrateTwoPoints, scaledTransform, proximity, idw, tin, gridVolumes, batterAllowance, polygonArea, bandNames, toCSV, fmt, LEVEL_RE, tokenize } from "./engine.js";
+import { pageTextItems, pageGeometry } from "./pdfgeom.js";
+pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.worker.min.mjs";
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const RENDER_SCALE = 1.5;
+const state = { topo: null, design: null, showing: "topo", T: null, levels: [], excluded: new Set(), manual: [], zones: [], sel: null, mode: "pan", draft: [], calib: [], zoom: 1, checked: null, vp: null };
+
+// ---------- loading ----------
+async function loadPdf(file) { const data = new Uint8Array(await file.arrayBuffer()); const doc = await pdfjsLib.getDocument({ data }).promise; return { doc, name: file.name, pages: doc.numPages }; }
+$("#topoFile").addEventListener("change", async e => { const f = e.target.files[0]; if (!f) return; state.topo = await loadPdf(f); fillPages($("#topoPage"), state.topo.pages); await loadTopoPage(1); });
+$("#designFile").addEventListener("change", async e => { const f = e.target.files[0]; if (!f) return; state.design = await loadPdf(f); fillPages($("#designPage"), state.design.pages); $("#showDesign").disabled = false; await scanDesign(); });
+$("#topoPage").addEventListener("change", e => loadTopoPage(+e.target.value));
+$("#designPage").addEventListener("change", () => { if (state.showing === "design") renderPage(state.design.doc, +$("#designPage").value, false); });
+function fillPages(sel, n) { sel.innerHTML = Array.from({ length: n }, (_, i) => `<option value="${i + 1}">p${i + 1}</option>`).join(""); }
+async function loadTopoPage(no) {
+  const t = state.topo; t.pageNo = no; const page = await t.doc.getPage(no); t.page = page;
+  t.items = await pageTextItems(page); t.geom = await pageGeometry(page, pdfjsLib.OPS);
+  state.zones = []; state.excluded = new Set(); state.manual = []; state.sel = null; state.checked = null;
+  readLevels(); autoScale(); await renderPage(t.doc, no, true); showTopo(); renderZoneTable(); renderResults(); status();
+  const key = "kkl_ew_" + t.name; try { const saved = JSON.parse(localStorage.getItem(key) || "null"); if (saved && saved.page === no) applyProject(saved); } catch (e) {}
+}
+function readLevels() {
+  const t = state.topo; if (!t) return;
+  const raw = parseSpotLevels(t.items, { min: +$("#lvMin").value, max: +$("#lvMax").value });
+  const markers = clusterMarkers(t.geom.markers); state.levels = associateMarkers(raw, markers);
+  const onM = state.levels.filter(l => l.source === "marker").length;
+  $("#lvStat").innerHTML = `found <b>${state.levels.length}</b> · on marker <b>${onM}</b> · excluded <b>${state.excluded.size}</b> · manual <b>${state.manual.length}</b>`;
+  if (state.levels.length > 1500) $("#showLabels").checked = false;
+}
+$("#reparse").addEventListener("click", () => { readLevels(); drawOverlay(); });
+function autoScale() {
+  const t = state.topo; const g = georeferenceFromGrid(t.items, t.geom.lines);
+  if (g.ok) { state.T = { mode: "grid", ...g }; $("#scaleStat").innerHTML = `E/N grid read: <b>${g.mPerPt.toFixed(5)} m/pt</b> (≈ 1:${Math.round(g.mPerPt / scaleFromDeclared(1))}) · ${g.eLabels.length} E + ${g.nLabels.length} N labels`; return; }
+  const s = declaredScaleFromText(t.items); if (s) { $("#declared").value = s; setDeclared(s); $("#scaleStat").innerHTML += " · from title block, confirm with two clicks"; return; }
+  state.T = null; $("#scaleStat").textContent = "not set: enter the declared scale or calibrate";
+}
+function setDeclared(s) { state.T = { mode: "declared", scale: s, ...scaledTransform(scaleFromDeclared(s)) }; $("#scaleStat").innerHTML = `declared 1:${s}: <b>${state.T.mPerPt.toFixed(5)} m/pt</b>`; status(); }
+$("#useDeclared").addEventListener("click", () => { const s = +$("#declared").value; if (s >= 50) { setDeclared(s); drawOverlay(); } });
+$("#calibBtn").addEventListener("click", () => { if (!(+$("#calibDist").value > 0)) { $("#calibDist").focus(); return; } setMode("calib"); state.calib = []; });
+
+// ---------- rendering ----------
+async function renderPage(doc, no, isTopo) {
+  const page = await doc.getPage(no); const vp = page.getViewport({ scale: RENDER_SCALE }); if (isTopo) state.vp = vp;
+  const canvas = $("#pg"); canvas.width = vp.width; canvas.height = vp.height; $("#ov").setAttribute("width", vp.width); $("#ov").setAttribute("height", vp.height); $("#ov").setAttribute("viewBox", `0 0 ${vp.width} ${vp.height}`);
+  await page.render({ canvasContext: canvas.getContext("2d"), viewport: vp }).promise; $("#ov").innerHTML = ""; if (isTopo) drawOverlay(); fit();
+}
+function showTopo() { state.showing = "topo"; $("#showTopo").classList.add("on"); $("#showDesign").classList.remove("on"); if (state.topo) renderPage(state.topo.doc, state.topo.pageNo, true); }
+$("#showTopo").addEventListener("click", showTopo);
+$("#showDesign").addEventListener("click", () => { state.showing = "design"; $("#showDesign").classList.add("on"); $("#showTopo").classList.remove("on"); renderPage(state.design.doc, +$("#designPage").value, false); });
+const toPx = (x, y) => state.vp.convertToViewportPoint(x, y), toPdf = (px, py) => state.vp.convertToPdfPoint(px, py);
+function drawOverlay() {
+  const ov = $("#ov"); if (!state.vp || state.showing !== "topo") return; let s = "";
+  // cells (computed)
+  if ($("#showCells").checked) for (const z of state.zones) if (z.result && state.T) s += cellRects(z);
+  // zones
+  state.zones.forEach((z, i) => { const pts = z.poly.map(p => toPx(p.x, p.y)); const c = pts.reduce((a, p) => [a[0] + p[0] / pts.length, a[1] + p[1] / pts.length], [0, 0]);
+    s += `<polygon class="zone ${i === state.sel ? "sel" : ""}" points="${pts.map(p => p.join(",")).join(" ")}" data-z="${i}"></polygon><text class="zl" x="${c[0]}" y="${c[1]}" text-anchor="middle">${esc(z.name)} · FEL ${z.fel != null ? z.fel.toFixed(3) : "?"}</text>`; });
+  if (state.draft.length) { const pts = state.draft.map(p => toPx(p.x, p.y)); s += `<polyline class="draft" points="${pts.map(p => p.join(",")).join(" ")}"></polyline>` + pts.map(p => `<circle cx="${p[0]}" cy="${p[1]}" r="3" fill="#c85a10"></circle>`).join(""); }
+  if (state.calib.length) { const pts = state.calib.map(p => toPx(p.x, p.y)); s += pts.map(p => `<circle class="calib" cx="${p[0]}" cy="${p[1]}" r="5"></circle>`).join(""); if (pts.length === 2) s += `<line class="calib" x1="${pts[0][0]}" y1="${pts[0][1]}" x2="${pts[1][0]}" y2="${pts[1][1]}"></line>`; }
+  // levels
+  const labels = $("#showLabels").checked;
+  state.levels.forEach((l, i) => { const [px, py] = toPx(l.px, l.py); const ex = state.excluded.has(i);
+    s += `<circle class="lvl ${l.source} ${ex ? "excl" : ""}" cx="${px}" cy="${py}" r="2.4" data-l="${i}"><title>${l.value} (${l.source}${l.prefix ? ", " + esc(l.prefix) : ""})</title></circle>`;
+    if (labels && !ex) s += `<text class="lab" x="${px + 3}" y="${py - 2}">${l.value.toFixed(l.decimals)}</text>`; });
+  state.manual.forEach((m, i) => { const [px, py] = toPx(m.x, m.y); s += `<rect class="lvl manual" x="${px - 3}" y="${py - 3}" width="6" height="6" data-m="${i}" transform="rotate(45 ${px} ${py})"><title>${m.value} (manual)</title></rect>` + (labels ? `<text class="lab" x="${px + 4}" y="${py - 2}">${m.value}</text>` : ""); });
+  ov.innerHTML = s;
+}
+function cellRects(z) {
+  const r = z.result; const T = state.T; const cells = r.cells.filter(c => c.depth != null); if (!cells.length) return "";
+  const area = r.summary.area; const dc = Math.max(r.summary.cell, Math.ceil(Math.sqrt(area / 4000)));   // aggregate for display
+  const bins = new Map();
+  for (const c of cells) { const k = Math.floor(c.X / dc) + "," + Math.floor(c.Y / dc); const b = bins.get(k) || { X: Math.floor(c.X / dc) * dc, Y: Math.floor(c.Y / dc) * dc, d: 0, n: 0 }; b.d += c.depth; b.n++; bins.set(k, b); }
+  const maxd = Math.max(...cells.map(c => Math.abs(c.depth)), 0.01); let s = "";
+  for (const b of bins.values()) { const d = b.d / b.n; const p1 = toPx(...Object.values(T.fromWorld(b.X, b.Y))), p2 = toPx(...Object.values(T.fromWorld(b.X + dc, b.Y + dc)));
+    const t = Math.min(1, Math.abs(d) / maxd); const col = d >= 0 ? `rgba(200,90,16,${0.15 + 0.45 * t})` : `rgba(47,111,176,${0.15 + 0.45 * t})`;
+    s += `<rect class="cell" x="${Math.min(p1[0], p2[0])}" y="${Math.min(p1[1], p2[1])}" width="${Math.abs(p2[0] - p1[0])}" height="${Math.abs(p2[1] - p1[1])}" fill="${col}"><title>${z.name}: depth ${d.toFixed(2)} m</title></rect>`; }
+  return s;
+}
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+$("#showLabels").addEventListener("change", drawOverlay); $("#showCells").addEventListener("change", drawOverlay);
+
+// ---------- zoom and modes ----------
+function setZoom(z) { state.zoom = Math.max(0.15, Math.min(6, z)); $("#inner").style.transform = `scale(${state.zoom})`; $("#inner").style.width = $("#pg").width * state.zoom + "px"; $("#inner").style.height = $("#pg").height * state.zoom + "px"; }
+function fit() { const v = $("#viewer"); setZoom(Math.min((v.clientWidth - 4) / $("#pg").width, (v.clientHeight - 4) / $("#pg").height)); }
+$("#zoomIn").addEventListener("click", () => setZoom(state.zoom * 1.25)); $("#zoomOut").addEventListener("click", () => setZoom(state.zoom / 1.25)); $("#zoomFit").addEventListener("click", fit);
+$("#viewer").addEventListener("wheel", e => { if (!e.ctrlKey) return; e.preventDefault(); setZoom(state.zoom * (e.deltaY < 0 ? 1.15 : 1 / 1.15)); }, { passive: false });
+function setMode(m) { state.mode = m; $("#modeTag").textContent = { pan: "PAN", calib: "CALIBRATE: click 2 points", zone: "DRAW ZONE: click corners, double-click to finish", excl: "EXCLUDE / INCLUDE: click dots", add: "ADD LEVEL: click a point" }[m];
+  $("#modeExcl").classList.toggle("on", m === "excl"); $("#modeAdd").classList.toggle("on", m === "add"); $("#drawZone").classList.toggle("on", m === "zone"); $("#finishZone").disabled = m !== "zone"; $("#cancelZone").disabled = m !== "zone"; }
+$("#modeExcl").addEventListener("click", () => setMode(state.mode === "excl" ? "pan" : "excl"));
+$("#modeAdd").addEventListener("click", () => setMode(state.mode === "add" ? "pan" : "add"));
+$("#drawZone").addEventListener("click", () => { state.draft = []; setMode("zone"); drawOverlay(); });
+$("#cancelZone").addEventListener("click", () => { state.draft = []; setMode("pan"); drawOverlay(); });
+$("#finishZone").addEventListener("click", finishZone);
+document.addEventListener("keydown", e => { if (e.key === "Escape") { state.draft = []; state.calib = []; setMode("pan"); drawOverlay(); } if (e.key === "Enter" && state.mode === "zone") finishZone(); });
+function pagePointFromEvent(e) { const r = $("#inner").getBoundingClientRect(); const px = (e.clientX - r.left) / state.zoom, py = (e.clientY - r.top) / state.zoom; const [x, y] = toPdf(px, py); return { x, y }; }
+$("#inner").addEventListener("mousemove", e => { if (!state.vp || state.showing !== "topo") return; const p = pagePointFromEvent(e); const w = state.T ? state.T.toWorld(p.x, p.y) : null; $("#xy").textContent = w ? `${state.T.mode === "grid" ? "E " + w.X.toFixed(2) + "  N " + w.Y.toFixed(2) : "x " + w.X.toFixed(2) + "  y " + w.Y.toFixed(2) + " m"}` : `${p.x.toFixed(1)}, ${p.y.toFixed(1)} pt`; });
+$("#inner").addEventListener("click", e => {
+  if (!state.vp || state.showing !== "topo") return; const p = pagePointFromEvent(e);
+  if (state.mode === "calib") { state.calib.push(p); if (state.calib.length === 2) { const m = calibrateTwoPoints(state.calib[0], state.calib[1], +$("#calibDist").value); state.T = { mode: "calibrated", ...scaledTransform(m) }; $("#scaleStat").innerHTML = `calibrated: <b>${m.toFixed(5)} m/pt</b> (≈ 1:${Math.round(m / scaleFromDeclared(1))})`; setMode("pan"); status(); } drawOverlay(); }
+  else if (state.mode === "zone") { state.draft.push(p); drawOverlay(); }
+  else if (state.mode === "excl") { const el = e.target.closest("[data-l]"); if (el) { const i = +el.dataset.l; state.excluded.has(i) ? state.excluded.delete(i) : state.excluded.add(i); readLevelsStat(); drawOverlay(); } const m = e.target.closest("[data-m]"); if (m) { state.manual.splice(+m.dataset.m, 1); readLevelsStat(); drawOverlay(); } }
+  else if (state.mode === "add") { let v = parseFloat($("#manualVal").value); if (!(v > -50)) { const s = prompt("Level (m)"); v = parseFloat(s); if (!(v > -50)) return; } state.manual.push({ x: p.x, y: p.y, value: v }); readLevelsStat(); drawOverlay(); }
+  else { const zEl = e.target.closest("[data-z]"); if (zEl) { selectZone(+zEl.dataset.z); } }
+});
+$("#inner").addEventListener("dblclick", e => { if (state.mode === "zone") { e.preventDefault(); finishZone(); } });
+function readLevelsStat() { const onM = state.levels.filter(l => l.source === "marker").length; $("#lvStat").innerHTML = `found <b>${state.levels.length}</b> · on marker <b>${onM}</b> · excluded <b>${state.excluded.size}</b> · manual <b>${state.manual.length}</b>`; }
+function finishZone() { if (state.draft.length >= 3) { const z = { name: "Zone " + String.fromCharCode(65 + state.zones.length), fel: null, note: "", poly: state.draft.slice(), result: null }; state.zones.push(z); state.sel = state.zones.length - 1; }
+  state.draft = []; setMode("pan"); renderZoneTable(); drawOverlay(); if (state.sel != null) $("#zFel").focus(); }
+
+// ---------- zones ----------
+function renderZoneTable() {
+  const tb = $("#zoneTable tbody"); tb.innerHTML = state.zones.map((z, i) => `<tr class="${i === state.sel ? "sel" : ""}" data-i="${i}"><td>${esc(z.name)}</td><td class="num">${z.fel != null ? z.fel.toFixed(3) : "—"}</td><td>${esc(z.note).slice(0, 40)}</td><td><button class="tiny" data-del="${i}">✕</button></td></tr>`).join("") || `<tr><td colspan="4" class="hint">no zones yet</td></tr>`;
+  tb.querySelectorAll("tr[data-i]").forEach(tr => tr.addEventListener("click", e => { if (e.target.dataset.del) { state.zones.splice(+e.target.dataset.del, 1); state.sel = null; renderZoneTable(); renderResults(); drawOverlay(); return; } selectZone(+tr.dataset.i); }));
+  const z = state.sel != null ? state.zones[state.sel] : null; $("#zoneEdit").hidden = !z;
+  if (z) { $("#zName").value = z.name; $("#zFel").value = z.fel ?? ""; $("#zNote").value = z.note || ""; }
+}
+function selectZone(i) { state.sel = i; renderZoneTable(); drawOverlay(); }
+["zName", "zFel", "zNote"].forEach(id => $("#" + id).addEventListener("input", () => { const z = state.zones[state.sel]; if (!z) return; z.name = $("#zName").value; z.fel = $("#zFel").value === "" ? null : +$("#zFel").value; z.note = $("#zNote").value; z.result = null; $("#zoneTable tbody tr.sel td:first-child").textContent = z.name; $("#zoneTable tbody tr.sel td:nth-child(2)").textContent = z.fel != null ? z.fel.toFixed(3) : "—"; drawOverlay(); }));
+$("#zDerive").addEventListener("click", () => { const z = state.zones[state.sel]; if (!z) return; const ref = +$("#zRef").value; if (!(ref > -50)) return; const ded = ["zSlab", "zBlind", "zHard"].map(id => +$("#" + id).value || 0); const fel = ref - ded.reduce((s, v) => s + v, 0) / 1000;
+  z.fel = Math.round(fel * 1000) / 1000; z.note = `${ref.toFixed(3)} - ${ded.join(" - ")} mm = ${z.fel.toFixed(3)}` + (z.note ? " · " + z.note : ""); z.result = null; renderZoneTable(); drawOverlay(); });
+
+// ---------- design sheet levels ----------
+async function scanDesign() {
+  const d = state.design; const rows = []; const maxP = Math.min(d.pages, 30);
+  for (let p = 1; p <= maxP; p++) { const items = await pageTextItems(await d.doc.getPage(p)); for (const it of items) for (const { value: v } of levelsInText(it.str)) if (v >= +$("#lvMin").value && v <= +$("#lvMax").value) rows.push({ page: p, value: v, text: it.str.trim() }); }
+  const seen = new Set(); const uniq = rows.filter(r => { const k = r.page + "|" + r.text + "|" + r.value; if (seen.has(k)) return false; seen.add(k); return true; });
+  $("#designStat").innerHTML = `${d.name}: <b>${uniq.length}</b> level-like values on ${maxP} page${maxP > 1 ? "s" : ""}`;
+  const box = $("#designLevels"); box.hidden = !uniq.length; box.innerHTML = uniq.map(r => `<div><span title="${esc(r.text)}">p${r.page} · ${esc(r.text)}</span><button class="tiny" data-v="${r.value}" data-t="${esc(r.text)}">→ FEL</button></div>`).join("");
+  box.querySelectorAll("button").forEach(b => b.addEventListener("click", () => { const z = state.zones[state.sel]; if (!z) { alert("Select a zone first"); return; } z.fel = +b.dataset.v; z.note = `${state.design.name}: ${b.dataset.t}`; z.result = null; renderZoneTable(); drawOverlay(); }));
+}
+
+// ---------- compute ----------
+function usedPoints() { const T = state.T; const pts = []; state.levels.forEach((l, i) => { if (!state.excluded.has(i)) pts.push({ ...T.toWorld(l.px, l.py), z: l.value }); }); state.manual.forEach(m => pts.push({ ...T.toWorld(m.x, m.y), z: m.value })); return pts; }
+function settings() { const b = $("#bands").value; const edges = b === "custom" ? $("#bandsCustom").value.split(",").map(Number).filter(v => v > 0).sort((a, c) => a - c) : b.split(",").map(Number);
+  return { surface: $("#surface").value, k: +$("#kNear").value || 4, radius: +$("#radius").value || 25, cell: +$("#cell").value, bands: edges.length ? edges : [1.5, 3, 6], sample: $("#sample").value, batter: +$("#batter").value || 0 }; }
+function compute() {
+  if (!state.T) { alert("Set the scale first (grid, declared or calibrated)."); return; } if (!state.zones.length) { alert("Draw at least one zone."); return; }
+  const missingFel = state.zones.filter(z => z.fel == null); if (missingFel.length) { alert("Every zone needs a final excavation level: " + missingFel.map(z => z.name).join(", ")); return; }
+  const st = settings(); const pts = usedPoints(); if (pts.length < 3) { alert("Not enough spot levels."); return; }
+  const surf = st.surface === "tin" ? tin(pts) : st.surface === "idw" ? idw(pts, { k: st.k, radius: st.radius }) : proximity(pts, { k: st.k, radius: st.radius });
+  for (const z of state.zones) { const poly = z.poly.map(p => state.T.toWorld(p.x, p.y)); const r = gridVolumes(poly, surf, z.fel, { cell: st.cell, bands: st.bands, sample: st.sample });
+    const inZone = pts.filter(p => { const b = poly; return p.X >= Math.min(...b.map(q => q.X)) - st.radius && p.X <= Math.max(...b.map(q => q.X)) + st.radius && p.Y >= Math.min(...b.map(q => q.Y)) - st.radius && p.Y <= Math.max(...b.map(q => q.Y)) + st.radius; }).length;
+    z.result = { ...r, batter: st.batter > 0 ? batterAllowance(poly, surf, z.fel, st.batter) : 0, levelsNear: inZone, settings: st, polyArea: polygonArea(poly) }; }
+  state.checked = null; renderResults(); drawOverlay(); status();
+}
+$("#compute").addEventListener("click", compute);
+function renderResults() {
+  const zs = state.zones.filter(z => z.result); const th = $("#results thead"), tb = $("#results tbody"); $("#csvSummary").disabled = $("#csvCells").disabled = !zs.length; $("#checkedTag").textContent = state.checked ? `Checked by ${state.checked.by} · ${new Date(state.checked.at).toLocaleString("en-SG")}` : "";
+  if (!zs.length) { th.innerHTML = ""; tb.innerHTML = `<tr><td class="hint">no results yet</td></tr>`; $("#resStat").textContent = ""; return; }
+  const names = zs[0].result.summary.bands; th.innerHTML = `<tr><th>Zone</th><th>FEL</th><th>Area m²</th><th>Avg cut m</th><th>Cut m³</th>${names.map(n => `<th>cut ${n} m</th>`).join("")}<th>Fill m³</th><th>Batter m³</th></tr>`;
+  const tot = { area: 0, cut: 0, fill: 0, batter: 0, bands: Object.fromEntries(names.map(n => [n, 0])) };
+  tb.innerHTML = zs.map(z => { const s = z.result.summary; tot.area += s.area; tot.cut += s.cut; tot.fill += s.fill; tot.batter += z.result.batter; names.forEach(n => tot.bands[n] += s.byLayer[n]);
+    return `<tr><td>${esc(z.name)}</td><td class="num">${z.fel.toFixed(3)}</td><td class="num">${fmt(s.area, 0)}</td><td class="num">${fmt(s.avgCutDepth, 2)}</td><td class="num">${fmt(s.cut, 0)}</td>${names.map(n => `<td class="num">${fmt(s.byLayer[n], 0)}</td>`).join("")}<td class="num">${fmt(s.fill, 0)}</td><td class="num">${fmt(z.result.batter, 0)}</td></tr>`; }).join("") +
+    `<tr class="total"><td>Total</td><td></td><td class="num">${fmt(tot.area, 0)}</td><td></td><td class="num">${fmt(tot.cut, 0)}</td>${names.map(n => `<td class="num">${fmt(tot.bands[n], 0)}</td>`).join("")}<td class="num">${fmt(tot.fill, 0)}</td><td class="num">${fmt(tot.batter, 0)}</td></tr>`;
+  const st = zs[0].result.settings; const miss = zs.reduce((s, z) => s + z.result.summary.missing, 0);
+  $("#resStat").innerHTML = `${st.surface}${st.surface !== "tin" ? ` (K ${st.k}, R ${st.radius} m)` : ""} · cell ${st.cell} m · ${st.sample} · bands by layer · scale ${state.T.mode}` + (miss ? ` · <b style="color:var(--bad)">${fmt(miss, 0)} m² had no level within radius</b>` : "") + ` · nett, vertical sides${st.batter ? `; batter 1:${st.batter} shown separately` : ""}`;
+  $("#legendNote").textContent = zs.length ? `deepest cut ${fmt(Math.max(...zs.map(z => z.result.summary.maxDepth)), 2)} m` : "";
+}
+$("#markChecked").addEventListener("click", () => { const by = $("#checker").value.trim(); if (!by) { $("#checker").focus(); return; } state.checked = { by, at: Date.now() }; renderResults(); saveLocal(); });
+
+// ---------- export and project ----------
+function download(name, content, mime) { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([content], { type: mime + ";charset=utf-8" })); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500); }
+function summaryRows() { return state.zones.filter(z => z.result).map(z => { const s = z.result.summary, st = z.result.settings; const row = { zone: z.name, fel_m: z.fel, note: z.note, area_m2: s.area.toFixed(1), avg_cut_depth_m: s.avgCutDepth.toFixed(3), max_cut_depth_m: s.maxDepth.toFixed(2), cut_m3: s.cut.toFixed(1), fill_m3: s.fill.toFixed(1) };
+  for (const n of s.bands) row["cut_" + n + "_m3"] = s.byLayer[n].toFixed(1); for (const n of s.bands) row["cut_maxdepth_" + n + "_m3"] = s.byMaxDepth[n].toFixed(1);
+  Object.assign(row, { batter_m3: z.result.batter.toFixed(1), method: st.surface, k: st.k, radius_m: st.radius, cell_m: st.cell, sample: st.sample, levels_used: usedPoints().length, scale_mode: state.T.mode, m_per_pt: state.T.mPerPt.toFixed(6), sheet: state.topo.name, page: state.topo.pageNo, checked_by: state.checked?.by || "", checked_at: state.checked ? new Date(state.checked.at).toISOString() : "", vertices_pt: z.poly.map(p => p.x.toFixed(1) + "/" + p.y.toFixed(1)).join(" ") }); return row; }); }
+$("#csvSummary").addEventListener("click", () => { const rows = summaryRows(); download(fileBase() + "_earthworks.csv", toCSV(rows, Object.keys(rows[0])), "text/csv"); });
+$("#csvCells").addEventListener("click", () => { const rows = []; for (const z of state.zones) if (z.result) for (const c of z.result.cells) rows.push({ zone: z.name, X: c.X.toFixed(2), Y: c.Y.toFixed(2), egl: c.egl?.toFixed(3) ?? "", fel: c.fel, depth: c.depth?.toFixed(3) ?? "", area_m2: c.area }); download(fileBase() + "_cells.csv", toCSV(rows, ["zone", "X", "Y", "egl", "fel", "depth", "area_m2"]), "text/csv"); });
+const fileBase = () => (state.topo?.name || "earthworks").replace(/\.pdf$/i, "");
+function project() { return { version: 1, sheet: state.topo?.name, page: state.topo?.pageNo, transform: state.T ? { mode: state.T.mode, mPerPt: state.T.mPerPt, scale: state.T.scale } : null, zones: state.zones.map(z => ({ name: z.name, fel: z.fel, note: z.note, poly: z.poly })), excluded: [...state.excluded].map(i => state.levels[i]).filter(Boolean).map(l => [l.px, l.py, l.value]), manual: state.manual, settings: settings(), checked: state.checked }; }
+function applyProject(p) { if (p.transform && p.transform.mode !== "grid") { if (p.transform.mode === "declared") setDeclared(p.transform.scale); else { state.T = { mode: "calibrated", ...scaledTransform(p.transform.mPerPt) }; $("#scaleStat").innerHTML = `calibrated (project): <b>${p.transform.mPerPt.toFixed(5)} m/pt</b>`; } }
+  state.zones = (p.zones || []).map(z => ({ ...z, result: null })); state.manual = p.manual || []; state.excluded = new Set(); for (const [x, y, v] of p.excluded || []) { const i = state.levels.findIndex(l => Math.abs(l.px - x) < 0.5 && Math.abs(l.py - y) < 0.5 && l.value === v); if (i >= 0) state.excluded.add(i); }
+  if (p.settings) { $("#surface").value = p.settings.surface; $("#kNear").value = p.settings.k; $("#radius").value = p.settings.radius; $("#cell").value = p.settings.cell; $("#sample").value = p.settings.sample; $("#batter").value = p.settings.batter; const b = p.settings.bands.join(","); if ([...$("#bands").options].some(o => o.value === b)) $("#bands").value = b; else { $("#bands").value = "custom"; $("#bandsCustom").value = b; } }
+  state.checked = p.checked || null; readLevelsStat(); renderZoneTable(); renderResults(); drawOverlay(); status(); }
+function saveLocal() { try { if (state.topo) localStorage.setItem("kkl_ew_" + state.topo.name, JSON.stringify(project())); } catch (e) {} }
+$("#saveProj").addEventListener("click", () => { saveLocal(); download(fileBase() + "_project.json", JSON.stringify(project(), null, 1), "application/json"); });
+$("#loadProj").addEventListener("change", async e => { const f = e.target.files[0]; if (!f) return; const p = JSON.parse(await f.text()); if (state.topo && p.sheet && p.sheet !== state.topo.name && !confirm(`Project was saved for ${p.sheet}; apply to ${state.topo.name}?`)) return; applyProject(p); e.target.value = ""; });
+window.addEventListener("beforeunload", saveLocal);
+function status() { $("#tstat").innerHTML = state.topo ? `${esc(state.topo.name)} p${state.topo.pageNo} · ${state.T ? state.T.mode + " " + state.T.mPerPt.toFixed(5) + " m/pt" : "scale not set"} · ${state.zones.length} zone${state.zones.length === 1 ? "" : "s"}` : "no sheet loaded"; }
+
+// test and scripting hooks
+window.__ew = { state, compute, readLevels, addZone: (name, fel, poly, note = "") => { state.zones.push({ name, fel, note, poly, result: null }); renderZoneTable(); drawOverlay(); }, setDeclared, summaryRows, settings, applyProject, project };
+</script>
+</body>
+</html>

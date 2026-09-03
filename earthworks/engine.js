@@ -2,7 +2,7 @@
 // Pure functions, no DOM, no dependencies. Used by earthworks/index.html (browser) and test/ (node --test).
 // Coordinates: page points (PDF user space, y up) are converted to world metres (E,N or scaled page) by a transform.
 
-export const LEVEL_RE = /^[+]?(\d{1,3})\.(\d{2,3})$/;                 // 103.25, +103.250
+export const LEVEL_RE = /^(?:RL|FL|SSL|FFL|PL)?[+]?(\d{1,3})\.(\d{2,3})$/i;   // 103.25, +103.250, RL98.500
 const EXCLUDE_PREFIX = new Set(["IL", "CH", "H", "E", "N", "DIM", "DEPTH", "D"]);  // invert levels, chainages, heights, coordinates
 
 /** Split text items into word tokens with an estimated x for each token (items may hold several words). */
@@ -15,7 +15,8 @@ export function tokenize(items) {
     for (const part of parts) {
       if (part.trim()) {
         const off = (it.width || 0) * pos / n;                       // along the baseline
-        out.push({ str: part, x: it.x + off * cos, y: it.y + off * sin, item: idx, size: it.size || 0, angle: it.angle || 0, y0: it.y, x0: it.x });
+        const clean = part.replace(/[,;:.)\]]+$/, "").replace(/^[(\[]+/, "");   // trailing punctuation in notes: '99.000.' or '98.500,'
+        out.push({ str: clean || part, x: it.x + off * cos, y: it.y + off * sin, item: idx, size: it.size || 0, angle: it.angle || 0, y0: it.y, x0: it.x });
       }
       pos += part.length;
     }
@@ -42,7 +43,7 @@ export function parseSpotLevels(items, opts = {}) {
   const toks = mergeSplit(tokenize(items)); const out = [];
   toks.forEach((t, i) => {
     const m = LEVEL_RE.exec(t.str); if (!m) return;
-    const value = parseFloat(t.str.replace("+", "")); if (!(value >= min && value <= max)) return;
+    const value = parseFloat(t.str.replace(/^(?:RL|FL|SSL|FFL|PL)?\+?/i, "")); if (!(value >= min && value <= max)) return;
     const prev = toks[i - 1]; let prefix = "";
     if (prev && prev.item === t.item && Math.abs(prev.y - t.y) < 1.5 && t.x - prev.x < 40) prefix = prev.str.toUpperCase().replace(/[^A-Z]/g, "");
     if (prefix && excl.has(prefix)) return;
@@ -50,6 +51,9 @@ export function parseSpotLevels(items, opts = {}) {
   });
   return out;
 }
+
+/** Level tokens anywhere in free text (design notes): returns [{value, token}] after stripping punctuation. */
+export function levelsInText(str) { const out = []; for (const raw of str.split(/\s+/)) { const t = raw.replace(/[,;:.)\]]+$/, "").replace(/^[(\[]+/, ""); const m = LEVEL_RE.exec(t); if (m) out.push({ value: parseFloat(t.replace(/^(?:RL|FL|SSL|FFL|PL)?\+?/i, "")), token: t }); } return out; }
 
 /** Cluster small path centres into markers; markers: [{x,y,w,h}] (page pt). */
 export function clusterMarkers(cands, tol = 2.0) {

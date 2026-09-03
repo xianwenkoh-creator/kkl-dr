@@ -356,6 +356,14 @@ own estimates. Year one is deliberately the spine only.
 | 13 | Surface volume module (per project) | Baseline, design and periodic as-built surfaces to TIN difference per zone and depth band; used only where a bulk site and the contract's payment basis justify a survey | lxml, ezdxf, PDAL, scipy, numpy | Surface Ledger | 3 |
 | | **Year two total** | | | | **16 to 20** |
 
+**Built already, ahead of the phases above:** the bulk-excavation route the QS uses today from PDF
+drawings is working in `../earthworks/`: spot levels read off the topo sheet and snapped to their
+markers, the E/N grid read for real coordinates, zones drawn with a final excavation level each
+(typed, picked from the design sheet's levels, or derived from a slab level less deductions), and cut
+and fill by depth band by proximity, inverse-distance or TIN surfaces, verified within 2 percent of
+exact volumes on a synthetic sheet. It is the first primitive-capture surface of component 4 and
+the PDF half of component 13, and it goes into shadow use on the next live tender.
+
 Scans stay a QS-traced route with logging; symbol detectors and OCR are year three items, or
 bought, unless the ledger shows scans are a large share of money-bearing sheets.
 
@@ -576,4 +584,5 @@ evidence and consequences are in `takeoff-verification.json`.
 | `takeoff-synthesis.json` | The panel's merged design: components with budgets, roadmap, first 90 days, effort model, costs, twelve key claims, and sixteen rejected ideas |
 | `takeoff-open-questions.md` | Fifty-four questions for KKL, grouped by owner |
 | `../takeoff/` | Synthetic drawing with truth, five measuring spikes, calculation layer, markup capture, and their README |
+| `../earthworks/` | The working cut-and-fill tool: spot levels from the topo PDF, zones with final excavation levels, volumes by depth band, engine tests and README |
 | `../ai/index.html` | The document-AI workbench prototype whose Extract preset drafts rulebooks and BQ lines on cleared documents |

@@ -23,6 +23,15 @@ cost, and a "Mark checked" step stamps initials before export (same idea as DR V
 `takeoff/` — synthetic drawing with ground truth and three measurement spikes (PyMuPDF, pdf.js,
 raster/OpenCV) that back the takeoff system plan. See `takeoff/README.md` for results.
 
+## KKL Earthworks (cut and fill from PDF)
+`earthworks/index.html` — the QS's bulk-excavation method as a tool: reads the spot levels off
+the topographical survey PDF and snaps each to its marker, reads the E/N grid (or the declared
+scale, or a two-click calibration), lets the QS draw excavation zones and set each zone's final
+excavation level (typed, picked from the levels found on the design PDF, or derived from a slab
+level less deductions), then computes cut and fill per zone by depth band with a colour overlay
+for checking, CSV export and a checked-by stamp. `earthworks/engine.js` holds the arithmetic and
+is tested with `npm test` against a synthetic sheet with exact volumes (see `earthworks/README.md`).
+
 ## Takeoff system plan
 - `research/takeoff-system-plan.md` — the plan for reducing QS effort on takeoffs: a calculation
   engine over four measured primitives, capture of the QSs' existing workbooks and markups, staged
