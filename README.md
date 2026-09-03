@@ -19,6 +19,10 @@ cost, and a "Mark checked" step stamps initials before export (same idea as DR V
   scope on purpose (counts and schedule reads only).
 - Page previews use pdf.js from cdnjs; everything else is in the one file.
 
+## Takeoff engine spikes
+`takeoff/` — synthetic drawing with ground truth and three measurement spikes (PyMuPDF, pdf.js,
+raster/OpenCV) that back the takeoff system plan. See `takeoff/README.md` for results.
+
 ## Research
 - `research/civils-ai-study.md` — what civils.ai is, sells, charges and (inferred) how it works.
 - `research/kkl-ai-blueprint.md` — use cases ranked for KKL, build/buy, the five agents,
