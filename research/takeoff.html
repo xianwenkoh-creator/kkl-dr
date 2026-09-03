@@ -155,7 +155,7 @@ client and main contractor for DXF (exact quantities, no scale problem), and add
 that pre-highlights candidate runs for the QS to accept, gated by a two-day test on ten real sheets.</p>
 <p><strong>Who can build it.</strong> One part-time builder at 0.3 to 0.5 FTE has 8 to 13 person-weeks in six
 months. The first six months are therefore the engine, the rulebook, the workbook binder and the
-BQ binder, about 12 person-weeks, and nothing else. A second maintainer must be named by month six.</p>
+BQ binder, about 15 person-weeks, and nothing else. A second maintainer must be named by month six.</p>
 <p><strong>What it saves.</strong> Say it in capacity, not in a percentage curve nobody can measure: tenders per QS
 per month, claim packs per QS per month, days from drawings-in to quantity sheet, omissions caught
 before a bid, Superintending Officer queries per claim. The honest year-one expectation is about
@@ -517,6 +517,22 @@ lens. The table is in Appendix A. Seven changes to the design follow from it.</p
    untuned on ten real consultant plan sheets decides whether the assist overlay is funded; if
    untuned precision is under half, the money goes to a DXF request letter and the DXF fast path.</li>
 </ol>
+<h3 id="the-panels-merged-design-and-where-this-plan-departs-from-it">The panel's merged design, and where this plan departs from it</h3>
+<p>A synthesiser read the five designs and the three verdicts and produced one merged design
+(<code>takeoff-synthesis.json</code>): the Rulebook spine, a typed-primitive capture app, the conditional
+markup harvester, a claims roll-up on five pilot contracts by month six, and a real-sheet measurer
+built once in Python as a nightly shadow job in year two, at 41.5 builder person-weeks over 24
+months (20.5 in year one) with QS effort at 93, 82 and 65 percent of today at 6, 12 and 24 months.
+It also lists sixteen ideas it rejected or deferred, from a local server with sign-in to a symbol
+detector, each with a reason; that list stands.</p>
+<p>The sceptics' verdicts arrived after the synthesis and change three things in it. The typed-primitive
+capture app (3.5 person-weeks) is replaced by a binder that reads the workbooks QSs already fill,
+because typed tables beside Excel are double entry. The claims roll-up becomes a two-contract
+evidence binder until DR Capture carries BQ-item keys, because daily-report rows do not yet hold
+what a claim line needs. The effort percentages are replaced by capacity metrics, because the
+governance overhead and the unmeasured baseline make a percentage curve unverifiable in year one.
+The year-one budget therefore falls to about 15 person-weeks and the year-two measurer is gated
+rather than scheduled. Everything else in the merged design carries into section 6.</p>
 <h2 id="6-the-recommended-system">6. The recommended system</h2>
 <h3 id="61-principles">6.1 Principles</h3>
 <ol>
@@ -620,12 +636,20 @@ own estimates. Year one is deliberately the spine only.</p>
 <td>2.5</td>
 </tr>
 <tr>
+<td>9b</td>
+<td>Runbook and handover</td>
+<td>A runbook per nightly job, a README per page, and a walkthrough for the named second maintainer</td>
+<td>Markdown in the repo</td>
+<td>Synthesis</td>
+<td>0.5</td>
+</tr>
+<tr>
 <td></td>
 <td><strong>Year one total</strong></td>
 <td></td>
 <td></td>
 <td></td>
-<td><strong>about 14.5, plus 2 conditional</strong></td>
+<td><strong>about 15, plus 2 conditional</strong></td>
 </tr>
 <tr>
 <td>10</td>
@@ -713,7 +737,7 @@ ledger CSVs and regression sheets on SharePoint, never in the public repository.
 </tr>
 </tbody>
 </table></div>
-<p>Every project defaults to T2 until the contracts manager changes it in the register.</p>
+<p>Every project defaults to T2 until the contracts manager changes it in the register. The gateway is code, not policy: a T2 session never receives an API key, and every outbound call is logged against the project.</p>
 <h2 id="7-how-work-is-handed-to-the-machine">7. How work is handed to the machine</h2>
 <p>The stages are the same for every family and every drawing source. A family (for example the
 trench family on LTA-style contracts, or DR-SUMP counts from DXF) moves up one stage only when the
@@ -856,7 +880,7 @@ two hours a week and one manual sheet, so month six may show no net saving at al
 <tbody>
 <tr>
 <td>Builder time</td>
-<td>About 14.5 person-weeks, plus 2 if the harvester applies; fits 0.4 FTE with about 5 person-weeks left for support of the other apps</td>
+<td>About 15 person-weeks, plus 2 if the harvester applies; fits 0.4 FTE with about 4 person-weeks left for support of the other apps</td>
 <td>16 to 20 person-weeks if the assist overlay is funded; 6 to 8 if it is deferred</td>
 </tr>
 <tr>
@@ -1199,6 +1223,10 @@ evidence and consequences are in <code>takeoff-verification.json</code>.</p>
 <tr>
 <td><code>takeoff-verification.json</code></td>
 <td>Fourteen claims attacked by three sceptics, with tests and consequences</td>
+</tr>
+<tr>
+<td><code>takeoff-synthesis.json</code></td>
+<td>The panel's merged design: components with budgets, roadmap, first 90 days, effort model, costs, twelve key claims, and sixteen rejected ideas</td>
 </tr>
 <tr>
 <td><code>takeoff-open-questions.md</code></td>

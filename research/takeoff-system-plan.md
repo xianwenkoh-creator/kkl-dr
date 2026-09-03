@@ -28,7 +28,7 @@ that pre-highlights candidate runs for the QS to accept, gated by a two-day test
 
 **Who can build it.** One part-time builder at 0.3 to 0.5 FTE has 8 to 13 person-weeks in six
 months. The first six months are therefore the engine, the rulebook, the workbook binder and the
-BQ binder, about 12 person-weeks, and nothing else. A second maintainer must be named by month six.
+BQ binder, about 15 person-weeks, and nothing else. A second maintainer must be named by month six.
 
 **What it saves.** Say it in capacity, not in a percentage curve nobody can measure: tenders per QS
 per month, claim packs per QS per month, days from drawings-in to quantity sheet, omissions caught
@@ -297,6 +297,25 @@ lens. The table is in Appendix A. Seven changes to the design follow from it.
    untuned on ten real consultant plan sheets decides whether the assist overlay is funded; if
    untuned precision is under half, the money goes to a DXF request letter and the DXF fast path.
 
+### The panel's merged design, and where this plan departs from it
+
+A synthesiser read the five designs and the three verdicts and produced one merged design
+(`takeoff-synthesis.json`): the Rulebook spine, a typed-primitive capture app, the conditional
+markup harvester, a claims roll-up on five pilot contracts by month six, and a real-sheet measurer
+built once in Python as a nightly shadow job in year two, at 41.5 builder person-weeks over 24
+months (20.5 in year one) with QS effort at 93, 82 and 65 percent of today at 6, 12 and 24 months.
+It also lists sixteen ideas it rejected or deferred, from a local server with sign-in to a symbol
+detector, each with a reason; that list stands.
+
+The sceptics' verdicts arrived after the synthesis and change three things in it. The typed-primitive
+capture app (3.5 person-weeks) is replaced by a binder that reads the workbooks QSs already fill,
+because typed tables beside Excel are double entry. The claims roll-up becomes a two-contract
+evidence binder until DR Capture carries BQ-item keys, because daily-report rows do not yet hold
+what a claim line needs. The effort percentages are replaced by capacity metrics, because the
+governance overhead and the unmeasured baseline make a percentage curve unverifiable in year one.
+The year-one budget therefore falls to about 15 person-weeks and the year-two measurer is gated
+rather than scheduled. Everything else in the merged design carries into section 6.
+
 ## 6. The recommended system
 
 ### 6.1 Principles
@@ -329,7 +348,8 @@ own estimates. Year one is deliberately the spine only.
 | 7 | Ledger and scorecard | One row per line: source, engine value, QS final value, checks, reviewer, minutes from file timestamps; weekly disagreements with reason codes; per-family stage status; audit sampling and seeded errors | CSV on SharePoint; a single-file status page in DR Verify style | Shadow Ledger, TrueLine | 2 |
 | 8 | VO differential | Two primitive sets (old and new revision) through the same rulebook; omissions and additions listed separately; pricing basis column in the BQ rate, pro-rata, star rate, daywork order | Engine diff mode; `.xlsx` out | Rulebook | 1 |
 | 9 | Claims evidence binder (pilot, two contracts) | Attaches DR rows, delivery notes, weighbridge and staging-ground tickets to the QS's own claim lines; flags gaps; two-source reconciliation; back-to-back subcon certificate; audit appendix for SOP Act claims. Requires DR Capture BQ-item keys first | Single-file page over DR CSVs; workbench Extract for KKL's own tickets | Surface Ledger, corrected | 2.5 |
-| | **Year one total** | | | | **about 14.5, plus 2 conditional** |
+| 9b | Runbook and handover | A runbook per nightly job, a README per page, and a walkthrough for the named second maintainer | Markdown in the repo | Synthesis | 0.5 |
+| | **Year one total** | | | | **about 15, plus 2 conditional** |
 | 10 | DXF fast path and request letter | ezdxf importer mapping layers and blocks to codes per originator; a standard request for DXF, LandXML and TrueType-font PDFs in every tender and subcontract letter | ezdxf; LibreDWG for DWG | TrueLine | 2 |
 | 11 | Real-sheet corpus and gate | Thirty real KKL sheets with QS-confirmed quantities; untuned run of the existing extractor; report precision by pen weight, share of pages with readable scale, viewports per page | `extract_pymupdf.py` | Sceptics | 1 |
 | 12 | Assist overlay (only if the gate passes) | Pre-highlights candidate runs and symbols on vector PDF; two-click viewport calibration with a printed-dimension grader; snap-to-vector tracing; engine proposals written back as PDF annotations; every trace logged as a label | pdf.js 4.10.38 in the browser; PyMuPDF batch on the office PC | TrueLine, Shadow Ledger | 10 to 14 |
@@ -365,7 +385,7 @@ ledger CSVs and regression sheets on SharePoint, never in the public repository.
 | T1 | Client tender and contract documents without an NDA or Official Secrets marking, once the contracts manager has written a position for that client | Text of preambles, BQ lines and schedules may go to a cloud model on a Singapore-resident or zero-retention route; drawings never |
 | T2 | NDA-gated tenders, rail and depot work, main-contractor subcontracts with flow-downs | Nothing leaves KKL; rulebook typed from the client template; local rules for BQ classification |
 
-Every project defaults to T2 until the contracts manager changes it in the register.
+Every project defaults to T2 until the contracts manager changes it in the register. The gateway is code, not policy: a T2 session never receives an API key, and every outbound call is logged against the project.
 
 ## 7. How work is handed to the machine
 
@@ -459,7 +479,7 @@ two hours a week and one manual sheet, so month six may show no net saving at al
 
 | Item | Year one | Year two |
 |---|---|---|
-| Builder time | About 14.5 person-weeks, plus 2 if the harvester applies; fits 0.4 FTE with about 5 person-weeks left for support of the other apps | 16 to 20 person-weeks if the assist overlay is funded; 6 to 8 if it is deferred |
+| Builder time | About 15 person-weeks, plus 2 if the harvester applies; fits 0.4 FTE with about 4 person-weeks left for support of the other apps | 16 to 20 person-weeks if the assist overlay is funded; 6 to 8 if it is deferred |
 | Chief QS time | One day a week for three months, then half a day | Half a day a week |
 | Each QS | About two hours a week of corrections and audits plus one manual sheet | Same |
 | Contracts manager | Two days in the discovery pack; an hour per new contract | An hour per new contract |
@@ -553,6 +573,7 @@ evidence and consequences are in `takeoff-verification.json`.
 | `takeoff-designs.json` | Five complete designs: Rulebook, Shadow Ledger, TrueLine, KKL Takeoff Overlay, Surface Ledger |
 | `takeoff-judgements.json` | Three judges' scores, rankings, fatal flaws, unsupported claims and grafts |
 | `takeoff-verification.json` | Fourteen claims attacked by three sceptics, with tests and consequences |
+| `takeoff-synthesis.json` | The panel's merged design: components with budgets, roadmap, first 90 days, effort model, costs, twelve key claims, and sixteen rejected ideas |
 | `takeoff-open-questions.md` | Fifty-four questions for KKL, grouped by owner |
 | `../takeoff/` | Synthetic drawing with truth, five measuring spikes, calculation layer, markup capture, and their README |
 | `../ai/index.html` | The document-AI workbench prototype whose Extract preset drafts rulebooks and BQ lines on cleared documents |
