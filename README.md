@@ -23,6 +23,15 @@ cost, and a "Mark checked" step stamps initials before export (same idea as DR V
 `takeoff/` — synthetic drawing with ground truth and three measurement spikes (PyMuPDF, pdf.js,
 raster/OpenCV) that back the takeoff system plan. See `takeoff/README.md` for results.
 
+## Takeoff system plan
+- `research/takeoff-system-plan.md` — the plan for reducing QS effort on takeoffs: a calculation
+  engine over four measured primitives, capture of the QSs' existing workbooks and markups, staged
+  hand-over to the machine with statistical gates, and a first-90-days schedule.
+  `research/takeoff.html` is the same as one page.
+- Supporting evidence: `takeoff-research-digest.md` (seven research topics), `takeoff-designs.json`
+  (five designs), `takeoff-judgements.json` (three judges), `takeoff-verification.json` (three
+  sceptics on fourteen claims), `takeoff-open-questions.md` (what only KKL can answer).
+
 ## Research
 - `research/civils-ai-study.md` — what civils.ai is, sells, charges and (inferred) how it works.
 - `research/kkl-ai-blueprint.md` — use cases ranked for KKL, build/buy, the five agents,

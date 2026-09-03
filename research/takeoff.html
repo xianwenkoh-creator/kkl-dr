@@ -1,0 +1,1221 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KKL Takeoff System Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+  :root{
+    --paper:#f7f6f3; --ink:#26292b; --ink-soft:#5a5f63; --steel:#46606e; --steel-ink:#ffffff;
+    --accent:#c85a10; --accent-ink:#a34a0d; --line:#d9d6cf; --line-strong:#b9b5ac;
+    --card:#ffffff; --field:#fbfaf8; --good:#2e7d4f; --bad:#b3402e; --mark:#fdf1e3; --thead:#eef0ee;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){ --paper:#1e2022; --ink:#e6e3dc; --ink-soft:#a8aaa9; --steel:#93aebc; --steel-ink:#1e2022;
+      --accent:#e8823a; --accent-ink:#e8823a; --line:#3a3d3f; --line-strong:#55585a;
+      --card:#26292b; --field:#2c2f31; --good:#5cb884; --bad:#e07a63; --mark:#3a2f24; --thead:#2c3033; }
+  }
+  :root[data-theme="dark"]{ --paper:#1e2022; --ink:#e6e3dc; --ink-soft:#a8aaa9; --steel:#93aebc; --steel-ink:#1e2022;
+      --accent:#e8823a; --accent-ink:#e8823a; --line:#3a3d3f; --line-strong:#55585a;
+      --card:#26292b; --field:#2c2f31; --good:#5cb884; --bad:#e07a63; --mark:#3a2f24; --thead:#2c3033; }
+
+  *{box-sizing:border-box;}
+  html{background:var(--paper);}
+  body{margin:0; background:var(--paper); color:var(--ink); font-family:"Segoe UI",system-ui,-apple-system,sans-serif; font-size:16px; line-height:1.5;}
+  .mono{font-family:"Cascadia Mono",Consolas,"JetBrains Mono",monospace;}
+  .page{max-width:1180px; margin:0 auto; padding:20px 16px 80px;}
+
+  header.mast{border:2px solid var(--ink); background:var(--card); padding:16px 20px; display:flex; justify-content:space-between; align-items:flex-end; gap:16px; flex-wrap:wrap;}
+  header.mast h1{margin:0; font-size:26px; font-weight:650; letter-spacing:-.01em; text-wrap:balance;}
+  header.mast .sub{margin:4px 0 0; color:var(--ink-soft); font-size:15px; max-width:60ch;}
+  header.mast .tag{font-family:"Cascadia Mono",Consolas,"JetBrains Mono",monospace; font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-soft); text-align:right; line-height:1.7;}
+
+  .layout{display:grid; grid-template-columns:1fr; gap:24px; margin-top:20px;}
+  @media (min-width:1000px){ .layout{grid-template-columns:220px minmax(0,1fr);} nav.toc{position:sticky; top:16px;} }
+  nav.toc{align-self:start; border:1px solid var(--line-strong); background:var(--card); padding:12px 14px; border-radius:4px;}
+  nav.toc .eyebrow{margin:0 0 6px;}
+  nav.toc ol{list-style:none; margin:0; padding:0; font-size:13px;}
+  nav.toc li{padding:4px 0; border-bottom:1px solid var(--line);}
+  nav.toc li:last-child{border-bottom:none;}
+  nav.toc a{color:var(--ink); text-decoration:none;}
+  nav.toc a:hover{color:var(--accent-ink);}
+
+  article{min-width:0;}
+  section{margin:0 0 36px;}
+  .eyebrow{font-family:"Cascadia Mono",Consolas,"JetBrains Mono",monospace; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent-ink); font-weight:700; margin:0 0 4px;}
+  h2{font-size:22px; font-weight:650; margin:0 0 12px; text-wrap:balance;}
+  h3{font-size:16px; font-weight:650; margin:20px 0 6px;}
+  p{margin:0 0 12px; max-width:68ch;}
+  ul,ol{margin:0 0 12px; padding-left:22px; max-width:68ch;}
+  li{margin:0 0 4px;}
+  li::marker{color:var(--ink-soft);}
+  a{color:var(--accent-ink);}
+  small,.note{font-size:13px; color:var(--ink-soft);}
+
+  .decision{border:1.5px solid var(--ink); background:var(--card); border-radius:4px; overflow:hidden; margin:0 0 20px;}
+  .decision .head{background:var(--steel); color:var(--steel-ink); padding:8px 14px; font-family:"Cascadia Mono",Consolas,"JetBrains Mono",monospace; font-size:12px; font-weight:700; letter-spacing:.06em;}
+  .decision .body{padding:14px 16px;}
+  .decision ul{max-width:none;}
+  .decision li b{color:var(--accent-ink);}
+
+  .facts{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:0; border:1px solid var(--line-strong); border-right:none; border-bottom:none; border-radius:4px; overflow:hidden; background:var(--card); margin:0 0 14px;}
+  .facts div{padding:10px 12px; border-bottom:1px solid var(--line-strong); border-right:1px solid var(--line-strong);}
+  .facts dt{font-family:"Cascadia Mono",Consolas,"JetBrains Mono",monospace; font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-soft); margin:0 0 2px;}
+  .facts dd{margin:0; font-size:14px;}
+
+  .tablewrap{overflow-x:auto; border:1px solid var(--line-strong); border-radius:4px; background:var(--card); margin:0 0 14px;}
+  table{border-collapse:collapse; width:100%; font-size:13.5px;}
+  th{background:var(--thead); text-align:left; padding:7px 9px; border-bottom:1px solid var(--line); font-family:"Cascadia Mono",Consolas,"JetBrains Mono",monospace; font-size:10.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-soft); white-space:nowrap;}
+  td{padding:7px 9px; border-bottom:1px solid var(--line); vertical-align:top;}
+  tr:last-child td{border-bottom:none;}
+  td.num{text-align:right; font-family:"Cascadia Mono",Consolas,"JetBrains Mono",monospace; font-variant-numeric:tabular-nums; white-space:nowrap;}
+  td.k{font-weight:650; white-space:nowrap;}
+  .pill{display:inline-block; font-family:"Cascadia Mono",Consolas,"JetBrains Mono",monospace; font-size:10.5px; font-weight:700; letter-spacing:.04em; padding:1px 7px; border-radius:3px; border:1px solid var(--line-strong); color:var(--ink-soft); white-space:nowrap;}
+  .pill.now{background:var(--mark); color:var(--accent-ink); border-color:var(--accent);}
+  .pill.good{color:var(--good); border-color:var(--good);}
+  .pill.bad{color:var(--bad); border-color:var(--bad);}
+
+  ol.steps{list-style:none; padding:0; margin:0 0 14px; max-width:none; counter-reset:step;}
+  ol.steps li{display:grid; grid-template-columns:44px 1fr; gap:12px; padding:10px 0; border-bottom:1px solid var(--line); counter-increment:step;}
+  ol.steps li::before{content:counter(step,decimal-leading-zero); font-family:"Cascadia Mono",Consolas,"JetBrains Mono",monospace; font-weight:700; color:var(--accent-ink); font-size:14px; padding-top:2px;}
+  ol.steps li b{display:block; margin-bottom:2px;}
+
+  figure{margin:14px 0 18px; border:1px solid var(--line-strong); background:var(--card); border-radius:4px; padding:12px;}
+  figure svg{max-width:100%; height:auto; display:block; color:var(--ink);}
+  figcaption{font-size:13px; color:var(--ink-soft); margin-top:8px; max-width:80ch;}
+
+  .cols{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px; margin:0 0 14px;}
+  .cols > div{border:1px solid var(--line-strong); background:var(--card); border-radius:4px; padding:12px 14px;}
+  .cols h3{margin:0 0 6px; font-size:15px;}
+  .cols p,.cols ul{max-width:none; font-size:14px;}
+  .cols ul{padding-left:18px; margin:0;}
+  code{font-family:"Cascadia Mono",Consolas,"JetBrains Mono",monospace; font-size:13px; background:var(--field); border:1px solid var(--line); padding:0 4px; border-radius:3px;}
+  .sources{font-size:12.5px; color:var(--ink-soft); columns:2; column-gap:24px; max-width:none;}
+  .sources li{break-inside:avoid;}
+  @media (prefers-reduced-motion: reduce){ *{scroll-behavior:auto !important;} }
+
+  article h2{margin-top:36px; padding-top:18px; border-top:1px solid var(--line);}
+  article h2:first-of-type{border-top:none; margin-top:0; padding-top:0;}
+  article h3{font-size:16px; margin:22px 0 6px;}
+  article h4{font-size:14px; margin:16px 0 4px; color:var(--ink-soft); font-family:"Cascadia Mono",Consolas,"JetBrains Mono",monospace; letter-spacing:.06em; text-transform:uppercase;}
+  article p,article li{max-width:70ch;}
+  article table td,article table th{max-width:none;}
+  article blockquote{border-left:3px solid var(--accent); margin:0 0 12px; padding:6px 12px; background:var(--mark); color:var(--ink);}
+  article pre{background:var(--field); border:1px solid var(--line); padding:10px 12px; overflow-x:auto; font-size:13px;}
+  article strong{font-weight:650;}
+</style>
+</head>
+<body>
+
+<div class="page">
+<header class="mast">
+  <div><h1>KKL Takeoff System Plan</h1><p class="sub">How to reduce QS effort without losing money: an engine over four primitives, capture of what the QSs already do, and work handed to the machine only when the ledger proves it.</p></div>
+  <div class="tag">Koh Kock Leong Enterprise<br>internal · 3 Sep 2026<br>research branch: civil-ai-research</div>
+</header>
+<div class="layout">
+<nav class="toc" aria-label="Contents"><p class="eyebrow">Contents</p><ol><li><a href="#1-the-answer-on-one-page">1. The answer on one page</a></li>
+<li><a href="#2-what-the-research-established">2. What the research established</a></li>
+<li><a href="#3-evidence-from-the-spikes-and-from-real-sheets">3. Evidence from the spikes and from real sheets</a></li>
+<li><a href="#4-five-candidate-designs">4. Five candidate designs</a></li>
+<li><a href="#5-verification-what-survived-the-sceptics">5. Verification: what survived the sceptics</a></li>
+<li><a href="#6-the-recommended-system">6. The recommended system</a></li>
+<li><a href="#7-how-work-is-handed-to-the-machine">7. How work is handed to the machine</a></li>
+<li><a href="#8-what-a-qss-day-looks-like">8. What a QS's day looks like</a></li>
+<li><a href="#9-roadmap-and-what-less-qs-effort-will-mean">9. Roadmap, and what "less QS effort" will mean</a></li>
+<li><a href="#10-costs">10. Costs</a></li>
+<li><a href="#11-build-buy-or-both">11. Build, buy, or both</a></li>
+<li><a href="#12-the-first-90-days">12. The first 90 days</a></li>
+<li><a href="#13-risks">13. Risks</a></li>
+<li><a href="#14-questions-only-kkl-can-answer">14. Questions only KKL can answer</a></li>
+<li><a href="#appendix-a-claims-verified">Appendix A. Claims verified</a></li>
+<li><a href="#appendix-b-files">Appendix B. Files</a></li></ol></nav>
+<article>
+<p>Prepared for KKL (Koh Kock Leong Enterprise Pte Ltd), 3 September 2026.</p>
+<p>Companion files in this folder: <code>takeoff-research-digest.md</code> (seven research topics with sources),
+<code>takeoff-designs.json</code> (five independent designs), <code>takeoff-judgements.json</code> (three judges),
+<code>takeoff-verification.json</code> (three sceptics on fourteen claims), <code>takeoff-open-questions.md</code>
+(what only KKL can answer), and the feasibility spikes in <code>../takeoff/</code>.</p>
+<h2 id="1-the-answer-on-one-page">1. The answer on one page</h2>
+<p><strong>What to build.</strong> A calculation engine, not a drawing-reading robot. KKL's quantities are mostly
+arithmetic over four measured primitives (an area, a run length with its attributes, a count with
+its attributes, a volume from levels) plus the contract's own measurement rules and the LTA
+standard details. Build the engine that turns primitives into BQ lines, claim lines, subcontractor
+certificates and variation differentials, keyed to KKL's activity codes and to a per-contract
+rulebook that the chief QS confirms clause by clause. Feed it from the files the QSs already
+produce (their Excel dims sheets and, where they use it, their Bluebeam markups) rather than from
+a new app. Capture every takeoff the QSs do as evidence, run the engine silently beside them, and
+hand a family of lines to the machine only when a ledger shows it is safe.</p>
+<p><strong>What not to build yet.</strong> An automatic measurer for vector PDF drawings. The spikes measure a
+clean synthetic sheet exactly, but real LTA sheets carry up to 98,000 paths a page, most of them
+hatch strokes, with no layers, pen weights that change between editions and pages with no readable
+scale. That work is 30 to 40 person-weeks with no guarantee of coverage. In year two, ask every
+client and main contractor for DXF (exact quantities, no scale problem), and add an assist overlay
+that pre-highlights candidate runs for the QS to accept, gated by a two-day test on ten real sheets.</p>
+<p><strong>Who can build it.</strong> One part-time builder at 0.3 to 0.5 FTE has 8 to 13 person-weeks in six
+months. The first six months are therefore the engine, the rulebook, the workbook binder and the
+BQ binder, about 12 person-weeks, and nothing else. A second maintainer must be named by month six.</p>
+<p><strong>What it saves.</strong> Say it in capacity, not in a percentage curve nobody can measure: tenders per QS
+per month, claim packs per QS per month, days from drawings-in to quantity sheet, omissions caught
+before a bid, Superintending Officer queries per claim. The honest year-one expectation is about
+10 percent of QS takeoff time, concentrated in derived lines and BQ entry; 30 to 40 percent at
+24 months if the derived families graduate and the DXF path lands; the 55 percent some designs
+promised is an upside that needs two separate programmes to both reach autonomy.</p>
+<p><strong>What it costs.</strong> Builder time as above; run cost of US$100 to 300 a month; no new licences unless
+the QSs already annotate in Bluebeam (then Core seats at US$330 a year each); drone surveys bought
+per project only where a bulk site and the contract's payment basis justify them.</p>
+<p><strong>The first two weeks are paper, not code.</strong> Count three live BQs by line and by value; encode
+three contracts' preambles by hand with judgement flags; read five NDAs and write a confidentiality
+position per client; pull last year's quantity queries and corrections to learn KKL's real error
+rate; run a two-week time log per QS; dump the annotations from twenty marked-up PDFs. Under three
+person-weeks of QS and contracts time, and every item changes a decision below.</p>
+<h2 id="2-what-the-research-established">2. What the research established</h2>
+<p>Seven research passes (full digest in <code>takeoff-research-digest.md</code>) plus five spikes in <code>takeoff/</code>.
+The points below are the ones the design turns on.</p>
+<h3 id="21-where-the-qs-hours-go">2.1 Where the QS hours go</h3>
+<ul>
+<li>Two worlds that automate differently: drawing-based takeoff (tender, VO, final remeasure) and
+  site-record measurement (monthly SOPA progress claims, subcon certification, back-charges).</li>
+<li>Drawing takeoff reduces to four primitives: polygon area, polyline length with attributes, count
+  with attributes, volume from levels. Roughly 60 percent of KKL's BQ lines (trench excavation by
+  depth band, backfill, disposal, bedding, lean, formwork, concrete, asphalt tonnage, kerb haunch)
+  are formulas over those primitives plus LTA standard details and the contract preambles.</li>
+<li>Estimated split of QS time (to be replaced by a two-week time log): tender takeoff 35 to 45 percent,
+  monthly claims and subcon certification 25 to 30, VOs and claims 10 to 15, ordering and final
+  account 10 to 15. Industry accepts 2 to 5 percent variance on detailed bid takeoffs; a 1 percent
+  quantity error can move a bid by 8 to 12 percent.</li>
+<li>Progress claims recur monthly on about 30 contracts and are reconciliations of DR Capture rows,
+  survey, tickets and delivery orders against provisional BQ items, not drawing measurements.</li>
+</ul>
+<h3 id="22-what-the-drawings-actually-contain">2.2 What the drawings actually contain</h3>
+<ul>
+<li>Four input routes in descending value: DXF/DWG (layers, blocks and dimensions give quantities
+  directly, no scale needed), vector PDF (exact geometry once scale and class mapping are known),
+  scans at 300 dpi or better (about 2 percent), scans below that (not fit for money-bearing use).</li>
+<li>Real LTA standard-detail PDFs tested with the spike code: no layers, black pen weights only
+  (0.36, 0.72, 1.08, 1.44, 2.16 pt), 400 to 15,000 paths per A3 sheet, several scales on one sheet,
+  some rotated pages with text drawn as outlines and zero extractable words. A scale heuristic from
+  dimension strings recovered the declared scale on two of four sheets. Scale must therefore be a
+  per-viewport object confirmed by the QS, and classification must key on pen weight and context.</li>
+<li>PyMuPDF extracts 120,000 segments in about 2.4 s and exposes per-path colour, width, dash and
+  optional-content layer; pdf.js gives the same data in the browser. ezdxf reads DXF with block counts,
+  polyline lengths, hatch areas and true dimension values; DWG needs LibreDWG (GPL) or the ODA
+  converter (non-commercial terms to check). Civil 3D objects survive only as proxy graphics; surfaces
+  should be requested as LandXML.</li>
+<li>IFC will stay rare for KKL's scope: CORENET X and IFC-SG are building-permit regimes by GFA; LTA
+  street works are still A1/A3 drawings; tenders on GeBIZ are PDF and ZIP with no evidence of DWG
+  issue. DWG comes only on request from the client or the main contractor's CDE.</li>
+</ul>
+<h3 id="23-what-ai-can-and-cannot-do-on-drawings-today">2.3 What AI can and cannot do on drawings today</h3>
+<ul>
+<li>Vision-language models read title blocks, legends, notes and schedules at 0.9 to 0.95 accuracy but
+  count symbols poorly: the best model scores 0.51 exact-match on floor-plan counts (AECV-Bench, 2026);
+  dimension reading on dense sheets ranges from 80 percent (Gemini 2.5 Pro) to 40 percent (Claude Opus 4).
+  Zero-shot extraction from drawings shows recall of 25 to 37 percent with heavy hallucination; a small
+  fine-tuned detector beats frontier models by 30 to 50 points.</li>
+<li>Fine-tuned YOLO detectors reach mAP50 of about 82 percent on scanned symbol counting with roughly
+  2,000 labelled instances; that is the practical route for scans.</li>
+<li>Every vendor confirms the hybrid: Kreo re-fits AI outlines to the drawing's own lines; Beam AI and
+  civils.ai put engineers between the model and the customer; AGTEK says fully automatic earthworks
+  takeoff "is currently not realistic". Nobody publishes audited accuracy on civil drawings.</li>
+<li>Rule that follows: a model's number is never a quantity. Models classify, read and cross-check;
+  geometry code measures; a QS confirms.</li>
+</ul>
+<h3 id="24-capturing-the-daily-work-without-changing-it">2.4 Capturing the daily work without changing it</h3>
+<ul>
+<li>Measurements made in Bluebeam Revu, Acrobat, Foxit or PDF-XChange are stored inside the PDF as
+  standard annotations with an ISO 32000 scale dictionary and the item subject. A nightly job over the
+  tender and claims folders on SharePoint can log sheet, page, scale, geometry, item, author and value
+  for every takeoff a QS does. The spike reproduces this exactly. Bluebeam's own CSV export lacks
+  geometry, and its API exposes status, not vertices.</li>
+<li>Bluebeam Core or Complete (US$330 to 440 per user per year) is enough; Basics lacks count and volume
+  tools. Kreo Pro or Enterprise is the only AI takeoff SaaS returning measurements by API; Togal and
+  STACK return quantities only. No surveyed tool ships a Singapore civil method of measurement.</li>
+</ul>
+<h3 id="25-earthworks-volumes-and-progress-measurement">2.5 Earthworks volumes and progress measurement</h3>
+<ul>
+<li>Volume is a surface-difference problem: average end area over-estimates by 5 to 10 percent; TIN or
+  DTM differencing is the accurate method when surfaces are good. LandXML, DXF 3D faces and drone LAS
+  parse with open libraries (lxml, ezdxf, PDAL, scipy Delaunay, GDAL).</li>
+<li>RTK drone photogrammetry reaches 1 to 3 cm horizontal and 2 to 5 cm vertical; Singapore vendors
+  charge roughly S$1,500 to 10,000 per RTK survey by area with 2 to 3 day turnaround; platforms cost
+  about US$4,000 a year; CAAS permits apply. A fortnightly surface agreed with the main contractor can
+  replace the manual monthly progress takeoff for bulk excavation and fill.</li>
+<li>Trench and pit excavation is a formula over the plan primitives and the long-section levels
+  (the calc spike). LTA M&amp;W defines the material classes that drive disposal; staging grounds charge
+  by tonne (Good Earth about S$1.20, Soft Clay about S$5.00, 2022 schedule).</li>
+<li>Truck counts are a cross-check, not a measurement: loads times capacity divided by a bulking factor
+  against surveyed bank volume; the residual calibrates KKL's own factors.</li>
+</ul>
+<h3 id="26-singapore-contract-realities">2.6 Singapore contract realities</h3>
+<ul>
+<li>No national method of measurement covers civil works; CEMS and SMM2 are building-only. Rules come
+  from each contract's General and Particular Preambles, which PSSCOC Module A makes binding; HDB's SOR
+  is reported to follow CESMM. Public-sector civil BQ items are regular in shape: m3 by depth band,
+  m by size and depth stage, number by depth, m2 at stated thickness, m3 disposal.</li>
+<li>PSSCOC makes BQ quantities estimates: differences are variations at BQ or analogous rates, and
+  provisional quantities are remeasured at completion, so the same item mapping serves tender, claim
+  and VO. Client drawings fall under the Official Secrets Act and LTA NDAs; geometry extraction should
+  run locally and only non-sensitive text should go to a cloud model unless the client agrees.</li>
+</ul>
+<h3 id="27-how-to-hand-work-to-a-machine-safely">2.7 How to hand work to a machine safely</h3>
+<ul>
+<li>Every domain that automated judgment work converged on the same stages: shadow mode, assist with
+  full verification, confidence-gated auto-accept with a random audit, autonomous with audit. Document
+  AI ships this as product (Rossum auto-exports above 0.975; AWS adds random sampling to audit the
+  model). Medical coding reports automation rate and audited accuracy separately; 95 percent audited
+  accuracy is the benchmark; 15 to 20 percent of items staying with humans is normal.</li>
+<li>Independent tests of an AI takeoff tool found counts near perfect and areas systematically
+  under-measured, so graduation must be per item class and per drawing source, not per tool.</li>
+<li>Automation bias is large (about 45 percent of errors under AI assistance in one clinical trial) and
+  explanations do not fix it; making the reviewer commit before seeing the AI's answer does. Deskilling
+  is measurable after months of AI use, so reviewers need unassisted reps and blind audits.</li>
+<li>Sign-off stays with a named QS: the contractor carries the pricing and claim risk.</li>
+</ul>
+<h2 id="3-evidence-from-the-spikes-and-from-real-sheets">3. Evidence from the spikes and from real sheets</h2>
+<p>The <code>takeoff/</code> folder holds a synthetic 1:500 drainage plan with known quantities and five
+measuring routes against it (full results in <code>takeoff/README.md</code>).</p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Route</th>
+<th>Result on the synthetic sheet</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Vector PDF, PyMuPDF and pdf.js</td>
+<td>Every length, count and area exact; scale read from the title block; legend learned automatically; legend and title-block decoys excluded; scale bar cross-check 100.0 m</td>
+</tr>
+<tr>
+<td>CAD, DXF via ezdxf</td>
+<td>Every quantity exact from layers, block inserts and hatches; no scale needed because model space is in metres</td>
+</tr>
+<tr>
+<td>Simulated scan, OpenCV</td>
+<td>150 dpi: 7 percent length error and a false sump; 300 dpi: within 2 percent and correct counts</td>
+</tr>
+<tr>
+<td>Calculation layer</td>
+<td>4 lengths, 4 sizes, 8 level pairs and 1 count produce about 20 BQ lines in KKL activity codes</td>
+</tr>
+<tr>
+<td>Markup capture</td>
+<td>Three Revu-style measurement annotations read back exactly with subject, author, geometry, scale and value</td>
+</tr>
+</tbody>
+</table></div>
+<p>Two first-hand probes of real LTA Standard Details of Road Elements sheets (public PDFs) set the
+limits of that evidence:</p>
+<ul>
+<li>400 to 15,000 paths per A3 page in the first probe, and 26,000 to 98,000 in the kerb chapter,
+  of which up to 96,400 are green 0.36 pt hatch strokes. No PDF layers on any file. Linework is
+  black, separated only by pen weight (0.36, 0.72, 1.08, 1.44, 2.16 pt).</li>
+<li>The March 2025 re-plot of the same kerb sheets changed pen weights from 0.36 and 0.72 to 0.48
+  and 1.08 pt, so a classifier tuned on one edition breaks on the next.</li>
+<li>Several scales on one page (1:20 with 1:30; 1:1000 with 1:50), but the clip hierarchy gives one
+  box per page, so viewports cannot be reconstructed from clips alone. Some rotated pages have text
+  drawn as outlines and no extractable words, hence no readable scale.</li>
+<li>A crude scale vote from dimension strings recovered the declared scale on the one detail page with
+  real text and produced a confident wrong answer on the outline-text pages; ramp gradients such as
+  1:12 and a 2009 date read as scales to a naive regex.</li>
+</ul>
+<p>Consequences carried into the design: scale is a per-viewport object confirmed by the QS with a
+printed-dimension grader as the export block; the automatic vector measurer is an assist, not a
+quantity producer, until a real-sheet corpus says otherwise; DXF is the only route to automatic
+quantities in the plan's horizon.</p>
+<h2 id="4-five-candidate-designs">4. Five candidate designs</h2>
+<p>Five designers worked independently from the same digest, each from a different starting angle,
+and produced complete designs (full text in <code>takeoff-designs.json</code>). Three judges then scored them
+(<code>takeoff-judgements.json</code>). The headline numbers below are the designers' own estimates.</p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Design</th>
+<th>Angle</th>
+<th>Build (person-weeks)</th>
+<th>Run (US$/month)</th>
+<th>QS effort at 6 / 12 / 24 months (% of today)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Rulebook</td>
+<td>Calculation-first</td>
+<td>36</td>
+<td>150</td>
+<td>90 / 73 / 55</td>
+</tr>
+<tr>
+<td>Shadow Ledger</td>
+<td>Capture-first</td>
+<td>37</td>
+<td>450</td>
+<td>90 / 75 / 55</td>
+</tr>
+<tr>
+<td>TrueLine</td>
+<td>Vector-first engine</td>
+<td>42</td>
+<td>250</td>
+<td>92 / 76 / 62</td>
+</tr>
+<tr>
+<td>KKL Takeoff Overlay</td>
+<td>In-house civils.ai (model reads, code measures)</td>
+<td>76</td>
+<td>600</td>
+<td>88 / 74 / 58</td>
+</tr>
+<tr>
+<td>Surface Ledger</td>
+<td>Survey-first for progress claims</td>
+<td>42</td>
+<td>7,500 incl. drone surveys</td>
+<td>95 / 84 / 65</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li><strong>Rulebook.</strong> Measure or type four primitives once; a versioned, unit-tested rules engine keyed to
+  KKL activity codes and a per-contract rulebook (extracted from the BQ preambles and confirmed by
+  the chief QS) generates every derived BQ line, claim roll-up, subcon certificate and VO
+  differential. Derived lines need no statistical gate, only confirmed rules and golden tests, so
+  whole families (trench, chamber, RC section, pavement, kerb) graduate together. Primitives are
+  automated last, behind the same interface.</li>
+<li><strong>Shadow Ledger.</strong> Ship capture before any engine: a nightly job reads the measurement markups in the
+  PDFs QSs already save, their Excel workbooks and DR Capture rows into a ledger. The engine runs
+  blind against every captured sheet from week six; disagreements are the product for the first six
+  months (a second pair of eyes on bids); every correction is a label and a regression case.</li>
+<li><strong>TrueLine.</strong> One Sheet Geometry Model per page (viewports with confirmed scale, pen-weight classes,
+  chained paths, text with direction) fed by PyMuPDF, pdf.js and ezdxf; a classifier trained from QS
+  corrections decides what a path is, code decides how much, a rule pack calculates the rest, and a
+  QS confirms on an overlay. Scans are traced by the QS with snapping and logged.</li>
+<li><strong>KKL Takeoff Overlay.</strong> Grow the document-AI workbench into a takeoff product: a vision model reads
+  legends, schedules, title blocks and BQ lines but never emits a quantity; geometry code measures;
+  a small detector counts symbols on scans; the QS works on an overlay canvas with confidence chips
+  and a checked-by stamp; a confidentiality gateway decides per project what may leave the laptop.</li>
+<li><strong>Surface Ledger.</strong> Attack the recurring work first: monthly claims on about 30 contracts as a
+  reconciliation of DR Capture rows, tickets and fortnightly drone or total-station surfaces against
+  BQ items, with a joint-measurement pack for the main contractor. Tender takeoff comes second and
+  reuses the same item mapping.</li>
+</ul>
+<p>What they agree on, which is the strongest signal from the panel:</p>
+<ol>
+<li>A model's number is never a quantity. Geometry code measures; models classify, read and cross-check.</li>
+<li>A per-contract rulebook and a KKL item library are the backbone, because no Singapore civil method
+   of measurement exists and PSSCOC binds the preambles.</li>
+<li>The calculation layer over four primitives is where most lines come from, and it graduates by
+   confirmed rules and tests rather than by accuracy statistics.</li>
+<li>Graduation is per item class and per drawing source through shadow, assist, confidence-gated and
+   autonomous-with-audit stages, with the thresholds from the research digest.</li>
+<li>DR Capture rows are the claim-side source; capturing existing markups is the cheapest label source.</li>
+<li>Scale is per viewport and confirmed by a QS; scans below 300 dpi are not fit for money.</li>
+</ol>
+<p>Where they differ is sequencing: which stream delivers the first saved minutes, and how much
+product surface to build before the ledger proves anything.</p>
+<h3 id="the-judges-scores">The judges' scores</h3>
+<p>Three judges scored every design on six criteria out of 10 (effort reduction, money safety,
+feasibility, time to value, cost, fit with KKL), 60 per judge.</p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Design</th>
+<th>Chief QS</th>
+<th>Builder</th>
+<th>MD and contracts</th>
+<th>Total of 180</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Rulebook</td>
+<td>49</td>
+<td>48</td>
+<td>48</td>
+<td>145</td>
+</tr>
+<tr>
+<td>Shadow Ledger</td>
+<td>43</td>
+<td>41</td>
+<td>39</td>
+<td>123</td>
+</tr>
+<tr>
+<td>TrueLine</td>
+<td>39</td>
+<td>39</td>
+<td>41</td>
+<td>119</td>
+</tr>
+<tr>
+<td>Surface Ledger</td>
+<td>33</td>
+<td>32</td>
+<td>37</td>
+<td>102</td>
+</tr>
+<tr>
+<td>KKL Takeoff Overlay</td>
+<td>35</td>
+<td>34</td>
+<td>32</td>
+<td>101</td>
+</tr>
+</tbody>
+</table></div>
+<p>All three recommended the same merge: the Rulebook as the spine; Shadow Ledger's capture and
+evidence layer, including engine proposals written back into the PDF as annotations so a QS reviews
+in the tool they already use; TrueLine's real-sheet engineering, provenance per quantity and chainage
+ledger, with an honest budget; Surface Ledger's two-source reconciliation for claim lines and its
+per-item "paid on" and "measure rule" fields, without its survey-first economics; the Overlay's cost
+readout per line, checked-by stamp, confidentiality gateway and a three-month civils.ai trial on
+non-confidential sheets as an external benchmark.</p>
+<p>Fatal flaws they named: the Overlay's 64 to 76 person-week scope and server components; Surface
+Ledger's US$7,500 a month run cost against a year-one saving it put at about 5 percent; Shadow
+Ledger's unverified premise that QSs annotate PDFs; TrueLine specifying every module twice.</p>
+<h2 id="5-verification-what-survived-the-sceptics">5. Verification: what survived the sceptics</h2>
+<p>Three sceptics (technical, commercial and legal, practitioner and adoption) each tried to refute
+fourteen claims the merged design rests on. Full verdicts with evidence and tests are in
+<code>takeoff-verification.json</code>. None of the fourteen held cleanly; three were refuted by at least one
+lens. The table is in Appendix A. Seven changes to the design follow from it.</p>
+<ol>
+<li><strong>Paper before code.</strong> The first two weeks settle the share of formula lines, the shape of real
+   preambles, the confidentiality position, KKL's current error rate and the QS time split. Under
+   three person-weeks, and each result changes scope.</li>
+<li><strong>No separate capture app.</strong> The engine consumes the QS's existing Excel dims sheets and, where
+   present, Bluebeam markups, and writes engine-versus-QS columns and BQ codes back. Typed
+   primitive tables beside Excel and Bluebeam are double entry, and experienced QSs already hold
+   workbooks that do the depth-band arithmetic. The saving is in binding, reconciliation and
+   omission-catching, not in retyping.</li>
+<li><strong>Rulebook with judgement flags and an exceptions list.</strong> Real civil preambles carry clauses that
+   are not parameters (rock measured separately, work adjacent to services, below water table,
+   breaking out existing, working space "where necessary"). Each contract's rulebook is parameters
+   plus per-line judgement flags the QS sets, plus a cited exceptions list; an un-encodable clause
+   leaves its lines in assist rather than blocking the family.</li>
+<li><strong>Statistical gates, not "300 clean lines".</strong> Zero errors in 300 lines only bounds the error rate
+   at about 1 percent with 95 percent confidence; 600 blind-verified lines bound it at 0.5 percent.
+   Errors on derived lines come from inputs and rule interpretation and are correlated within a
+   tender, so the unit of evidence is the tender: at least 8 to 10 tenders per family with no
+   money-bearing error, plus 600 blind-verified lines, a value cap on auto-accepted lines, and an
+   audit that never falls below 5 percent for derived lines. Auto-accept the arithmetic only; every
+   input primitive keeps its cross-checks and a human confirmation.</li>
+<li><strong>Fix the daily-report schema before promising claims.</strong> DR Capture's depth bands (1.5, 3, 6 m)
+   do not align with BQ bands (2, 4, 6 m or 0.25 m stages); pipe size sits in free text; kerb type,
+   layer thickness and concrete grade are not fields; chainage is captured only on drainage
+   structure rows. Add BQ-item keys first, treat DR rows as progress evidence attached to drawing
+   quantities rather than as the quantity, and run claims as a two-contract evidence-binder pilot.</li>
+<li><strong>No-cloud by default for client documents.</strong> The Official Secrets Act reaches anyone who
+   obtained a document under a government contract; LTA tenders sit behind an NDA and a password;
+   main-contractor subcontracts add flow-downs; zero-retention API terms are negotiated, not default.
+   Geometry never leaves KKL in any case. Until the contracts manager has read the NDAs and written
+   a position per client, rulebooks are typed from per-client templates by the chief QS, and cloud
+   text extraction runs only on KKL's own documents.</li>
+<li><strong>Gate the automatic measurer behind real sheets.</strong> Two days running the existing extractor
+   untuned on ten real consultant plan sheets decides whether the assist overlay is funded; if
+   untuned precision is under half, the money goes to a DXF request letter and the DXF fast path.</li>
+</ol>
+<h2 id="6-the-recommended-system">6. The recommended system</h2>
+<h3 id="61-principles">6.1 Principles</h3>
+<ol>
+<li>A model's number is never a quantity. Geometry code and the rules engine measure and calculate;
+   models classify, read and cross-check; a named QS signs.</li>
+<li>Primitives are measured once; everything derived is code with a version, tests and a citation to
+   the rule that produced it.</li>
+<li>The QS's existing files are the input surface. The engine writes back into them.</li>
+<li>Every takeoff the QSs do is captured as evidence from week two; the engine runs in shadow against
+   it before anyone relies on it.</li>
+<li>Families graduate on evidence per contract type and drawing source, with structural and
+   statistical gates, and fall back on any money-bearing error.</li>
+<li>Client documents stay local by default; every project carries a confidentiality tier and an
+   egress log.</li>
+</ol>
+<h3 id="62-components-and-budget">6.2 Components and budget</h3>
+<p>Person-weeks are builder time, corrected by the judges and sceptics rather than the designers'
+own estimates. Year one is deliberately the spine only.</p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>Component</th>
+<th>What it does</th>
+<th>Tech</th>
+<th>Origin</th>
+<th>Person-weeks</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Discovery pack</td>
+<td>BQ line census by count and value; preamble encoding with judgement flags for three contracts; NDA reading and per-client position; last year's quantity queries as the error baseline; two-week QS time log; annotation dump of twenty marked-up PDFs</td>
+<td>Paper, Excel, <code>extract_markups.py</code></td>
+<td>Sceptics</td>
+<td>0 (about 3 person-weeks of QS and contracts time)</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Item library and rulebook schema</td>
+<td>KKL's own civil item taxonomy: trade, code, unit, band set, attributes, inclusions, DR join keys. Rulebook per contract: parameters with value, source page and confirmer; judgement flags per line; cited exceptions list</td>
+<td>JSON with schema, versioned in git, edited through a table page</td>
+<td>Rulebook, corrected</td>
+<td>1.5</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Rules engine</td>
+<td>Pure functions from primitives and rulebook to BQ lines for the trench, chamber, RC-section, pavement and kerb families; golden regression tests including the synthetic truth; continuous integration blocks any golden change</td>
+<td>Plain ES module, <code>node --test</code>; port of <code>calc_trench.py</code></td>
+<td>Rulebook</td>
+<td>3</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Workbook binder</td>
+<td>Reads the QS's Excel dims and trench workbooks, runs the engine, writes engine-versus-QS columns, BQ codes and provenance back; flags differences with reason codes</td>
+<td>SheetJS in the browser or openpyxl on the office PC</td>
+<td>Sceptics, Shadow Ledger</td>
+<td>2.5</td>
+</tr>
+<tr>
+<td>5</td>
+<td>BQ binder</td>
+<td>GeBIZ price-schedule PDF to structured BQ lines with page references; classification into the item library by rules first, model only where the tier allows; QS confirms unit and band</td>
+<td>PyMuPDF tables; existing workbench Extract preset on cleared documents</td>
+<td>Rulebook, Overlay</td>
+<td>2</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Markup harvester</td>
+<td>Nightly job over the tender and claims folders: sheet fingerprint, every measurement annotation with page-level viewport scale, value text, custom columns and subject mapped to activity codes. Built only if the discovery pack shows QSs annotate</td>
+<td>PyMuPDF and pypdf on the office PC; Bluebeam tool chest keyed to KKL codes</td>
+<td>Shadow Ledger</td>
+<td>2 (conditional)</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Ledger and scorecard</td>
+<td>One row per line: source, engine value, QS final value, checks, reviewer, minutes from file timestamps; weekly disagreements with reason codes; per-family stage status; audit sampling and seeded errors</td>
+<td>CSV on SharePoint; a single-file status page in DR Verify style</td>
+<td>Shadow Ledger, TrueLine</td>
+<td>2</td>
+</tr>
+<tr>
+<td>8</td>
+<td>VO differential</td>
+<td>Two primitive sets (old and new revision) through the same rulebook; omissions and additions listed separately; pricing basis column in the BQ rate, pro-rata, star rate, daywork order</td>
+<td>Engine diff mode; <code>.xlsx</code> out</td>
+<td>Rulebook</td>
+<td>1</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Claims evidence binder (pilot, two contracts)</td>
+<td>Attaches DR rows, delivery notes, weighbridge and staging-ground tickets to the QS's own claim lines; flags gaps; two-source reconciliation; back-to-back subcon certificate; audit appendix for SOP Act claims. Requires DR Capture BQ-item keys first</td>
+<td>Single-file page over DR CSVs; workbench Extract for KKL's own tickets</td>
+<td>Surface Ledger, corrected</td>
+<td>2.5</td>
+</tr>
+<tr>
+<td></td>
+<td><strong>Year one total</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td><strong>about 14.5, plus 2 conditional</strong></td>
+</tr>
+<tr>
+<td>10</td>
+<td>DXF fast path and request letter</td>
+<td>ezdxf importer mapping layers and blocks to codes per originator; a standard request for DXF, LandXML and TrueType-font PDFs in every tender and subcontract letter</td>
+<td>ezdxf; LibreDWG for DWG</td>
+<td>TrueLine</td>
+<td>2</td>
+</tr>
+<tr>
+<td>11</td>
+<td>Real-sheet corpus and gate</td>
+<td>Thirty real KKL sheets with QS-confirmed quantities; untuned run of the existing extractor; report precision by pen weight, share of pages with readable scale, viewports per page</td>
+<td><code>extract_pymupdf.py</code></td>
+<td>Sceptics</td>
+<td>1</td>
+</tr>
+<tr>
+<td>12</td>
+<td>Assist overlay (only if the gate passes)</td>
+<td>Pre-highlights candidate runs and symbols on vector PDF; two-click viewport calibration with a printed-dimension grader; snap-to-vector tracing; engine proposals written back as PDF annotations; every trace logged as a label</td>
+<td>pdf.js 4.10.38 in the browser; PyMuPDF batch on the office PC</td>
+<td>TrueLine, Shadow Ledger</td>
+<td>10 to 14</td>
+</tr>
+<tr>
+<td>13</td>
+<td>Surface volume module (per project)</td>
+<td>Baseline, design and periodic as-built surfaces to TIN difference per zone and depth band; used only where a bulk site and the contract's payment basis justify a survey</td>
+<td>lxml, ezdxf, PDAL, scipy, numpy</td>
+<td>Surface Ledger</td>
+<td>3</td>
+</tr>
+<tr>
+<td></td>
+<td><strong>Year two total</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td><strong>16 to 20</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>Scans stay a QS-traced route with logging; symbol detectors and OCR are year three items, or
+bought, unless the ledger shows scans are a large share of money-bearing sheets.</p>
+<h3 id="63-how-data-moves">6.3 How data moves</h3>
+<p>Tender documents arrive from GeBIZ as PDF and ZIP into the project's SharePoint folder, tagged with
+a confidentiality tier at intake. The QS measures as today, in Bluebeam or on the sheet, and enters
+primitives in their own workbook. The workbook binder reads that file, runs the engine with the
+contract's rulebook, and writes back a second block of columns: engine line, rule applied, source
+page, difference, reason. The BQ binder pre-fills the quantity sheet from the price schedule and
+the item library. Every night the office PC harvests markups (if any), workbook figures and DR rows
+into the ledger. The scorecard shows the chief QS the week's disagreements; adjudications become
+labels and regression cases. Claim packs are assembled from the QS's lines with evidence attached,
+never generated from DR rows alone. Nothing about a client's drawing leaves KKL; the only outbound
+call is text from cleared documents to a cloud model, logged per project.</p>
+<p>Repository layout: <code>takeoff/library/items.json</code>, <code>takeoff/rules/&lt;contract&gt;.json</code> with an
+<code>exceptions</code> list, <code>takeoff/engine.js</code> with <code>test/golden/</code>, <code>takeoff/binder.html</code>,
+<code>takeoff/bq-binder.html</code>, <code>takeoff/harvest.py</code>, <code>takeoff/ledger/status.html</code>, <code>takeoff/claims.html</code>;
+ledger CSVs and regression sheets on SharePoint, never in the public repository.</p>
+<h3 id="64-confidentiality-tiers">6.4 Confidentiality tiers</h3>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Documents</th>
+<th>Rule</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T0</td>
+<td>KKL's own: tickets, delivery orders, workbooks, daily reports, internal templates</td>
+<td>Cloud text calls allowed under zero-retention terms; geometry local</td>
+</tr>
+<tr>
+<td>T1</td>
+<td>Client tender and contract documents without an NDA or Official Secrets marking, once the contracts manager has written a position for that client</td>
+<td>Text of preambles, BQ lines and schedules may go to a cloud model on a Singapore-resident or zero-retention route; drawings never</td>
+</tr>
+<tr>
+<td>T2</td>
+<td>NDA-gated tenders, rail and depot work, main-contractor subcontracts with flow-downs</td>
+<td>Nothing leaves KKL; rulebook typed from the client template; local rules for BQ classification</td>
+</tr>
+</tbody>
+</table></div>
+<p>Every project defaults to T2 until the contracts manager changes it in the register.</p>
+<h2 id="7-how-work-is-handed-to-the-machine">7. How work is handed to the machine</h2>
+<p>The stages are the same for every family and every drawing source. A family (for example the
+trench family on LTA-style contracts, or DR-SUMP counts from DXF) moves up one stage only when the
+ledger shows the gate is met, and moves down on any trigger. Thresholds start from the research
+digest and were tightened by the sceptics; KKL's own baselines from the discovery pack may move them.</p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Stage</th>
+<th>What happens</th>
+<th>Gate to the next stage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0 Instrument</td>
+<td>Discovery pack; minutes per family derived from workbook and file timestamps, not from buttons; two QSs blind-measure five sheets and the chief QS adjudicates, scored raw and after interpretation differences are reconciled; money-bearing error defined in writing</td>
+<td>Baseline published; error definition signed</td>
+</tr>
+<tr>
+<td>1 Shadow</td>
+<td>The engine runs against every workbook and marked-up sheet the QSs produce; the QS commits first; differences are logged with reason codes and adjudicated weekly</td>
+<td>For derived lines: rulebook confirmed with exceptions listed, golden tests green, three hand-worked runs per contract reproduced. For measured primitives: at least 200 items across 5 projects and 2 sources, median error at most 1 percent (vector or DXF) or 3 percent (scan), 95th percentile at most 5 percent, counts exact on 98 percent, zero confident-wrong</td>
+</tr>
+<tr>
+<td>2 Assist</td>
+<td>The engine's lines appear beside the QS's own; every line is verified; on a 20 percent sample the QS enters an independent check before the engine's value is shown; every edit is a label and a regression case</td>
+<td>At least 8 to 10 tenders per family with no money-bearing error; at least 600 blind-verified lines; accepted without edit at least 95 percent; escaped-error rate at or below KKL's measured baseline</td>
+</tr>
+<tr>
+<td>3 Confidence-gated</td>
+<td>Derived lines whose inputs passed their cross-checks and whose rules carry no judgement flag are accepted without a second review; everything else queues for review; a 10 percent random audit falls to 5 percent and never lower for derived lines; lines making up the top 80 percent of bid or claim value are always human-checked; a value cap applies per line</td>
+<td>Twelve months of clean audits per family</td>
+</tr>
+<tr>
+<td>4 Autonomous with audit</td>
+<td>As stage 3 with a permanent 5 percent audit, a monthly drift review and a quarterly blind re-baseline; a named QS still signs</td>
+<td>Not applicable</td>
+</tr>
+</tbody>
+</table></div>
+<p>Measured primitives from vector PDF are never confidence-gated on a score. They reach stage 3 only
+structurally: DXF sources, or viewports whose scale and legend the QS confirmed by click on that
+sheet, with sheet-level audit sampling. Anything from a scan below 300 dpi, any judgement item
+(soil-class split, working space, bulking, existing-condition demolition) and any line whose value
+depends on a judgement flag stays in assist.</p>
+<p><strong>Money-bearing error.</strong> A difference that changes a bid line, claim, VO or subcontractor payment by
+more than the larger of 2 percent of the item value or a fixed sum, proposed at S$2,000 for claims
+and payments and S$10,000 for tender line items, to be set against the error baseline from the
+discovery pack. Any such error in the auto-accepted stream returns the family to stage 2 until
+600 clean lines have passed.</p>
+<p><strong>Rollback and drift.</strong> Any money-bearing error; audit error rate above twice the graduation baseline
+over the last 100 items; a new drawing source or client until 50 clean items; any change to code,
+rulebook, model or library, which re-runs the regression corpus; a monthly check on edit rates that
+acts only when it coincides with an audit accuracy drop.</p>
+<p><strong>Keeping reviewers sharp.</strong> Blind-then-reveal on a sample; seeded known-error lines with each
+reviewer's catch rate tracked (target 90 percent); one fully manual sheet per QS per week scored
+against the engine; juniors work six months in assist mode with reveal disabled; reviewers are
+measured on catch rate, not throughput.</p>
+<p><strong>Ownership.</strong> The chief QS owns the item library, the rulebooks, the graduation decisions and the
+incident log, at one day a week for the first three months and half a day thereafter, protected by
+the managing director. The builder owns the engine and the regression corpus, with a second
+maintainer named by month six. The contracts manager owns the confidentiality register and the
+error definition. A named QS signs every bid, claim and certificate because under PSSCOC the
+quantities are the contractor's risk. Notify the professional-indemnity insurer in writing of the
+assisted process. Report automation rate and audited accuracy separately, per family, every month.</p>
+<h2 id="8-what-a-qss-day-looks-like">8. What a QS's day looks like</h2>
+<p><strong>Months 1 to 3.</strong> Nothing changes at the desk. The QS measures and fills the same workbook. Once a
+week the chief QS looks at a page of disagreements between the engine and the team's figures and
+decides which were right. A few omissions and double counts surface before bids go out. The BQ
+binder starts pre-filling the quantity sheet from the price schedule.</p>
+<p><strong>Months 3 to 6.</strong> The workbook comes back from the binder with the engine's lines beside the QS's
+own: same run, same levels, the trench family's twenty lines already computed and cited to the
+preamble clause. The QS checks, corrects, and stops building those lines by hand. Variation orders
+become a diff run. Claims on two pilot contracts arrive as the QS's lines with evidence attached.</p>
+<p><strong>Months 6 to 12.</strong> Derived families whose inputs pass their cross-checks are accepted without a
+second look; the QS's time goes to primitives, judgement items and the review queue. New contracts
+start with a rulebook drafted from the client template and confirmed clause by clause in an hour.</p>
+<p><strong>Year two.</strong> DXF arrives on more contracts and counts and lengths come out exact. On vector PDFs
+the assist overlay pre-highlights runs and the QS accepts them by lasso after calibrating each
+viewport with one printed dimension. The QS measures less and reviews more, and the ledger says
+how much.</p>
+<h2 id="9-roadmap-and-what-less-qs-effort-will-mean">9. Roadmap, and what "less QS effort" will mean</h2>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Phase</th>
+<th>When</th>
+<th>Goal</th>
+<th>Stop or go</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0 Discovery</td>
+<td>Weeks 0 to 2</td>
+<td>Settle scope on paper: formula share, preamble shape, confidentiality position, error baseline, time split, annotation practice</td>
+<td>Go if derived lines are a large minority of value in at least two families and the contracts position allows at least T0 processing</td>
+</tr>
+<tr>
+<td>1 Spine</td>
+<td>Months 1 to 6</td>
+<td>Item library, rulebooks for three contracts, engine with golden tests, workbook binder, BQ binder, ledger, VO differential; harvester if applicable</td>
+<td>Month 3: engine in shadow on two live tenders. Month 6: two families in assist, BQ binder on every new tender, first capacity figures</td>
+</tr>
+<tr>
+<td>2 Evidence and claims</td>
+<td>Months 6 to 12</td>
+<td>Derived families to stage 3 where gates pass; DR Capture BQ-item keys; claims evidence binder on two contracts; DXF request letter in every tender</td>
+<td>Month 9: first family confidence-gated. Month 12: audit results, cash conversion review</td>
+</tr>
+<tr>
+<td>3 Measurement assist</td>
+<td>Months 12 to 24</td>
+<td>DXF fast path; real-sheet corpus and gate; assist overlay if funded; surface module where justified; second maintainer active</td>
+<td>Month 14: corpus gate decides the overlay. Month 18: DXF-sourced counts and lengths at stage 3 where gates pass</td>
+</tr>
+</tbody>
+</table></div>
+<p>Capacity metrics, reported monthly from file timestamps and the ledger rather than from timers the
+QSs press: tenders per QS per month; claim packs per QS per month; days from drawings-in to
+quantity sheet; omissions and double counts caught before bid; Superintending Officer and
+main-contractor queries per pack; minutes per family per sheet; automation rate and audited
+accuracy per family. State up front how saved capacity converts to cash: a deferred hire, or more
+tenders bid per month.</p>
+<p>Honest expectations, to be replaced by measured figures: about 10 percent of QS takeoff time in
+year one, concentrated in derived lines and BQ entry; 30 to 40 percent at 24 months if derived
+families graduate and the DXF path lands; 55 percent only if both the drawing and the claims
+programmes reach autonomy, which no evidence yet supports. Governance itself costs each QS about
+two hours a week and one manual sheet, so month six may show no net saving at all.</p>
+<h2 id="10-costs">10. Costs</h2>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Year one</th>
+<th>Year two</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Builder time</td>
+<td>About 14.5 person-weeks, plus 2 if the harvester applies; fits 0.4 FTE with about 5 person-weeks left for support of the other apps</td>
+<td>16 to 20 person-weeks if the assist overlay is funded; 6 to 8 if it is deferred</td>
+</tr>
+<tr>
+<td>Chief QS time</td>
+<td>One day a week for three months, then half a day</td>
+<td>Half a day a week</td>
+</tr>
+<tr>
+<td>Each QS</td>
+<td>About two hours a week of corrections and audits plus one manual sheet</td>
+<td>Same</td>
+</tr>
+<tr>
+<td>Contracts manager</td>
+<td>Two days in the discovery pack; an hour per new contract</td>
+<td>An hour per new contract</td>
+</tr>
+<tr>
+<td>Run cost</td>
+<td>US$100 to 300 a month of model usage on KKL's own documents; nothing for geometry</td>
+<td>Same, plus DXF conversion if DWG needs it</td>
+</tr>
+<tr>
+<td>Licences</td>
+<td>None, unless QSs annotate in Bluebeam: Core at US$330 per user per year</td>
+<td>Same</td>
+</tr>
+<tr>
+<td>Services</td>
+<td>civils.ai Starter at US$90 a month for a three-month benchmark on non-confidential sheets</td>
+<td>Drone or total-station surveys per project only where justified, S$2,500 to 10,000 per visit</td>
+</tr>
+</tbody>
+</table></div>
+<p>Treat year one as a capped experiment with stop-loss reviews at months three and six.</p>
+<h2 id="11-build-buy-or-both">11. Build, buy, or both</h2>
+<p>Civils.ai (US$90 to 270 a user a month, human-reviewed takeoffs in 24 hours, US servers) and Kreo
+(US$35 to 175 a month, the only affordable tool with a measurement API) sell the part of the problem
+this plan defers: measured quantities from drawings. Neither knows KKL's activity codes, contract
+preambles, daily-report data or claim cycle, and neither can process NDA-gated documents. Use them
+as instruments, not as the system: a three-month civils.ai Starter trial on non-confidential sheets
+benchmarks the in-house engine; Kreo Pro is the first thing to try if the corpus gate says the
+in-house overlay is not worth building. Bluebeam stays the QS's measuring tool. Re-check the
+buy-versus-build position each quarter against the ledger.</p>
+<h2 id="12-the-first-90-days">12. The first 90 days</h2>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Weeks</th>
+<th>Action</th>
+<th>Owner</th>
+<th>Done when</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Tag every line of three live price documents (LTA, HDB, PUB) as formula, primitive, judgement or not measured; report shares by count and by value per family</td>
+<td>Chief QS, one day</td>
+<td>The share table exists and names the families worth building</td>
+</tr>
+<tr>
+<td>1 to 2</td>
+<td>Ask each QS which tool and edition they measure in and where files are saved; collect twenty marked-up PDFs; dump every annotation and page viewport; compare with Bluebeam's own markup list where it exists</td>
+<td>Builder, two days</td>
+<td>Hit rate for value, scale source and subject reported; harvester go or no-go</td>
+</tr>
+<tr>
+<td>1 to 2</td>
+<td>Start a two-week paper time log per QS in five categories; pull last year's quantity queries and corrections and value them</td>
+<td>Chief QS, contracts</td>
+<td>KKL's own time split and error baseline published</td>
+</tr>
+<tr>
+<td>1 to 3</td>
+<td>Read the NDAs and confidentiality clauses of five live contracts; write a one-page position per client; set every project's tier in a register</td>
+<td>Contracts manager, two days</td>
+<td>Register live; T0 documents identified</td>
+</tr>
+<tr>
+<td>2 to 4</td>
+<td>Chief QS and a senior QS independently encode the preambles of the same three contracts into the rulebook template with judgement flags and exceptions; count parameters, un-encodable clauses and disagreements</td>
+<td>Chief QS, senior QS, four days</td>
+<td>Rulebooks v0 for three contracts; exception lists cited</td>
+</tr>
+<tr>
+<td>2 to 4</td>
+<td>Two QSs blind-measure five sheets from one live tender; chief QS adjudicates in one sitting; score raw and reconciled</td>
+<td>Two QSs, chief QS</td>
+<td>Inter-QS baseline per family</td>
+</tr>
+<tr>
+<td>3 to 6</td>
+<td>Item library v0 from the three price documents; engine for the trench and chamber families ported from the spike with golden tests and continuous integration</td>
+<td>Builder, chief QS</td>
+<td>Three hand-worked runs per contract reproduced to the rounding rule</td>
+</tr>
+<tr>
+<td>5 to 8</td>
+<td>Workbook binder v1 reading the QSs' real trench workbooks and writing engine columns back; shadow on two live tenders</td>
+<td>Builder, two QSs</td>
+<td>Weekly scorecard of disagreements with reason codes in use</td>
+</tr>
+<tr>
+<td>6 to 8</td>
+<td>Stopwatch study: one drain run of six to eight sumps, same QS, workbook alone versus workbook plus binder; repeat with a junior</td>
+<td>Chief QS</td>
+<td>Minutes per family measured, not assumed</td>
+</tr>
+<tr>
+<td>8 to 12</td>
+<td>BQ binder v1 on the next live tender; RC-section, pavement and kerb families; VO differential</td>
+<td>Builder, chief QS</td>
+<td>Quantity sheet pre-filled; first VO diffed</td>
+</tr>
+<tr>
+<td>10 to 12</td>
+<td>Add BQ-item keys to DR Capture (pipe size, kerb type, band from depth, layer thickness, grade; chainage or fixed zone on every measured row)</td>
+<td>Builder, site engineers</td>
+<td>Keys live on two pilot contracts</td>
+</tr>
+<tr>
+<td>12</td>
+<td>Stop-loss review: builder hours booked against plan, disagreement trend, first capacity figures, decision on months 4 to 6</td>
+<td>MD, chief QS, builder, contracts</td>
+<td>Written go, adjust or stop</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="13-risks">13. Risks</h2>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Risk</th>
+<th>Mitigation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>The builder is one person with other apps to keep alive; year one over-commits</td>
+<td>Scope cut to the spine; second maintainer named by month six; weekly hours booked against the plan; stop-loss at weeks 12 and 26</td>
+</tr>
+<tr>
+<td>Garbage in: a mistyped level or wrong pipe size propagates into twenty lines</td>
+<td>Entry cross-checks (invert levels monotonic, depth within band, run totals against the schedule, size against the OD table); the value rule; provenance per line</td>
+</tr>
+<tr>
+<td>Preamble clauses that no parameter captures</td>
+<td>Judgement flags and a cited exceptions list per contract; flagged lines never auto-accept</td>
+</tr>
+<tr>
+<td>Clients or main contractors object to any cloud processing</td>
+<td>T2 by default; geometry always local; rulebooks typed from templates; written position per client before any text leaves</td>
+</tr>
+<tr>
+<td>QSs do not annotate PDFs, so the harvester has nothing to read</td>
+<td>Discovery pack decides; the workbook binder does not depend on it</td>
+</tr>
+<tr>
+<td>Daily-report rows are not claim-grade</td>
+<td>Schema keys first; DR rows as evidence attached to drawing quantities, never the quantity; two-contract pilot</td>
+</tr>
+<tr>
+<td>Reviewers stop checking</td>
+<td>Blind-then-reveal sample; seeded errors with catch rates; one manual sheet a week; audits never below 5 percent on derived lines</td>
+</tr>
+<tr>
+<td>Real drawings defeat the automatic measurer</td>
+<td>It is an assist overlay gated by a real-sheet test; DXF requests in every letter; buy Kreo or civils.ai for measured takeoffs if the gate fails</td>
+</tr>
+<tr>
+<td>Savings evaporate into busier weeks</td>
+<td>Capacity metrics agreed with the MD; cash conversion stated up front</td>
+</tr>
+<tr>
+<td>Insurance and liability</td>
+<td>Named QS signs everything; insurer notified in writing; audit trail per line</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="14-questions-only-kkl-can-answer">14. Questions only KKL can answer</h2>
+<p>The discovery pack answers the ones that gate the plan: the formula share by value, the shape of
+three preambles, the confidentiality position per client, KKL's current error rate, the QS time
+split, and whether QSs annotate PDFs. The full list of 54 questions from the research, grouped by
+owner, is in <code>takeoff-open-questions.md</code>. Five more decide year two: whether main contractors on
+MRT subcontracts will release DXF or LandXML; how bulk-excavation claims are agreed today (survey,
+loads or theoretical); whether any tippers carry payload weighing; which contracts pay bulk
+excavation on survey rather than design-nett; and whether the professional-indemnity insurer
+accepts an assisted process with a named sign-off.</p>
+<h2 id="appendix-a-claims-verified">Appendix A. Claims verified</h2>
+<p>Verdicts from the technical, commercial and legal, and practitioner sceptics. Full reasoning,
+evidence and consequences are in <code>takeoff-verification.json</code>.</p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>Claim the design rested on</th>
+<th>Technical</th>
+<th>Commercial</th>
+<th>Practitioner</th>
+<th>Cheapest test in the first 90 days</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>C1</td>
+<td>About 60 percent of BQ lines are formulas over four primitives</td>
+<td>weakened</td>
+<td>weakened</td>
+<td>weakened</td>
+<td>Week 1: take the Price Documents of three to five live LTA, HDB and PUB contracts, tag every line in KKL's scope as measured-primitive, derived-by-formula, lookup/schedule, or judgement/sundry, and report the share by count and by value per client. Half a day of chief QS time per BQ.</td>
+</tr>
+<tr>
+<td>C2</td>
+<td>Preambles reduce to about 40 rulebook parameters with no free-text exceptions</td>
+<td>weakened</td>
+<td>weakened</td>
+<td>weakened</td>
+<td>Weeks 3-5: encode the measurement preambles of three live contracts clause by clause into the rulebook schema, marking each clause as parameter, lookup, judgement flag, or un-encodable; count clauses in each bucket and the share of BQ value touched by judgement flags.</td>
+</tr>
+<tr>
+<td>C3</td>
+<td>Entering primitives takes 30 to 40 percent of the hand time</td>
+<td>weakened</td>
+<td>weakened</td>
+<td>weakened</td>
+<td>Stopwatch study on 10 real sheets: for each trench and chamber family, time (a) measuring and level-reading, (b) Excel entry and arithmetic, (c) entry into the capture app; compute primitives-time as a share of today's family time and the double-entry overhead.</td>
+</tr>
+<tr>
+<td>C4</td>
+<td>Derived lines can auto-accept after rules, tests and 300 clean lines</td>
+<td>weakened</td>
+<td>refuted</td>
+<td>weakened</td>
+<td>On the shadow ledger, cluster every engine-vs-QS disagreement by tender x family x root cause (input, rule reading, engine) to measure how correlated errors are; and have a second QS blind-adjudicate 100 randomly sampled 'clean' assist lines to estimate the false-clean rate.</td>
+</tr>
+<tr>
+<td>C5</td>
+<td>Markups in the QSs' PDFs can be read on real Revu files</td>
+<td>weakened</td>
+<td>weakened</td>
+<td>weakened</td>
+<td>Week 1: collect five marked-up PDFs from three QSs (or discover none exist), run the extractor, and compare every recovered value to the Markups List CSV exported from Revu for the same file; count matches within 0.1%. Half a day of builder time once the files are in hand.</td>
+</tr>
+<tr>
+<td>C6</td>
+<td>Automatic counts and lengths on real layerless sheets within 1 percent, in 15 to 20 person-weeks</td>
+<td>weakened</td>
+<td>weakened</td>
+<td>weakened</td>
+<td>Assemble 30 real KKL tender sheets (not LTA standard details), hand-label drain, pipe and kerb runs on five of them, run the spike's signature clustering and report per-path precision and recall by pen weight, the share of pages with extractable scale text, and the number of viewports per page; this fixes coverage and the real budget before any person-week is committed.</td>
+</tr>
+<tr>
+<td>C7</td>
+<td>Per-viewport scale proposed automatically on 80 percent of viewports</td>
+<td>weakened</td>
+<td>weakened</td>
+<td>weakened</td>
+<td>On the 30-sheet real corpus, have a QS list every viewport and its true scale by hand, then run the three voters (title text with gradient and date exclusion, dimension-line detector, scale bar) and report hit rate, confident-wrong rate and no-proposal rate per sheet type (detail, plan, long-section).</td>
+</tr>
+<tr>
+<td>C8</td>
+<td>DR Capture rows roll up to 80 percent of claimable items, packs within 2 percent</td>
+<td>weakened</td>
+<td>weakened</td>
+<td>weakened</td>
+<td>Take the last three certified claim packs on two pilot contracts and, line by line, try to derive each claimed BQ quantity from the DR CSV rows by hand; report the share of lines derivable at all, the share where keys exist but bands or sizes must be inferred, and the quantity gap per derivable line before any calibration.</td>
+</tr>
+<tr>
+<td>C9</td>
+<td>Local geometry plus text-only cloud calls satisfies OSA and NDAs</td>
+<td>weakened</td>
+<td>weakened</td>
+<td>weakened</td>
+<td>Contracts person reads the NDAs and confidentiality clauses of three live LTA/HDB/PUB contracts and one main-contractor subcontract for third-party processing wording, tags all 30 live contracts by tier, and sends one written query to a client asking whether zero-retention API processing of BQ and preamble text is permitted; the answer rate and wording settle the tier split.</td>
+</tr>
+<tr>
+<td>C10</td>
+<td>One part-time builder ships the spine in six months and auto-primitives in twelve</td>
+<td>weakened</td>
+<td>refuted</td>
+<td>refuted</td>
+<td>Log the builder's actual hours on the programme weekly against the M0-M3 plan and record the calendar slip at week 12; in parallel time a full extraction of a 90,000-path sheet in pdf.js on a QS office PC.</td>
+</tr>
+<tr>
+<td>C11</td>
+<td>QS effort falls to 90, 73 and 55 to 70 percent at 6, 12 and 24 months</td>
+<td>weakened</td>
+<td>weakened</td>
+<td>refuted</td>
+<td>Run the per-sheet per-class timer for four weeks before any tool changes anything, then run the shadow tenders with the timer on and report minutes per family; publish the measured hour split so the curve can be rebuilt from data rather than inference.</td>
+</tr>
+<tr>
+<td>C12</td>
+<td>Two QSs disagree at least as much as the engine's gated error</td>
+<td>untestable yet</td>
+<td>weakened</td>
+<td>weakened</td>
+<td>Two-QS blind measurement of 20 sheets with at least 50 items per class, recording geometric disagreement (same item, different number) separately from interpretive disagreement (different scope or rule reading), and reporting the median and 95th percentile per class.</td>
+</tr>
+<tr>
+<td>C13</td>
+<td>Claims and subcon certification are 25 to 30 percent of QS hours</td>
+<td>untestable yet</td>
+<td>weakened</td>
+<td>weakened</td>
+<td>Two-week time log per QS with categories tender takeoff, claim quantity roll-up, claim documentation and negotiation, subcon certification, VO, ordering, other; then compute the share that a roll-up tool could touch.</td>
+</tr>
+<tr>
+<td>C14</td>
+<td>A check-based confidence proxy reaches 0.5 percent error at 60 percent automation</td>
+<td>weakened</td>
+<td>untestable yet</td>
+<td>weakened</td>
+<td>During shadow, log the five check outcomes per item alongside the QS's figure; after 90 days tabulate error rate and item share per check combination, and separately per sheet, to see whether an all-green bucket exists, how large it is, and whether its errors cluster by sheet.</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="appendix-b-files">Appendix B. Files</h2>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>File</th>
+<th>Contents</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>takeoff-research-digest.md</code></td>
+<td>Seven research topics with findings, sources, implications and open questions, plus the spike evidence and real-sheet analysis</td>
+</tr>
+<tr>
+<td><code>takeoff-designs.json</code></td>
+<td>Five complete designs: Rulebook, Shadow Ledger, TrueLine, KKL Takeoff Overlay, Surface Ledger</td>
+</tr>
+<tr>
+<td><code>takeoff-judgements.json</code></td>
+<td>Three judges' scores, rankings, fatal flaws, unsupported claims and grafts</td>
+</tr>
+<tr>
+<td><code>takeoff-verification.json</code></td>
+<td>Fourteen claims attacked by three sceptics, with tests and consequences</td>
+</tr>
+<tr>
+<td><code>takeoff-open-questions.md</code></td>
+<td>Fifty-four questions for KKL, grouped by owner</td>
+</tr>
+<tr>
+<td><code>../takeoff/</code></td>
+<td>Synthetic drawing with truth, five measuring spikes, calculation layer, markup capture, and their README</td>
+</tr>
+<tr>
+<td><code>../ai/index.html</code></td>
+<td>The document-AI workbench prototype whose Extract preset drafts rulebooks and BQ lines on cleared documents</td>
+</tr>
+</tbody>
+</table></div>
+</article>
+</div>
+</div>
+</body>
+</html>
