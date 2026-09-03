@@ -1,0 +1,134 @@
+{
+ "runs": [
+  {
+   "id": "D1",
+   "item": [
+    "DR-PIPE",
+    "RC pipe 300 dia",
+    "m"
+   ],
+   "length_m": 95.25,
+   "avg_depth_m": 1.76,
+   "trench_width_m": 0.98,
+   "exc_by_band_m3": {
+    "1.5-3.0m": 178.3
+   },
+   "exc_total_m3": 178.3,
+   "bedding_surround_m3": 52.7,
+   "backfill_m3": 114.8
+  },
+  {
+   "id": "D2",
+   "item": [
+    "DR-PIPE",
+    "RC pipe 450 dia",
+    "m"
+   ],
+   "length_m": 59.97,
+   "avg_depth_m": 2.0,
+   "trench_width_m": 1.15,
+   "exc_by_band_m3": {
+    "1.5-3.0m": 147.9
+   },
+   "exc_total_m3": 147.9,
+   "bedding_surround_m3": 44.4,
+   "backfill_m3": 89.3
+  },
+  {
+   "id": "D3",
+   "item": [
+    "DR-RCU",
+    "Precast U-drain 600x600",
+    "m"
+   ],
+   "length_m": 134.06,
+   "avg_depth_m": 0.93,
+   "trench_width_m": 1.4,
+   "exc_by_band_m3": {
+    "<1.5m": 201.8
+   },
+   "exc_total_m3": 201.8,
+   "bedding_surround_m3": 28.2,
+   "backfill_m3": 90.0
+  },
+  {
+   "id": "D4",
+   "item": [
+    "DR-PIPE",
+    "RC pipe 600 dia",
+    "m"
+   ],
+   "length_m": 77.75,
+   "avg_depth_m": 2.18,
+   "trench_width_m": 1.32,
+   "exc_by_band_m3": {
+    "1.5-3.0m": 239.1
+   },
+   "exc_total_m3": 239.1,
+   "bedding_surround_m3": 73.0,
+   "backfill_m3": 134.4
+  }
+ ],
+ "bq": [
+  {
+   "code": "DR-PIPE",
+   "desc": "RC pipe 300 dia",
+   "unit": "m",
+   "qty": 95.2
+  },
+  {
+   "code": "EW-EXCT",
+   "desc": "Trench excavation, depth 1.5-3.0m",
+   "unit": "m3",
+   "qty": 565.3
+  },
+  {
+   "code": "EW-BF",
+   "desc": "Backfilling incl. compaction",
+   "unit": "m3",
+   "qty": 428.5
+  },
+  {
+   "code": "EW-HARD",
+   "desc": "Granular bedding and surround",
+   "unit": "m3",
+   "qty": 198.3
+  },
+  {
+   "code": "EW-DISP",
+   "desc": "Disposal offsite (excavated less backfill)",
+   "unit": "m3",
+   "qty": 338.6
+  },
+  {
+   "code": "DR-PIPE",
+   "desc": "RC pipe 450 dia",
+   "unit": "m",
+   "qty": 60.0
+  },
+  {
+   "code": "DR-RCU",
+   "desc": "Precast U-drain 600x600",
+   "unit": "m",
+   "qty": 134.1
+  },
+  {
+   "code": "EW-EXCT",
+   "desc": "Trench excavation, depth <1.5m",
+   "unit": "m3",
+   "qty": 201.8
+  },
+  {
+   "code": "DR-PIPE",
+   "desc": "RC pipe 600 dia",
+   "unit": "m",
+   "qty": 77.8
+  },
+  {
+   "code": "DR-SUMP",
+   "desc": "Sump / manhole (precast)",
+   "unit": "no",
+   "qty": 8
+  }
+ ]
+}

@@ -10,6 +10,7 @@ measuring code, not of any AI model.
 | `extract_pymupdf.py` | Vector route, Python (PyMuPDF). Reads the scale from the title block, pulls every path with colour/width/closure, clusters paths by signature, **learns the legend** (symbol signature → legend text), names filled areas from the text inside them, excludes the legend box and title block, measures lengths/areas/counts, attaches the nearest run label, cross-checks the scale bar, compares with truth. |
 | `extract_pdfjs.mjs` | Same measurement with pdf.js 4.10.38, i.e. the route that can run inside a browser page like `ai/index.html` with no server. Walks the operator list with a graphics-state stack. `npm install pdfjs-dist@4.10.38` to run. |
 | `extract_dxf.py` | CAD route: writes the same plan as `sample_drawing.dxf` the way a CAD user draws it (layers per class, sump symbols as block inserts, asphalt and footpath as hatches, model space in metres) and measures it back with ezdxf. No scale detection at all. `pip install ezdxf`. DWG needs a converter to DXF first (ODA File Converter). |
+| `calc_trench.py` | Calculation layer: turns the measured primitives (run length, size, ground and invert levels) into trench excavation by KKL depth band, bedding and surround, backfill, disposal and pipe/U-drain lengths, rolled up to KKL activity codes. Writes `sample_drawing.quantities.json`. No dependencies. |
 | `extract_raster.py` | Scanned-drawing route: rasterises the sample at 150 or 300 dpi with blur and noise, then measures with classical computer vision only (colour masks, thinning, blob counting). Needs `opencv-python-headless`. |
 
 ## Results (3 Sep 2026)
@@ -43,8 +44,15 @@ Raster route (simulated scan of the same sheet):
 | Sumps | 9 of 8 | 8 of 8 |
 | Asphalt area | +2.3 % | −0.5 % |
 
+Calculation layer (`calc_trench.py`): the four measured runs, their sizes and eight level pairs
+produce about twenty BQ lines (EW-EXCT by depth band, EW-BF, EW-HARD, EW-DISP, DR-PIPE by
+diameter, DR-RCU, DR-SUMP) from rules a QS applies by hand today. The rules are illustrative
+and must be replaced by KKL's own.
+
 What this proves and what it does not:
 
+- Most quantities are calculations, not measurements. Once the primitives are trusted, the
+  depth-band excavation, backfill and disposal lines are deterministic code.
 - DWG/DXF is the best input: layers and blocks already name the classes and the units are real.
   Asking clients and main contractors for CAD files is worth more than any amount of AI.
 - A vector PDF from CAD carries exact geometry. Reading the scale, clustering by drawing signature,
