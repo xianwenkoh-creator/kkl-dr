@@ -76,7 +76,9 @@ shared with the tests. No drawing leaves the machine.
    capped by the existing ground; adjacent platforms, sumps and ramps combine on their own, the
    slope between a -12 and a -18 platform comes out of the rules, and nothing is counted twice. The
    result table gives, per platform, the footprint area, the cut within the footprint, the cut on its
-   slopes, the total, the depth bands and the stage volumes, with a total row.
+   slopes, the total, the slope-face area (measured on the slope, for slope protection items) and the
+   berm area, the depth bands and the stage volumes, with a total row. Stage levels set to the SMM
+   2 m depth stages give the excavation bill items directly.
 
 ## Workflow C: the DWG itself (exact outlines, no tracing)
 

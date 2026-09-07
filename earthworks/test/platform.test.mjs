@@ -71,3 +71,15 @@ test("adjacent platforms, a deeper sump, a vertical pre-cut and a graded ramp co
   close(d(100, 30), r.rise(-12, 30), 1e-9, "south of B2-2 at 30 m"); close(d(150, 30), r.rise(-18, 30), 1e-9, "B2-3's mitred corner reaches further south-west than B2-2's edge"); assert.equal(d(5, 5), 4); assert.equal(d.at(5, 5).tag, "PRE-CUT");
   close(sum(g.summary.byTag), g.summary.cut, 1e-6, "tags sum"); close(sum(g.summary.byLevel), g.summary.cut, 1e-6, "levels sum"); assert.equal(g.summary.missing, 0);
 });
+
+test("slope face area and berm area of a battered rectangle match the mitred geometry", () => {
+  const L = 100, W = 60, poly = rect(60, 60, 160, 120), boundary = rect(0, 0, 220, 180);
+  const r = slopeRules([{ top: -6, H: 1 }, { top: Infinity, H: 2.5 }], [{ level: -6, width: 3 }]); const egl = flatSurface(4);
+  const g = gridVolumes(boundary, egl, designSurface([{ name: "P", poly, fel: -12, sides: "rules" }], r, egl, { top: 4 }), { cell: 0.5, sample: "centre" });
+  const band1 = (2 * (L + W) + 8 * 3) * 6 * Math.SQRT2;                                   // -12 to -6 at 1:1, offsets 0 to 6
+  const berm = (L + 18) * (W + 18) - (L + 12) * (W + 12);                                   // 3 m bench at -6, offsets 6 to 9
+  const band2 = (2 * (L + W) + 8 * 21.5) * 10 * Math.sqrt(1 + 2.5 * 2.5);                  // -6 to +4 at 1:2.5, offsets 9 to 34
+  close(g.summary.slopeArea, band1 + band2, (band1 + band2) * 0.015, "slope face area"); close(g.summary.bermArea, berm, berm * 0.03, "berm area");
+  close(g.summary.byTag["P slopes"].slopeArea, g.summary.slopeArea, 1e-6, "per-tag slope area"); assert.equal(g.summary.byTag.P.slopeArea, 0);
+  const v = gridVolumes(boundary, egl, designSurface([{ name: "V", poly, fel: -12, sides: "vertical" }], r, egl, { top: 4 }), { cell: 1, sample: "centre" }); assert.equal(v.summary.slopeArea, 0); assert.equal(v.summary.bermArea, 0);
+});

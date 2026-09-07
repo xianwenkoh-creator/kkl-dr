@@ -257,14 +257,15 @@ export function levelBandNames(cuts) { if (!cuts.length) return []; const n = [`
  * Grid method over a polygon (world metres). egl: surface fn (X,Y)->level|null. fel: number, fn (X,Y)->level, or a
  * design surface with fel.at(X,Y)->{z, tag} (tag = the platform governing that cell).
  * opts: {cell=1, bands=DR_BANDS, sample:'corners'|'centre', levels:[absolute cut-off levels for stage volumes]}
- * Returns {cells:[{X,Y,egl,fel,depth,area,tag}], summary:{area,cut,fill,avgCutDepth,maxDepth,byLayer,byMaxDepth,byLevel,byTag:{tag:{area,cut,fill,byLayer,byLevel}},missing}}
+ * Returns {cells:[{X,Y,egl,fel,depth,area,tag}], summary:{area,cut,fill,avgCutDepth,maxDepth,byLayer,byMaxDepth,byLevel,byTag:{tag:{area,cut,fill,slopeArea,bermArea,byLayer,byLevel}},
+ *  slopeArea (batter faces measured on the slope, m²), bermArea (flat benches, m²), missing}}
  */
 export function gridVolumes(poly, egl, fel, opts = {}) {
   const cell = opts.cell ?? 1, edges = opts.bands ?? DR_BANDS, sample = opts.sample ?? "corners", names = bandNames(edges);
   const felAt = typeof fel === "function" ? (typeof fel.at === "function" ? fel.at : (X, Y) => ({ z: fel(X, Y) })) : () => ({ z: fel });
   const cuts = (opts.levels || []).slice().sort((a, b) => b - a), lvNames = levelBandNames(cuts), bounds = [Infinity, ...cuts, -Infinity];
   const xs = poly.map(p => p.X), ys = poly.map(p => p.Y); const x0 = Math.floor(Math.min(...xs) / cell) * cell, x1 = Math.max(...xs), y0 = Math.floor(Math.min(...ys) / cell) * cell, y1 = Math.max(...ys);
-  const cells = []; let area = 0, cut = 0, fill = 0, missing = 0, maxDepth = 0; const byLayer = Object.fromEntries(names.map(n => [n, 0])), byMax = Object.fromEntries(names.map(n => [n, 0])), byLevel = Object.fromEntries(lvNames.map(n => [n, 0])), byTag = {};
+  const cells = []; let area = 0, cut = 0, fill = 0, missing = 0, maxDepth = 0, slopeArea = 0, bermArea = 0; const byLayer = Object.fromEntries(names.map(n => [n, 0])), byMax = Object.fromEntries(names.map(n => [n, 0])), byLevel = Object.fromEntries(lvNames.map(n => [n, 0])), byTag = {};
   const a = cell * cell, e = [0, ...edges, Infinity];
   for (let X = x0 + cell / 2; X < x1; X += cell) for (let Y = y0 + cell / 2; Y < y1; Y += cell) {
     if (!pointInPolygon(X, Y, poly)) continue;
@@ -272,17 +273,18 @@ export function gridVolumes(poly, egl, fel, opts = {}) {
     if (sample === "corners") { const vs = [egl(X - cell / 2, Y - cell / 2), egl(X + cell / 2, Y - cell / 2), egl(X + cell / 2, Y + cell / 2), egl(X - cell / 2, Y + cell / 2)].filter(v => v != null); g = vs.length ? vs.reduce((s, v) => s + v, 0) / vs.length : null; }
     else g = egl(X, Y);
     const r = felAt(X, Y); const f = r.z, tag = r.tag; area += a;
-    const bt = tag != null ? (byTag[tag] || (byTag[tag] = { area: 0, cut: 0, fill: 0, byLayer: Object.fromEntries(names.map(n => [n, 0])), byLevel: Object.fromEntries(lvNames.map(n => [n, 0])) })) : null; if (bt) bt.area += a;
+    const bt = tag != null ? (byTag[tag] || (byTag[tag] = { area: 0, cut: 0, fill: 0, slopeArea: 0, bermArea: 0, byLayer: Object.fromEntries(names.map(n => [n, 0])), byLevel: Object.fromEntries(lvNames.map(n => [n, 0])) })) : null; if (bt) bt.area += a;
     if (g == null || f == null || !isFinite(f)) { missing += a; cells.push({ X, Y, egl: g, fel: isFinite(f) ? f : null, depth: null, area: a, tag }); continue; }
     const d = g - f; cells.push({ X, Y, egl: g, fel: f, depth: d, area: a, tag });
     if (d > 0) { cut += d * a; maxDepth = Math.max(maxDepth, d); if (bt) bt.cut += d * a;
+      if (r.berm) { bermArea += a; if (bt) bt.bermArea += a; } else if (r.inside === false && r.faceFactor > 1) { slopeArea += a * r.faceFactor; if (bt) bt.slopeArea += a * r.faceFactor; }
       for (let k = 0; k < names.length; k++) { const v = Math.max(0, Math.min(d, e[k + 1]) - e[k]) * a; byLayer[names[k]] += v; if (bt) bt.byLayer[names[k]] += v; }
       byMax[names[edges.filter(b => d >= b).length]] += d * a;
       for (let k = 0; k < lvNames.length; k++) { const v = Math.max(0, Math.min(g, bounds[k]) - Math.max(f, bounds[k + 1])) * a; byLevel[lvNames[k]] += v; if (bt) bt.byLevel[lvNames[k]] += v; } }
     else { fill += -d * a; if (bt) bt.fill += -d * a; }
   }
   const cutArea = cells.filter(c => c.depth > 0).reduce((s, c) => s + c.area, 0);
-  return { cells, summary: { area, cut, fill, avgCutDepth: cutArea ? cut / cutArea : 0, maxDepth, byLayer, byMaxDepth: byMax, byLevel, byTag, missing, cell, bands: names, levelBands: lvNames } };
+  return { cells, summary: { area, cut, fill, avgCutDepth: cutArea ? cut / cutArea : 0, maxDepth, byLayer, byMaxDepth: byMax, byLevel, byTag, slopeArea, bermArea, missing, cell, bands: names, levelBands: lvNames } };
 }
 /** Approximate extra excavation for battered sides: sum over edges of (depth along edge)^2 * slopeH / 2 * length. slopeH = horizontal per 1 vertical. */
 export function batterAllowance(poly, egl, fel, slopeH = 1, step = 1) {
@@ -333,22 +335,24 @@ export function slopeRules(bands = [{ top: Infinity, H: 1 }], berms = []) {
   const M = berms.slice().sort((a, b) => a.level - b.level);
   const Hat = z => { for (const b of B) if (z < b.top - 1e-9) return b.H; return B[B.length - 1].H; };
   const events = fel => [...new Set([...B.map(b => b.top), ...M.map(m => m.level)])].filter(L => isFinite(L) && L > fel + 1e-9).sort((a, b) => a - b);
-  function rise(fel, d) {
+  /** Level reached d metres out, with the gradient there (H per 1 V) and whether the point lies on a berm. */
+  function riseInfo(fel, d) {
     let z = fel, rem = d;
     for (const L of events(fel)) {
       const H = Hat(z);
-      if (H > 0) { const need = H * (L - z); if (rem <= need) return z + rem / H; rem -= need; }
-      z = L; const berm = M.find(m => Math.abs(m.level - L) < 1e-9); if (berm) { if (rem <= berm.width) return L; rem -= berm.width; }
+      if (H > 0) { const need = H * (L - z); if (rem <= need) return { z: z + rem / H, H, berm: false }; rem -= need; }
+      z = L; const berm = M.find(m => Math.abs(m.level - L) < 1e-9); if (berm) { if (rem <= berm.width) return { z: L, H: 0, berm: true }; rem -= berm.width; }
     }
-    const H = Hat(z); return H > 0 ? z + rem / H : (rem <= 0 ? z : Infinity);
+    const H = Hat(z); return H > 0 ? { z: z + rem / H, H, berm: false } : { z: rem <= 0 ? z : Infinity, H: 0, berm: false };
   }
+  const rise = (fel, d) => riseInfo(fel, d).z;
   function reach(fel, top) {
     let z = fel, d = 0;
     for (const L of events(fel)) { if (L >= top) break; d += Hat(z) * (L - z); z = L; const berm = M.find(m => Math.abs(m.level - L) < 1e-9); if (berm) d += berm.width; }
     if (top > z) { const H = Hat(z); d += H > 0 ? H * (top - z) : 0; }
     return d;
   }
-  return { rise, reach, bands: B, berms: M };
+  return { rise, riseInfo, reach, bands: B, berms: M };
 }
 /** '1V:1H to -6, 1:2.5 to +4, vertical' -> bands [{top:-6,H:1},{top:4,H:2.5},{top:Infinity,H:0}]; null if nothing parses. */
 export function parseSlopeText(s) {
@@ -379,16 +383,17 @@ export function designSurface(platforms, rules, egl, opts = {}) {
     const felFn = graded ? gradedLevel(p.fel) : () => p.fel; const felMin = graded ? Math.min(p.fel.z1, p.fel.z2) : p.fel;
     return { ...p, prep, felFn, reach: p.sides === "vertical" ? 0 : rules.reach(felMin, top) }; });
   function envelope(X, Y) {
-    let best = Infinity, gi = -1, gin = false;
+    let best = Infinity, gi = -1, gin = false, gH = 0, gBerm = false;
     for (let i = 0; i < P.length; i++) { const p = P[i], b = p.prep.bbox; if (X < b.x0 - p.reach || X > b.x1 + p.reach || Y < b.y0 - p.reach || Y > b.y1 + p.reach) continue;
-      const o = offsetDistance(p.prep, X, Y, corners); let z;
-      if (o.inside) z = p.felFn(X, Y); else if (p.sides === "vertical") continue; else z = rules.rise(p.felFn(o.qx, o.qy), o.d);
-      if (z < best) { best = z; gi = i; gin = o.inside; } }
-    return { z: best, index: gi, inside: gin };
+      const o = offsetDistance(p.prep, X, Y, corners); let z, H = 0, berm = false;
+      if (o.inside) z = p.felFn(X, Y); else if (p.sides === "vertical") continue; else { const r = rules.riseInfo(p.felFn(o.qx, o.qy), o.d); z = r.z; H = r.H; berm = r.berm; }
+      if (z < best) { best = z; gi = i; gin = o.inside; gH = H; gBerm = berm; } }
+    return { z: best, index: gi, inside: gin, H: gH, berm: gBerm };
   }
   const f = (X, Y) => { const g = egl(X, Y); if (g == null) return null; return Math.min(g, envelope(X, Y).z); };
   f.at = (X, Y) => { const g = egl(X, Y); const e = envelope(X, Y); if (g == null) return { z: null, tag: null, index: e.index, inside: e.inside };
-    const z = Math.min(g, e.z); const tag = e.index < 0 || z >= g ? null : e.inside ? P[e.index].name : P[e.index].name + " slopes"; return { z, tag, index: e.index, inside: e.inside }; };
+    const z = Math.min(g, e.z); const onSlope = e.index >= 0 && z < g && !e.inside; const tag = e.index < 0 || z >= g ? null : e.inside ? P[e.index].name : P[e.index].name + " slopes";
+    return { z, tag, index: e.index, inside: e.inside, berm: onSlope && e.berm, faceFactor: onSlope && !e.berm && e.H > 0 ? Math.sqrt(1 + 1 / (e.H * e.H)) : 1 }; };
   f.envelope = (X, Y) => envelope(X, Y).z; f.platforms = P; f.rules = rules; f.corners = corners;
   return f;
 }
