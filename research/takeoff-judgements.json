@@ -1,0 +1,548 @@
+[
+ {
+  "lens": "in-house builder: one part-time person shipping single-file GitHub Pages apps and Python jobs, no ops team; judged on technical risk on real LTA-style sheets (no layers, black pen weights 0.36-2.16 pt, several scales per page, outline text, 3,614-line hatching), sequencing, reuse of the 715 lines of spike code versus new invention, one-person maintainability, licence constraints (AGPL PyMuPDF, GPL LibreDWG, AGPL ultralytics, ODA non-commercial), and honesty of person-week estimates",
+  "scores": [
+   {
+    "design": "TrueLine: KKL vector-first takeoff engine",
+    "effort_reduction": 6,
+    "money_safety": 8,
+    "feasibility": 5,
+    "time_to_value": 4,
+    "cost": 8,
+    "kkl_fit": 8,
+    "total": 39,
+    "rationale": "Effort curve 92/76/62 is the most conservative and its 6-month figure explicitly includes verification overhead, and every step is tied to the digest's 200/500-item gates; but nothing saves QS minutes before M3 shadow (week 18) and rule packs (week 24), because the M0 timer and CSV export are instrumentation, not savings. Money safety is the strongest of the five on provenance: every quantity cites sheet hash, viewport, confirmed scale, path ids and rule-pack version; no model emits a number; dimension grader blocks export outside 1%/5%; top-80%-of-value rule; rollback to Stage 2 on any money-bearing error. Feasibility is where it strains one part-time builder: it commits to two full implementations (import_pdf.py AND import-pdfjs.js, scale.py AND scale.js, kernel.py AND kernel.js, plus a scikit-learn HistGradientBoosting model exported to a hand-rolled JSON tree the browser evaluates), so every fix lands twice. The pdf.js clip stack for viewport reconstruction (intersecting clip polygons across save/restore) is not in extract_pdfjs.mjs (106 lines, no clip handling) and is budgeted at 3 person-weeks together with Bezier flattening and direction vectors on both routes, which is optimistic. The 42 person-weeks do sum correctly across milestones (2+4+2.5+5+4+3.5+5+4.5+3+8) but consume the full 0.4 FTE for two years with no slack. Cost is US$250/month, all open source, PyMuPDF confined to the batch job and pdf.js (Apache) in the QS-facing app, which is the right licence split. KKL fit is high: chainage ledger keyed to DR Capture chainage from/to so claims become lookups, confidentiality tier per project, rule packs from BQ preambles via the existing Extract agent, DR-keyed CSV rows.",
+    "gets_right": "Only design that specifies how to survive real sheets: viewports from get_drawings(extended=True) clip records with DBSCAN bbox-cluster fallback and title-text typing; a dimension-line detector (0.36 pt line with tick/arrow terminators and parallel numeric text) as a scale voter; quantised pen weight, dash, parallel-partner offset (double-wall pipe collapse, kerb face/back) and hatch-membership as classifier features; 'a detail or cross-section viewport is never a source of plan lengths'; synthetic regression via ezdxf PyMuPdfBackend DXF-to-PDF round trips; chainage ledger joined to DR Capture for monthly claims and VO diff as sheet.json revision diff."
+   },
+   {
+    "design": "Shadow Ledger: capture-first takeoff flywheel",
+    "effort_reduction": 6,
+    "money_safety": 8,
+    "feasibility": 6,
+    "time_to_value": 5,
+    "cost": 7,
+    "kkl_fit": 9,
+    "total": 41,
+    "rationale": "Curve 90/75/55: the 24-month 55% is the joint most aggressive and is admitted to be 'inference stacked on digest hour shares'; a large share of it rides on the claims roll-up reaching Stage 4 on all 30 contracts, which depends on DR data quality the design does not control. Gates are the digest's verbatim and per class x source, with the best-articulated confidence proxy of the five (check-pattern buckets whose empirical error is measured, not a weighted sum; missing check = sub-threshold). Money safety is strong: truth is 'QS final after chief-QS adjudication plus the workbook figure', not raw markups; engine never edits the QS's file, it writes a KKL-ENGINE layer on a copy; blind-then-reveal on 20%; automatic demotion. Feasibility for this builder is good in shape (a nightly Python job on an office PC over OneDrive-synced folders, JSONL/CSV to SharePoint, three PapaParse pages) and it avoids building a measurement canvas by letting the QS review engine proposals as annotations in Bluebeam; but the geometry engine 'on real sheets' is budgeted at 6 person-weeks (weeks 6-14) with far less specification than TrueLine of how viewports, scale and black-pen classification will be solved, and PyMuPDF xref_set_key writing of /Measure and /IT dictionaries plus pdf-lib annotation writing in the conditional Takeoff Pad are fiddly, under-documented work (digest: only the Line case is publicly documented). The whole premise is conditional on QSs saving measurement annotations, an open question in the digest; if not, Takeoff Pad (4 pw) precedes everything. Time to value: capture at week 6 produces data, not minutes; the first QS minutes saved arrive with assist at weeks 16-22, though the weekly scorecard can catch omissions before bids from month 3. Cost US$450/month including possible Bluebeam Core seats. KKL fit is the best: the 38-code Bluebeam tool chest mapped to DR Capture activity codes, CSVHEAD ingest, DuckDB local, T0/T1/T2 tiers enforced in the job, regression corpus of real sheets kept on SharePoint with only synthetic sheets in GitHub Actions (correct for OSA).",
+    "gets_right": "Assist mode delivered as an annotation layer on a PDF copy so QSs review in the tool they already use and the nightly diff is the corrections log; sheet fingerprint as SHA-256 of normalised get_cdrawings tuples so markups, engine runs and corrections pair automatically across re-saves; shadow scorer matching by shapely buffered overlap / IoU with reason codes that become the builder's weekly backlog; confidence calibrated per check pattern with >=200 items; confidential regression corpus on SharePoint, synthetic only in CI."
+   },
+   {
+    "design": "Surface Ledger: survey-first progress measurement",
+    "effort_reduction": 5,
+    "money_safety": 7,
+    "feasibility": 5,
+    "time_to_value": 5,
+    "cost": 3,
+    "kkl_fit": 7,
+    "total": 32,
+    "rationale": "Curve 101/95/84/65 is honest about being slow and its 24-month 65% depends on claims being 25-30% of QS hours (digest low-confidence inference) and on DR Capture rows carrying chainage, depth band and loads on >=90% of rows (design admits 'unverified'). It does not address the brief's daily drawing takeoff until month 9 and then compresses all of TrueLine's real-sheet work into a 16-week 'tender plug-in', so tender effort barely moves in year one. Money safety is structurally good for claims (two independent sources per line, surfaces as volume source with loads as KPI only, held lines never exported silently, named QS signs) but the design's own risk list concedes bulk excavation is often paid design-nett, in which case the survey engine yields evidence rather than the claim quantity, and truck-count reconciliation may never stabilise (digest: systematically unreliable). Feasibility for the code is fine (600 lines of lxml/scipy/numpy/shapely; the claims app is a single file), but the critical path is non-code: drone vendor procurement with NDA, CAAS operator/activity permits, Infrastructure Protection Act checks on MRT sites, MC surveyors accepting a shared surface, PDAL on a Windows office PC (conda-only in practice), and 'builder availability of ~2 d/wk for 12 months on this project alone', which contradicts part-time. Time to value: first assisted claims month 5-6 on 5 pilot contracts, gated on bq_map, flights and DR coverage. Cost is the outlier: US$7,500/month run cost (30x the others) driven by fortnightly RTK flights. KKL fit is deep on the site side (CSVHEAD fields, staging-ground tonnage by stream, asphalt by weight, SOPA cadence, JM packs) but weak on GeBIZ PDF takeoff and on 'learns from the takeoffs QSs already do'.",
+    "gets_right": "bq_map paid_on field (survey vs design_nett vs dr_rows vs tickets) per BQ item, which no other design makes explicit; joint-measurement pack with hashed surfaces and 10 random check cells for MC total-station verification; ticket/DO extraction confined to KKL's own tier-0 documents so cloud use is uncontroversial; calibrated bulking, m3/load and m3/h from survey-vs-loads residuals fed back into tender rates; asphalt reconciled by weighbridge tonnes because LTA M&W pays by weight."
+   },
+   {
+    "design": "Rulebook: preamble-driven quantity engine",
+    "effort_reduction": 7,
+    "money_safety": 8,
+    "feasibility": 8,
+    "time_to_value": 8,
+    "cost": 9,
+    "kkl_fit": 8,
+    "total": 48,
+    "rationale": "Curve 100/90/73/55: the 55% is aggressive, but the mechanism is the most credible because whole derived families (TRENCH, CHAMBER, RC-SECTION, PAVEMENT, KERB) graduate together on rulebook confirmation plus golden tests plus 300 clean lines rather than one primitive class at a time, and the digest's own inventory puts CIS RC build-ups (15%), trench runs and derived lines (15-20%) and BQ entry/reconciliation (15-20%) at roughly half of tender hours. The gate for derived lines is proportionate (deterministic code does not need a statistical accuracy gate; it needs rule confirmation and regression), and the primitives themselves pass through the digest's per-class x source gates later. Money safety: every rulebook parameter carries page citation and a named confirmer and an unconfirmed parameter blocks the engine; every line stamps engine version, rulebook version and primitive hash; judgement inputs stay human; garbage-in risk on typed primitives is real (one wrong IL propagates into 20 lines) and is mitigated by entry cross-checks (IL monotonic, depth within band, run totals vs schedule, scale grader) and the top-80%-of-value rule. Feasibility is the best fit to this builder: engine.js as one pure ES module used by the app, the claims page and node --test golden tests (including sample_drawing.truth.json), typed tables that mirror the QS's spreadsheet, .xlsx out via SheetJS, single-file pages, one on-prem Python harvester; per-milestone estimates are in builder-days (5, 6, 6, 5, 5, 6, 10, 8) and sum to about 11-12 person-weeks for the first six months, consistent with the stated 36 total; auto-measure is deliberately last, so all the real-sheet risk sits behind a working product. Time to value: TRENCH/CHAMBER in shadow on live tenders from week 6 (calc_trench.py already emits those lines), Stage 2 by month 3, BQ binder pre-filling the quantity sheet by week 11. Cost US$150/month, no new licences. KKL fit: item library keyed on DR Capture codes and struct/method/spec_element, claims join on the same keys with chainage-interval union against double claiming, VO pricing-basis column in the HKIS order, tier A/B/C with Tier-A rulebooks typed from templates.",
+    "gets_right": "Typed primitive tables as a day-one input path independent of any drawing parsing, so value does not wait on viewports, scale or classification; one engine module shared by browser app, claims roll-up and CI tests; rulebook parameters with {value, source_page, confirmed_by} and 'rulebook incomplete' blocking output; entry-time cross-checks that catch the garbage-in failure mode; CI blocking release when any golden line changes; automation order that puts deterministic families before measured primitives."
+   },
+   {
+    "design": "KKL Takeoff Overlay: the in-house civils.ai",
+    "effort_reduction": 6,
+    "money_safety": 7,
+    "feasibility": 3,
+    "time_to_value": 6,
+    "cost": 5,
+    "kkl_fit": 7,
+    "total": 34,
+    "rationale": "Curve 97/88/74/58 with the candid note that section-based volumes cap the reduction near 40-45% of takeoff effort; gates are the digest's and enforced in the UI. Money safety is sound in principle (VLM emits labels, regions and cross-checks, never a quantity; per-viewport scale must be QS-confirmed and dimension check green before export; kerb type gate at 97% because 'type is the money'), but it lets VLM schedule reads (sizes, IL/GL, BBS totals, which are money-bearing attributes) reach Stage 3 by month 6 on a claimed 98% cell accuracy, against digest evidence of 25-37% recall and up to 56% hallucination on structured drawing extraction and Claude Opus 4 at 40% on dense dimension reads; and T1 crops of client drawings go to cloud models. Feasibility is the fatal weakness for one part-time builder: 76 person-weeks in the costs block (64 in its own text), a FastAPI runner with Entra ID sign-in (a server, outside house style), a four-model benchmark harness (Gemini 3 Pro via Vertex, Claude, GPT-5.x, local Qwen2.5-VL), a YOLO detector exported to ONNX and run with onnxruntime-web, PaddleOCR, a surface engine, a claims module and the canvas, all maintained by one person; 'canvas with counts and schedule reads in assist by week 7' requires the sheet model, viewport and scale problems solved in weeks 1-4, which TrueLine budgets at 6.5 weeks for the same work. Time to value is nominally early (schedule reads via the existing Extract agent are real) but counts and schedule reads are under 10% of tender hours. Cost US$600/month plus VM, Gemini lane and possible ultralytics or Artifex licences. KKL fit: the confidentiality gateway (T2 sessions never receive an API key, egress log per project) is the best treatment of OSA/NDA of the five; template library per client as data; annotated PDF export readable in Bluebeam; but the Gemini/Vertex lane fragments the Claude workbench KKL already has.",
+    "gets_right": "Confidentiality gateway as code (tier decides endpoint and content blocks, T2 sessions have no API key, every egress logged); cost readout per item (qty x KKL rate) so review attention follows money; annotated-PDF export with ISO 32000 /Measure and /Subj so the canvas output opens in Bluebeam; kerb-type classification as its own money gate; detector inference kept local via onnxruntime-web; honest cap on effort reduction from section-based volumes."
+   }
+  ],
+  "ranking": [
+   "Rulebook: preamble-driven quantity engine",
+   "Shadow Ledger: capture-first takeoff flywheel",
+   "TrueLine: KKL vector-first takeoff engine",
+   "KKL Takeoff Overlay: the in-house civils.ai",
+   "Surface Ledger: survey-first progress measurement"
+  ],
+  "best_ideas_to_graft": [
+   {
+    "from_design": "Shadow Ledger",
+    "idea": "Assist mode as a KKL-ENGINE annotation layer written onto a copy of the QS's PDF (PyMuPDF add_polyline_annot/add_polygon_annot with /Measure, /Subj = activity code, custom columns = checks and path ids), reviewed in Bluebeam, with the nightly diff between engine and final annotations as the corrections log",
+    "why": "Removes the need to build and maintain a measurement canvas in the first year; the QS stays in their own tool; the same 75-line extract_markups.py reader becomes both harvester and corrections diff"
+   },
+   {
+    "from_design": "Shadow Ledger",
+    "idea": "Sheet fingerprint = SHA-256 of normalised get_cdrawings tuples plus words, independent of annotations and re-saves; confidence as check-pattern buckets with empirical error measured per pattern (missing check = sub-threshold); shadow scorer matching engine items to QS markups by shapely buffered overlap / IoU with reason codes",
+    "why": "These are the three pieces that turn daily QS work into pairable labels, a calibrated auto-accept rule and a reason-coded backlog for one builder; all are small Python over libraries already in the spikes"
+   },
+   {
+    "from_design": "TrueLine",
+    "idea": "Viewport reconstruction from get_drawings(extended=True) clip/scissor records with DBSCAN bbox-cluster fallback and title-text typing; per-viewport three-voter scale (title text corrected for page size, dimension-line detector, scale bar) with QS confirmation cached per originator template; pen-weight/dash/parallel-partner/hatch-membership classifier features; 'detail and section viewports never supply plan lengths or counts'",
+    "why": "This is the only concrete answer in the panel to the digest's real-sheet findings (no layers, black pens, several scales per page, 3,614 hatch lines); it should be the spec for the auto-measure phase, implemented once (PyMuPDF batch shadow), not twice"
+   },
+   {
+    "from_design": "TrueLine",
+    "idea": "Synthetic regression suite via ezdxf drawing add-on PyMuPdfBackend (DXF with known quantities rendered to PDF and re-measured) plus a real-sheet corpus of >=30 sheets before any promise; chainage ledger of designed quantities per activity code per interval joined to DR Capture chainage from/to for monthly claims",
+    "why": "Cheap, deterministic test coverage the builder can run in CI without confidential sheets; the chainage ledger makes drain/kerb/pipe claim lines a lookup instead of a re-measure"
+   },
+   {
+    "from_design": "KKL Takeoff Overlay",
+    "idea": "Confidentiality gateway as code: per-project tier decides endpoint and permitted content blocks, T2 sessions never receive an API key, every egress logged to SharePoint; cost readout (qty x rate) on every item; annotated-PDF export with /Measure so outputs open in Bluebeam",
+    "why": "About 200 lines that make OSA/NDA compliance verifiable rather than procedural; the cost readout directs review attention to money and implements the top-80%-of-value rule visibly"
+   },
+   {
+    "from_design": "Surface Ledger",
+    "idea": "bq_map paid_on field per BQ item (survey | design_nett | dr_rows | tickets) with measure_rule and band_edges; joint-measurement pack with hashed surfaces and random check cells; ticket/DO extraction confined to KKL's own tier-0 documents",
+    "why": "Makes the claims roll-up correct per contract preamble instead of assuming survey pays; the JM pack is a later, optional add-on once a contract funds a survey; ticket extraction reuses the existing Extract agent at zero confidentiality risk"
+   },
+   {
+    "from_design": "Rulebook",
+    "idea": "Entry-time cross-checks on primitives (IL monotonic along a run, GL-IL depth within band range, run-length total vs drain schedule read with citations, scale-bar grader blocking export >5%) and 'rulebook incomplete' blocking any derived output until every money-bearing parameter is confirmed against its cited page",
+    "why": "The garbage-in failure mode (one bad level into twenty lines) is the main money risk of a calculation-first spine and these checks are cheap pure functions"
+   }
+  ],
+  "fatal_flaws": [
+   {
+    "design": "KKL Takeoff Overlay",
+    "flaw": "Scope is a product team's roadmap, not a part-time builder's: 76 person-weeks (64 in its own text), a FastAPI server with Entra ID outside the single-file house style, a four-model VLM benchmark lane including Vertex/Gemini and a local Qwen2.5-VL, a YOLO-to-ONNX-to-browser pipeline, PaddleOCR, a surface engine, a claims module and the canvas; 'counts and schedule reads on the canvas by week 7' presumes viewport and scale resolution solved in weeks 1-4. One person cannot maintain this, and the VLM schedule reads promoted to Stage 3 by month 6 put money-bearing attributes (sizes, IL/GL) on the weakest evidence in the digest"
+   },
+   {
+    "design": "Surface Ledger",
+    "flaw": "Does not answer the brief for nine months (drawing takeoff is a 16-week plug-in in M7), while its critical path runs through things the builder cannot control: drone vendor procurement and CAAS/IPA permits, main-contractor acceptance of a shared surface, DR Capture chainage/loads coverage >=90% (unverified), and preambles that may pay bulk excavation design-nett; run cost US$7,500/month is 30x the other designs and 'builder 2 d/wk on this project alone' is not part-time"
+   },
+   {
+    "design": "Shadow Ledger",
+    "flaw": "Conditional: the entire capture premise rests on QSs saving PDF measurement annotations, which the digest lists as an open question; if the week-1 sample says no, the design must first build the Takeoff Pad (4 pw, writing /Measure annotations with pdf-lib) and becomes a canvas design with a thinner real-sheet spec than TrueLine. Not fatal if the sample says yes"
+   },
+   {
+    "design": "TrueLine",
+    "flaw": "Not fatal, but a one-person maintenance trap: importer, scale resolver, measurement kernel and classifier evaluation are each specified twice (Python and JavaScript) with shared test vectors, and a scikit-learn HistGradientBoosting model must be exported to a hand-rolled JSON tree for the browser; combined with first QS savings at week 18-24, a stalled plan leaves a large half-built engine"
+   }
+  ],
+  "unsupported_claims": [
+   {
+    "design": "TrueLine",
+    "claim": "Claim 2: >=90% per-path precision on measurable classes after no more than 20 corrected sheets from the same originator, using pen weight, dash, parallel-partner, hatch membership, symbol signature and label regex",
+    "why_fragile": "No evidence exists; the spike's sig() keys on stroke colour and closure on a synthetic sheet with no curves, hatching or overlaps, while real LTA sheets are all black with 3,614 hatch strokes and text drawn as glyph outlines; the digest says no civil dataset exists to pre-train on. The 3 person-week budget for a dual-route importer with clip-stack viewport reconstruction is also optimistic given extract_pdfjs.mjs has no clip handling today"
+   },
+   {
+    "design": "Shadow Ledger",
+    "claim": "Annotation timestamps (/M, /CreationDate) give a usable per-sheet, per-class effort baseline without a timer; and Engine v1 on real sheets plus shadow scorer in 6 person-weeks (weeks 6-14)",
+    "why_fragile": "Timestamps give first-to-last markup span, not effort, and Revu may write dates at save; the engine budget covers the same viewport/scale/black-pen problems TrueLine budgets at 6.5 weeks for the importer and scale resolver alone, with much less specification"
+   },
+   {
+    "design": "Surface Ledger",
+    "claim": "DR Capture rows carry chainage, depth band, soil type and loads on >=90% of rows after DR Verify; loads x nominal capacity / (1+bulking) reconciles to surveyed bank volume within \u00b110% after 3 cycles; at least half of MCs accept a shared hashed surface as the JM record",
+    "why_fragile": "All three are marked assumption or open question in the design and digest; the digest states truck-count volumes are systematically unreliable and JM remains a spreadsheet-based contract practice, and the design's own risk list admits bulk excavation may be paid design-nett"
+   },
+   {
+    "design": "Rulebook",
+    "claim": "A QS can enter or trace the primitives for TRENCH, CHAMBER, RC-SECTION and PAVEMENT in no more than 30-40% of the time they spend producing those families by hand; and preambles reduce to ~40 parameters per contract without free-text exceptions",
+    "why_fragile": "Typed tables add a data-entry step beside the QS's existing Excel/Bluebeam workflow (double entry until the markup harvester is verified on a real KKL PDF in weeks 15-18), and the 60% formula-line share is a digest inference the design itself schedules to test in week 1; if preambles contain untypable exceptions the engine blocks on 'rulebook incomplete'"
+   },
+   {
+    "design": "KKL Takeoff Overlay",
+    "claim": "Frontier VLMs with thumbnail plus 2x2/3x3 crops reach >=95% field accuracy on title blocks, legends and schedules and >=98% cell accuracy on Extract; per-viewport scale resolved automatically to within 0.5% on >=90% of sheets; canvas with counts in assist by week 7",
+    "why_fragile": "Digest evidence is 0.90-0.95 for text QA at best, Claude Opus 4 at 40% on dense dimension reads, 25-37% recall and up to 56% hallucination on structured extraction; the crude scale voter got 2 of 4 LTA sheets; and the week-7 canvas requires the sheet model, viewports and scale done in weeks 1-4 by the same one person"
+   }
+  ],
+  "recommendation": "Build the Rulebook spine first and let the other designs supply its phases. Sequencing for one part-time builder: (M0, 2 weeks) inbox sample for vector/outline/scan/DXF mix and Bluebeam usage, timer page, two-QS baseline, tier tag per project, week-1 count of BQ lines by family on 3-5 live Price Documents, verify extract_markups.py on one real KKL Revu PDF. (M1, 3 weeks) takeoff/engine.js as one pure ES module ported from calc_trench.py (TRENCH, CHAMBER, then RC-SECTION, PAVEMENT, KERB), golden tests with node --test in GitHub Actions blocking on any golden change, rulebook JSON with {value, source_page, confirmed_by} per parameter and 'rulebook incomplete' blocking output, Preamble-to-Rules Extract preset on the existing workbench for tier-B/C projects. (M2, 3 weeks) single-file takeoff/index.html: typed primitive tables mirroring the QS spreadsheet, pdf.js 4.10.38 viewer with per-viewport scale object (title-text seed corrected for page size, scale-bar check, OpenTakeoff grader green <=1% amber <=5% block >5%) and polyline/polygon/count tracing with snapping, entry cross-checks (IL monotonic, depth in band, run totals vs schedule), .xlsx quantity sheet with engine-vs-QS columns via SheetJS, primitives.json and CSV to SharePoint; shadow on live tenders from week 6 with QS committing first. (M3, 2-3 weeks) nightly Python harvester on an office PC: Shadow Ledger's sheet fingerprint (SHA-256 of normalised get_cdrawings tuples), markup extraction into primitives with subject-to-code map and a Bluebeam tool chest of KKL codes, BQ workbook harvest with openpyxl; PyMuPDF stays in this internal batch job only (AGPL is fine for internal use; pdf.js Apache in the QS-facing app), LibreDWG dwg2dxf as a separate process, no ODA, no ultralytics. (M4, 3 weeks) claims.html joining DR Capture CSVHEAD rows to bq.json through the item library with chainage-interval union, Surface Ledger's paid_on/measure_rule fields in the BQ map, shadow on 2 contracts; ticket/DO Extract presets on KKL's own tier-0 documents only. (M5, 3 weeks) ledger CSV plus status page with the digest gates per class x source, Shadow Ledger's check-pattern confidence buckets, blind-then-reveal, seeded errors, Overlay's cost readout and top-80%-of-value list, Overlay's 200-line confidentiality gateway with egress log; derived families to Stage 3 when 300 clean lines and 100% confirmed parameters. (M6-M7, months 7-12) auto-measure as a PyMuPDF batch shadow job implemented once, to TrueLine's spec: clip-hierarchy viewports with DBSCAN fallback, dimension-line detector as a third scale voter, pen-weight/dash/parallel-partner/hatch-membership rules and legend learning, counts and lengths first; proposals delivered as a KKL-ENGINE annotation layer on a PDF copy (Shadow Ledger) so no canvas classifier is needed in the browser; shadow scorer with shapely overlap and reason codes; real-sheet corpus of >=30 sheets on SharePoint plus ezdxf PyMuPdfBackend synthetic round trips in CI; a trained class map only after the rules plateau, and only if it can be evaluated in Python (do not port to JS). Keep the dual-route PyMuPDF-vs-pdf.js agreement as a periodic corpus test, not a per-sheet feature, so nothing is implemented twice. (Year 2) areas and section tools, VO differential via engine diff mode, TrueLine's chainage ledger joined to DR chainage, LandXML surface differencing computed by code with QS ownership; drone surveys and JM packs only when a contract funds them; scans stay QS-traced with snapping; no YOLO until >=2,000 logged instances and a licence-clean detector. First QS minutes saved at month 3 (derived families in Stage 2, BQ binder), claims assist by month 6, measured primitives graduating per source from month 12. Budget about 36-40 person-weeks over 24 months and about US$150-250/month run cost; the 24-month effort figure should be quoted as 60-65% of today with 55% as the upside if the claims roll-up reaches Stage 3 on most contracts."
+ },
+ {
+  "lens": "Chief quantity surveyor: twenty years measuring earthworks and drainage, signs every claim, QSs live in the tool daily. Judged on minutes actually removed from a QS's day, whether review work created is less than measuring removed, respect for how QSs really work (Bluebeam, Excel, printed sheets, phone calls to site, DR Verify countersign), whether money-bearing errors can slip through, and whether I would put my name on a claim or bid built by it.",
+  "scores": [
+   {
+    "design": "TrueLine: KKL vector-first takeoff engine",
+    "effort_reduction": 6,
+    "money_safety": 9,
+    "feasibility": 5,
+    "time_to_value": 4,
+    "cost": 8,
+    "kkl_fit": 7,
+    "total": 39,
+    "rationale": "Effort: the curve (100/92/76/62) is the most carefully derived (shares x speed-ups from the digest inventory, verification overhead included) but it is internally inconsistent: the 6-month row says counts are at Stage 3 for repeat originators, while the build plan only puts Stage 2 assist live and 'counts move to Stage 3 if gates are met' at M5 (weeks 24-30). For the first five months a QS's day gets longer, not shorter: timer, blind-then-reveal, click/lasso relabel on sheets with 400-15,000 paths. Claim 6 (touch time under 30% of measuring time) is the whole effort case and is untested. Money safety is the best in the panel: every quantity cites sheet hash, viewport, confirmed scale, path ids and rule-pack version; dual-route PyMuPDF/pdf.js agreement; dimension grader blocks export beyond 1%/5%; top-80%-of-value always human; rollback on any money-bearing error; a named QS signs. I would sign a claim from this. One QS worry: gap bridging across labels (collinear within 2 degrees, gap under 3x text height) and double-wall collapse can silently join a run that actually terminates or merge a kerb face/back with a drain wall pair; it is 'visible in the overlay' only if the reviewer looks, and the value rule is the only backstop. Feasibility: 42 person-weeks is undercounted because the kernel, importer, scale resolver and calc are each written twice (kernel.py and kernel.js 'to the same spec with shared test vectors'), plus DBSCAN viewport reconstruction, a dimension-line detector, a 40-feature HistGradientBoosting classifier exported to browser JSON, hatch polygonisation, a section tool, LandXML, PaddleOCR, skeleton snapping and YOLOv8; this is a research programme for one 0.4 FTE builder. It is, however, the only design that engages concretely with the real LTA sheet evidence (PDFill re-save, pen weights 0.36-2.16 pt, outline text, several scales per page). Time to value: first minutes saved around month 5-6 (Stage 2 at weeks 24-30; rule-pack BQ lines at week 24). Cost: US$250/month, no licences, good. KKL fit: chainage ledger joined to DR Capture is a strong idea (Claim 10 honestly flags chainage-convention mismatch), rule packs from preambles, confidentiality tier per project; but Bluebeam is an optional harvester 'only if QSs actually use it' and the QS must do everything in the new workbench, and claims (25-30% of QS hours) get only ~4% saving at 12 months.",
+    "gets_right": "Parallel-partner test for double-wall drains and kerb face/back; hatch strokes as their own IGNORE/HATCH class; section tool that interpolates GL/IL from long-sections to band trench depth the way a QS actually does it; dimension-line detector and per-viewport three-voter scale with originator template memory; VO diff as a diff of two sheet.json revisions per class; path-id provenance for every number."
+   },
+   {
+    "design": "Shadow Ledger: capture-first takeoff flywheel",
+    "effort_reduction": 7,
+    "money_safety": 8,
+    "feasibility": 7,
+    "time_to_value": 5,
+    "cost": 7,
+    "kkl_fit": 9,
+    "total": 43,
+    "rationale": "Effort: 100/90/75/55. The 6-month figure leans on 'shadow diff catches omissions before bid' (a quality gain, not minutes) and on claims roll-up at Stage 2 on 5 contracts (M4 shadow weeks 12-18). The best ergonomic idea in the panel is here: engine proposals written as measurement annotations on a KKL-ENGINE layer of a copy of the PDF, so the QS reviews in Bluebeam with keep/move/delete/draw, which is how they already work; the nightly diff is the corrections log. That makes review work cheap in a way no canvas can match. But the whole first six months rests on QSs saving annotated PDFs (digest lists this as an open question); if they measure from printed sheets or Excel-only, the flywheel has no fuel and Takeoff Pad (4 pw) must be built first. 55% at 24 months is the most aggressive curve and is stacked on digest hour shares. Money safety: the digest gates verbatim, confidence as a check pattern (not a weighted sum) with empirical error per pattern, truth = QS final after chief-QS adjudication plus the workbook figure (correct: the workbook is what went into the bid), reason-coded corrections, automatic demotion, named QS initials before export. The engine never touches the QS's own file. Weakness: the scorecard will carry hundreds of disagreements per week on real sheets in months 3-6, so 'chief QS 1 h/week adjudication' is not credible and un-adjudicated disagreements will pollute truth. Feasibility: ledger job ~3 pw on an office PC with PyMuPDF/DuckDB is realistic; engine v1 on real sheets in 6 pw (weeks 6-14) is optimistic but harmless because it runs in shadow; real Revu keys (/VP, /BSIColumnData, Count) are unverified with a sensible CSV fallback. Volumes engine plus bought drone surveys is scope creep. Time to value: no cost to QSs in months 0-4 (effort stays at 100%, not 105%), but first minutes saved only at assist (weeks 16-22) or claims shadow (weeks 12-18). Cost US$450/month including Bluebeam Core seats if needed. KKL fit is the strongest: DR Capture CSVHEAD ingest, tool chest with the 38 codes, synced SharePoint folders, workbook harvest, T0/T1/T2 tiers, claims roll-up from month 3, PSSCOC.",
+    "gets_right": "Zero-behaviour-change capture of markups, workbooks and DR rows before any engine; engine proposals written back as a KKL-ENGINE annotation layer reviewed in Bluebeam; the BQ workbook as the second truth source; confidence as a check pattern with empirical error per pattern; the top reason code of the week drives the builder's backlog; real-sheet regression corpus kept on SharePoint with only synthetic cases in CI."
+   },
+   {
+    "design": "Surface Ledger: survey-first progress measurement",
+    "effort_reduction": 5,
+    "money_safety": 8,
+    "feasibility": 6,
+    "time_to_value": 4,
+    "cost": 2,
+    "kkl_fit": 8,
+    "total": 33,
+    "rationale": "Effort: 101/95/84/65, the most conservative and probably the most honest, but it rests on three unverified pillars the design itself flags: claims are 25-30% of QS hours (digest low-confidence inference), DR rows carry chainage/depth band/loads on >=90% (unverified), and main contractors accept a shared drone surface. From my chair, rolling DR rows into drain/kerb/sump claim lines with a delivery-note cross-check is genuinely what a claims QS does every month and would save real hours; but the tender side, 35-45% of hours and the thing the owner asked for, is deferred to month 9-12 and then given a 16-week footnote ('extract_pymupdf/extract_dxf wired to bq_map; per-viewport scale confirmation UI') for the same real-sheet work other designs budget 10+ pw for. Money safety: two independent sources per line (DR chainage vs precast units, tonnes vs area-derived tonnes, survey vs loads) is exactly how a good chief QS already sanity-checks a claim, and SO certification within weeks is the only real external truth in the panel; the audit appendix with DR row ids, ticket ids and surface hashes is what an SO and an adjudicator want. Loads as KPI never as quantity: correct. Concern: exclusion masks for machines/stockpiles/water are manual each cycle and are where a volume error hides; and the design does not distinguish under-claiming (KKL's loss) from over-claiming (SO's catch). Feasibility: surface engine ~600 lines, reconcile tab, ticket extraction and claim pack are all shippable; but drone vendor procurement, CAAS permits, Infrastructure Protection Act on MRT sites and MC agreement to joint measurement are outside the builder's control, and '34 builder pw over 12 months' is ~0.65 FTE, not part-time. Time to value: month 3 is 101%; first minutes at month 5-6 on five pilot contracts, once a month. Cost is the killer: US$7,500/month (S$9k/month of RTK flights) is thirty times the others; the MD will ask why we fly drones when the MC's surveyor and our own total station already produce agreed levels. KKL fit is deep: CSVHEAD, DR Verify status as a gate, truck capacities from the machine register, staging-ground tonnage by stream, LTA M&W Ch.3 baseline survey, SOP Act cadence, subcon back-to-back, paid_on survey vs design-nett per item.",
+    "gets_right": "Two-source agreement as the confidence proxy for claims; SO-certified quantity as the truth signal; paid_on (survey | design_nett | dr_rows | tickets) per BQ item; bulking and m3-per-load calibration from survey-vs-loads residual feeding tender rates; joint-measurement pack with random check cells for the MC's total station; to-complete quantities for ordering as a by-product; DR Verify coverage as a promotion gate."
+   },
+   {
+    "design": "Rulebook: preamble-driven quantity engine",
+    "effort_reduction": 7,
+    "money_safety": 8,
+    "feasibility": 8,
+    "time_to_value": 8,
+    "cost": 9,
+    "kkl_fit": 9,
+    "total": 49,
+    "rationale": "Effort: 100/90/73/55. This is the only design that attacks where my hours actually go: the arithmetic and bookkeeping around the lines, not the lines. TRENCH/CHAMBER families in shadow from week 6 (calc_trench.py already produces them), Stage 2 by month 3, Stage 3 by month 8; a QS types or traces 25 primitives and stops hand-building twenty depth-banded lines. The claim that primitive entry takes 30-40% of the time of producing the family by hand is an assumption, but it matches my experience of where the tedium is. The insight that deterministic derived lines need root-caused differences and golden tests, not a statistical accuracy gate, is correct and lets whole families graduate together. Weakness: measuring is not removed until year 2, and the auto-measure budget ('~10 builder days over 3 months' for per-viewport scale, pen-weight clustering, legend learning, label attachment on real sheets) is a fraction of what TrueLine budgets for the same thing, so the 55% at 24 months is soft. Money safety: rulebook parameters each carry value, source page, extractor, confirmer and timestamp, shown as a diff against the client template, and an unconfirmed parameter blocks the engine; this is exactly the discipline I apply when reading preambles and it becomes auditable. Golden regression, CI blocking, engine/rulebook version stamped on every line, RC-REB only from an issued BBS, chainage-interval union to prevent double claiming. The real exposure is garbage-in: a mistyped IL or wrong viewport scale propagates into twenty lines with no path-id provenance ('typed by X' is all an SO gets); the entry cross-checks (IL monotonic, GL-IL within band, run totals vs schedule, scale grader blocking export >5%) and the value rule are the only defence, and they are the right ones. I would sign this; it is my own spreadsheet made reproducible. Feasibility: 36 pw, but the plan is written in builder days (5, 6, 5 days per milestone), engine.js is a plain ES module with node --test, outputs are .xlsx, typed tables mirror the QS's spreadsheets, harvester turns existing Bluebeam markups into primitives; it works whether QSs use Bluebeam, Excel or printed sheets. Time to value: month 3, earliest in the panel. Cost US$150/month, no licences. KKL fit: item library keyed to KKL codes with DR join keys, claims.html over DR Capture CSVs with chainage union, VO differential with the pricing-basis column in the HKIS order, SOR-contract note, Tier A/B/C, Excel kept as the presentation layer.",
+    "gets_right": "Rulebook as a page-cited, confirmer-named diff against the client template with unconfirmed parameters blocking the engine; one pure engine.js module shared by the tender app, claims and tests; chainage-interval union against double claiming; entry cross-checks (IL monotonic, depth within band, run totals vs schedule); typed tables that mirror the QS's existing spreadsheets and .xlsx out; VO pricing-basis column; a build plan in builder days."
+   },
+   {
+    "design": "KKL Takeoff Overlay: VLM-hybrid canvas",
+    "effort_reduction": 6,
+    "money_safety": 7,
+    "feasibility": 4,
+    "time_to_value": 7,
+    "cost": 5,
+    "kkl_fit": 6,
+    "total": 35,
+    "rationale": "Effort: 97/88/74/58 with an honest cap ('bulk excavation from sections stays human-led, capping reduction near 40-45%'). Counts and schedule reads on the canvas at week 7 are visible early but, as the design admits, under 10% of tender hours. Review ergonomics: accept/edit/reject with single keys and a cost readout per item is good, but confirming items one at a time on a 15,000-path LTA sheet is slow without lasso/bulk accept, and every confirmation is framed as a label, which tempts management to count labels rather than minutes. Money safety: VLM never emits a number, its count is a disagreement flag only, five confidence chips, tier gateway with egress log, value rule, blind-then-reveal, named stamp. But VLM-read schedules feed IL/GL and sizes into depth bands; 'row must carry a citation and column sums reconcile' does not catch a plausible wrong invert. And T1 ('client tender documents without NDA/OSA marking') sending 200 dpi crops to a Gemini lane on Vertex conflicts with the digest's reading that public-sector client drawings fall under the OSA regardless of marking; my contracts person would not let that crop leave. Feasibility is the problem: 76 person-weeks (the licences text says ~64, a 12 pw discrepancy), a FastAPI local runner with Entra ID (a server, breaking the single-file plus CSV house style), a four-model VLM benchmark harness including a local Qwen2.5-VL, YOLO to ONNX in the browser, a surface engine and a claims module; weeks 1-4 sheet model, weeks 3-7 canvas and weeks 6-10 benchmark overlap for one part-time person. Real-sheet handling ('curves, hatching, overlaps and multi-viewport') is a six-week milestone with none of TrueLine's mechanism. Time to value: week 7 on counts and schedule reads, genuinely early even if small. Cost US$600/month plus an Azure VM, GPU for detector training and a civils.ai benchmark subscription. KKL fit: grows from ai/index.html, shares DR Capture keys, exports an annotated PDF with /Measure markups Bluebeam can open; but the runner and the Gemini lane pull away from the stack and the confidentiality reality.",
+    "gets_right": "Cost readout (qty x KKL rate) beside every item so the reviewer's eye goes where the money is; kerb-type classification accuracy >=97% as its own gate because type is the rate; radius <20 m short-unit rule; annotated PDF export with ISO /Measure and /Subj so Bluebeam opens the engine's work; VLM count as a disagreement flag only; egress log per project; civils.ai Starter as an external benchmark, never the pipeline."
+   }
+  ],
+  "ranking": [
+   "Rulebook: preamble-driven quantity engine",
+   "Shadow Ledger: capture-first takeoff flywheel",
+   "TrueLine: KKL vector-first takeoff engine",
+   "KKL Takeoff Overlay: VLM-hybrid canvas",
+   "Surface Ledger: survey-first progress measurement"
+  ],
+  "best_ideas_to_graft": [
+   {
+    "from_design": "Shadow Ledger",
+    "idea": "Nightly zero-behaviour-change capture of Bluebeam/Acrobat markups, BQ workbooks and DR rows from week 2, and engine proposals written back as a KKL-ENGINE annotation layer on a copy of the PDF so QSs review in the tool they already use; nightly diff = corrections log with reason codes.",
+    "why": "Cheapest possible review work: keep/move/delete in Bluebeam is minutes a QS already spends; no new app to learn before value; corrections come free. Must be conditional on the week-1 inbox sample showing QSs actually annotate."
+   },
+   {
+    "from_design": "Shadow Ledger",
+    "idea": "Truth = QS final after chief-QS adjudication plus the workbook figure, not the raw markup; confidence as a check pattern with an empirically measured error rate per pattern rather than a weighted score.",
+    "why": "Markups are stale and double-counted; the workbook is what went into the bid. A check pattern I can read ('scale confirmed, two routes agree, legend unambiguous, label attached') is something a chief QS can audit; a weighted score is not."
+   },
+   {
+    "from_design": "TrueLine",
+    "idea": "The measurement engine specifics: pen-weight classes, dash pattern, parallel-partner offset test for double-wall drains and kerbs, hatch-membership IGNORE class, symbol signature vs learned legend, label regex context, per-viewport three-voter scale with originator template memory, dimension grader blocking export, and the section tool interpolating GL/IL from long-sections into depth bands.",
+    "why": "It is the only design that answers how classification survives PDFill-re-saved, layerless, all-black, multi-scale LTA sheets. Graft as the phase-2 measurer behind the Rulebook's primitives.json interface, but build one kernel (pdf.js in the browser for the QS app; PyMuPDF only as the nightly second route), not two."
+   },
+   {
+    "from_design": "TrueLine",
+    "idea": "Path-id provenance on every measured primitive and a chainage ledger of designed quantity per activity code per chainage interval so monthly drain/kerb/pipe claims become DR chainage lookups; VO diff as a diff of two sheet.json revisions per class.",
+    "why": "An SO or adjudicator can rebuild the number from the sheet; typed primitives cannot offer that. The chainage ledger is the bridge between tender takeoff and the monthly claim."
+   },
+   {
+    "from_design": "Surface Ledger",
+    "idea": "Two-source reconciliation as the confidence proxy for claim lines (DR chainage vs precast delivery units x 1.0 m; asphalt tonnes vs m2 x thickness x density; DO m3 vs design m3), a paid_on field per BQ item (survey | design_nett | dr_rows | tickets), DR Verify coverage as a promotion gate, and SO-certified quantity as the truth signal.",
+    "why": "This is how a chief QS already sanity-checks a pack; making it structural means a claim line only auto-drafts where two records agree, and the SO's certificate closes the accuracy loop within weeks with no drone programme required."
+   },
+   {
+    "from_design": "Surface Ledger",
+    "idea": "Loads x nominal capacity / (1+bulking) as a KPI only, calibrated per soil type from whatever surveys already exist, feeding m3/load and m3/h into tender rates; surface differencing only on contracts that already pay on survey and already have a surface.",
+    "why": "Keeps the valuable calibration without S$9k/month of flights; surfaces are exact where they exist and a distraction where they do not."
+   },
+   {
+    "from_design": "KKL Takeoff Overlay",
+    "idea": "Cost readout (qty x rate) beside every line, kerb-type accuracy as its own gate, radius <20 m short-unit rule, annotated PDF export with ISO /Measure and /Subj = KKL code, and an egress log of what left KKL per project.",
+    "why": "Reviewer attention follows money; kerb type is the rate; the /Measure export round-trips to Bluebeam so the engine's work is visible in the QS's own tool; the egress log is what the contracts person needs to answer an LTA NDA query."
+   },
+   {
+    "from_design": "KKL Takeoff Overlay",
+    "idea": "Trial civils.ai Starter on T0 (own or public) sheets for three months purely as an external benchmark for the in-house engine.",
+    "why": "Cheap independent calibration of the accuracy ledger; never the pipeline, never on client drawings."
+   }
+  ],
+  "fatal_flaws": [
+   {
+    "design": "Surface Ledger: survey-first progress measurement",
+    "flaw": "Answers a different question for nine months (claims, not takeoff from PDF drawings and BQs), at US$7,500/month (S$9k of fortnightly RTK flights), with three load-bearing dependencies outside KKL's control (MC acceptance of a shared surface, CAAS/IPA permits, DR chainage coverage >=90%). The tender side, 35-45% of QS hours, is a 16-week footnote."
+   },
+   {
+    "design": "KKL Takeoff Overlay: VLM-hybrid canvas",
+    "flaw": "76 person-weeks (64 elsewhere in the same document), a FastAPI local runner with Entra ID, a four-model VLM benchmark harness, a browser YOLO pipeline and a surface engine is a product company's roadmap, not one part-time builder on GitHub Pages plus CSV; and the T1 tier sends drawing crops to a cloud VLM (including a Gemini lane on Vertex) on public-sector client drawings the digest places under the Official Secrets Act regardless of NDA marking."
+   },
+   {
+    "design": "TrueLine: KKL vector-first takeoff engine",
+    "flaw": "Near-fatal for feasibility rather than for safety: every core module (importer, scale resolver, kernel, calc) is specified twice, in Python and in JavaScript to a shared spec, on top of a 40-feature learned classifier, DBSCAN viewport reconstruction and a dimension-line detector, and no QS minute is saved before month 5-6; the 6-month effort row assumes counts at Stage 3 while the build plan reaches Stage 3 gating only at weeks 24-30."
+   },
+   {
+    "design": "Shadow Ledger: capture-first takeoff flywheel",
+    "flaw": "Conditional, not absolute: if the week-1 inbox sample shows QSs measure from printed sheets or Excel-only (an open question in the digest), the flywheel has no fuel, Takeoff Pad becomes a 4-person-week detour, and the first six months deliver nothing; the 'chief QS 1 h/week adjudication' will not clear the disagreement volume real sheets produce, so un-adjudicated truth pollutes the ledger."
+   }
+  ],
+  "unsupported_claims": [
+   {
+    "design": "TrueLine: KKL vector-first takeoff engine",
+    "claim": "Claim 6: QS touch time per item in Stage 2 is under 30% of hand-measuring time, and the 6-month row shows counts at Stage 3.",
+    "why_fragile": "No timer data exists; the Togal study shows learning-curve effects masquerade as gains; the build plan only reaches Stage 2 assist at weeks 24-30, so the 92% at month 6 is not achievable on the design's own schedule."
+   },
+   {
+    "design": "TrueLine: KKL vector-first takeoff engine",
+    "claim": "Claim 2: >=90% per-path precision on measurable classes after 20 corrected sheets per originator template; and 42 person-weeks total.",
+    "why_fragile": "No civil drawing dataset exists to prior this on; the real LTA sheets carry 3,614 hatch strokes and text drawn as outlines on one page; and the dual Python/JS kernel means the person-week count is closer to double for the shared modules."
+   },
+   {
+    "design": "Shadow Ledger: capture-first takeoff flywheel",
+    "claim": "At least half of tender sheets are saved as PDFs with measurement annotations, and annotation timestamps give a usable minutes-per-sheet-per-class baseline.",
+    "why_fragile": "The digest explicitly lists whether KKL QSs use Bluebeam as an open question; Revu /M is a modification date written at save and a per-markup timestamp conflates thinking, phone calls to site and lunch with measuring, so the baseline criterion 1 demands would be fiction."
+   },
+   {
+    "design": "Shadow Ledger: capture-first takeoff flywheel",
+    "claim": "Shadow disagreements surface >=1 real QS omission or double count per 10 sheets in the first 3 months, adjudicated by the chief QS in 1 h/week.",
+    "why_fragile": "On real layerless sheets the engine's early precision will be low, so most disagreements will be engine noise; adjudicating them is hours, not one hour, and if skipped the truth set is wrong."
+   },
+   {
+    "design": "Surface Ledger: survey-first progress measurement",
+    "claim": "Claims plus subcon certification are 25-30% of QS hours; DR rows carry chainage/depth band/loads on >=90% after DR Verify; at least half of MCs accept a hashed drone surface as the joint-measurement record.",
+    "why_fragile": "The first is the digest's own low-confidence inference; the second the design labels unverified; the third is a digest open question; all three must hold for the 12-month 84% figure."
+   },
+   {
+    "design": "Surface Ledger: survey-first progress measurement",
+    "claim": "Vendor RTK flights at S$2,500-5,000 fortnightly on 2-3 sites cost less than the QS and surveyor hours they replace.",
+    "why_fragile": "No KKL hourly cost exists in the evidence; strut-level and MC joint surveys already happen by total station on decked sites where drones cannot see, so the marginal replaced hours may be small."
+   },
+   {
+    "design": "Rulebook: preamble-driven quantity engine",
+    "claim": "A contract's measurement preambles fit in ~40 parameters per contract with no free-text exceptions the engine cannot apply.",
+    "why_fragile": "Real LTA/HDB/PUB preambles carry exceptions (rock measured separately, breaking out existing, working around services, excavation for channels included or not) and two QSs already read 'measured over sumps' differently; the design flags this as refutable in weeks 3-5, which is the right test but the 24-month curve assumes it passes."
+   },
+   {
+    "design": "Rulebook: preamble-driven quantity engine",
+    "claim": "Vector-PDF auto counts and lengths on real sheets reach median error <=1% and count exact-match >=98% after ~10 builder days over months 7-10.",
+    "why_fragile": "TrueLine budgets 4+5+2+3 person-weeks for the same components; ten days will produce a shadow run that fails its gates and the 24-month 55% figure leans on those primitives graduating."
+   },
+   {
+    "design": "KKL Takeoff Overlay: VLM-hybrid canvas",
+    "claim": "Frontier VLMs with a global thumbnail plus crops reach >=95% field accuracy on title blocks, legends and schedules and >=98% cell accuracy; contracts will classify most non-rail tenders as T1 (cloud permitted).",
+    "why_fragile": "The digest puts text QA at 0.90-0.95, Claude at 40% on dense dimension reads, zero-shot structured extraction at 25-37% recall with up to 56% hallucination, and states client drawings for public-sector civil works fall under the OSA; the T1 assumption is a legal reading the contracts person has not made."
+   },
+   {
+    "design": "KKL Takeoff Overlay: VLM-hybrid canvas",
+    "claim": "A part-time builder ships the canvas with counts and schedule reads in 7 weeks while also building the sheet model (weeks 1-4), the runner and the VLM benchmark (weeks 6-10); total 76 person-weeks (stated as 64 in the cost note).",
+    "why_fragile": "Three overlapping milestones for one person, a server component outside the house style, and a 12-person-week internal inconsistency."
+   }
+  ],
+  "recommendation": "Build the Rulebook as the spine and let the other four supply organs. Weeks 0-2: inbox sample (vector/outline/scan/DXF and whether QSs annotate PDFs), two-QS baseline on 20 sheets, money-bearing error definition signed, item library v0 from 3-5 live Price Documents, confidentiality tier per project. Weeks 2-6: Shadow Ledger's nightly capture job on an office PC (markups, BQ workbooks, DR Capture/DR Verify rows) so ground truth starts accumulating with zero behaviour change, plus the Bluebeam tool chest with KKL codes. Weeks 3-8: engine.js (TRENCH/CHAMBER ported from calc_trench.py, then RC-SECTION, PAVEMENT, KERB) as one pure module with golden tests; per-contract rulebook drafted by the Extract agent from preamble text only and confirmed parameter-by-parameter against cited pages as a diff to the client template; primitive capture app with typed tables that mirror the QS's spreadsheets, pdf.js trace with snapping and per-viewport scale confirmation, .xlsx out, and every trace saved as an ISO /Measure annotation so the same harvester reads it. Derived families go shadow at week 6, assist at month 3, auto-with-audit at month 8 on root-caused differences and 300 clean lines, not statistical gates. Months 3-6: claims.html over DR Capture CSVs with chainage-interval union, Surface Ledger's two-source reconciliation (DR chainage vs delivery units, tonnes vs area x thickness x density, DO m3 vs design m3), a paid_on field per BQ item, DR Verify coverage as a promotion gate, SO-certified quantities entered back as truth; surfaces only where a contract already pays on survey and a surface already exists, no drone programme in year 1. Months 7-12: TrueLine's measurer behind the same primitives.json interface, built once (pdf.js in the browser for the QS app, PyMuPDF as the nightly second route only): pen-weight and dash classes, parallel-partner test, hatch IGNORE class, legend signature learning, label regexes, three-voter per-viewport scale with originator memory, dimension grader blocking export, path-id provenance; counts and linear runs in shadow per class x source under the digest gates, proposals written back as a KKL-ENGINE annotation layer where QSs use Bluebeam and as overlay items in the capture app otherwise. Year 2: section tool for GL/IL from long-sections, areas with the mean-signed-error guard, DXF fast path, scan tracing with snapping, chainage ledger joining tender quantities to DR rows. Throughout: cost readout beside every line, top-80%-of-value always human, blind-then-reveal on 20%, seeded errors, one manual sheet per QS per week, lasso/bulk accept in the reviewer, kerb type as its own gate, egress log, no drawing pixels to any cloud model on any tier until the contracts person has read the NDA and the OSA position in writing, engine and rulebook version stamped on every quantity, and a named QS signs every bid, claim and subcon certificate. This removes my QSs' arithmetic minutes by month 3, their BQ-entry minutes by month 4, their monthly claim-building minutes by month 6, and their measuring minutes only when KKL's own ledger says the measurer has earned it."
+ },
+ {
+  "lens": "Managing director and contracts manager jointly: cash ROI and QS capacity, timing of savings versus spend, PSSCOC Module A / SOP Act exposure when a quantity is wrong (tender pricing risk, claim certification, KKL as SOPA respondent on subcon claims), OSA / NDA / Infrastructure Protection Act confidentiality, dependency on clients and main contractors (DXF, LandXML, joint measurement, drone permissions), honest buy-vs-build against civils.ai, Kreo or a takeoff service, organisational change for the QS team (roles, incentives, deskilling), and builder single-point-of-failure risk.",
+  "scores": [
+   {
+    "design": "TrueLine: KKL vector-first takeoff engine",
+    "effort_reduction": 7,
+    "money_safety": 9,
+    "feasibility": 6,
+    "time_to_value": 5,
+    "cost": 7,
+    "kkl_fit": 7,
+    "total": 41,
+    "rationale": "Effort (7): the 6-month figure of 92% is honest because it is tender-only and includes verification overhead; 76% at 12 months needs DR-PIPE/DR-RCU/RW-KERB at Stage 3 (500 verified items across 5 projects) by month 9-12 while the classifier for black-pen sheets (M3, weeks 11-18) is still v0 rules, and the claims block (25-30% of hours per digest topic 2) is touched only through the chainage-ledger join 'live on >= 10 contracts' at month 12; 62% at 24 months is plausible but tender-heavy. Gates are the digest's verbatim and per class x source, and the design correctly keeps scans at Stage 2 and judgement items never automated. Money safety (9): the strongest provenance in the panel: every quantity cites sheet hash, viewport, confirmed scale, path ids and rule-pack version; no probabilistic component ever emits a number; dual-route PyMuPDF/pdf.js agreement, dimension grader blocking export beyond 1%/5%, top-80%-of-value always human, automatic rollback, blind-then-reveal, seeded errors, one manual sheet per QS per week. For a contracts manager defending a VO or subcon dispute before an SO or adjudicator, this is the audit trail that matters. Feasibility (6): it is the only design that engages seriously with the real LTA sheets in the digest (clip-hierarchy viewports with DBSCAN fallback, outline-text detection, hatch strokes as their own class, parallel-partner test for double-wall pipes, per-viewport three-voter scale), but that is also 42 person-weeks of geometry code, and its own arithmetic does not close: 30 pw in the first 12 months at 0.4 FTE is 21 pw of capacity, so M6-M8 slip by months even before real-sheet surprises. The risk register admits real sheets could push classification 'well below the gates'. Time to value (5): weeks 0-3 deliver a timer and CSV export (instrumentation, not saving); schedule reads via the existing Extract agent from month 1; counts Stage 2 by month 3; real assist on linear runs only at M5 (weeks 24-30). Cost (7): US$250/month, no per-seat SaaS, PyMuPDF AGPL question budgeted at US$1-2k/yr; the QS-time cost (2 h/QS/week of corrections) is stated, which most designs omit. KKL fit (7): DR-keyed CSV rows, chainage ledger designed to make claim lines DR Capture lookups, rule packs from preambles signed by the chief QS, single-file GitHub Pages plus SharePoint; but it is tender-first in a business where the monthly SOPA cycle on ~30 contracts is the recurring pain, and it says nothing about subcon certification (where KKL is the SOPA respondent) or the buy alternative.",
+    "gets_right": "Reconstructible provenance per quantity (sheet hash, viewport, path ids, rule-pack version) and the discipline that no model-emitted number ever becomes a quantity; the only design that treats hatch strokes, outline-text pages and multi-viewport scale as first-class engineering problems with a regression corpus of real LTA sheets before any promise; shared JSON test vectors between Python and JS kernels so the browser route is provably the same code."
+   },
+   {
+    "design": "Shadow Ledger: capture-first takeoff flywheel",
+    "effort_reduction": 6,
+    "money_safety": 8,
+    "feasibility": 6,
+    "time_to_value": 4,
+    "cost": 7,
+    "kkl_fit": 8,
+    "total": 39,
+    "rationale": "Effort (6): 90% at 6 months and 75% at 12 are inferences stacked on digest hour shares (the design says so), and 55% at 24 months is the most aggressive floor in the panel because it requires two big bets to land together: counts/linear/areas at Stage 4 on drawings and the claims roll-up at Stage 4 on all ~30 contracts, on 37 person-weeks. The first six months explicitly reduce no effort ('disagreements are the product'); the value is a second pair of eyes before bids, which the MD may value but cannot book as capacity. Money safety (8): nothing auto-accepts until the ledger proves it, the engine writes proposals to a copy on a KKL-ENGINE layer and never edits the QS's file, confidence is a check pattern with empirically measured error rather than a weighted sum, truth is 'QS final after chief-QS adjudication' with the two-QS baseline as ceiling, derived lines are tested code, and the real-sheet regression corpus stays on SharePoint with only synthetic cases in GitHub Actions (a confidentiality detail the others miss). Slight circularity remains: the engine is graded against the same QS markups that train it, and escaped errors only surface if an SO or MC catches them. Feasibility (6): the whole thesis rests on an unverified premise the digest lists as open: whether KKL QSs measure in Bluebeam/Acrobat at all or type dimensions into Excel. If under 50% of sheets carry annotations, the design falls back to building Takeoff Pad (4 pw), i.e. the same snapping workbench TrueLine and Overlay build, with 6 pw budgeted for the engine on real sheets versus TrueLine's ~20. Bluebeam seats (US$330/user/yr, Core or above because Basics lacks count tools) become a hidden prerequisite. Time to value (4): assist mode arrives at M5 (weeks 16-22); the claims roll-up reaches Stage 2 on 5 contracts by month 6; before that the QS sees only a tool chest and a weekly note. Cost (7): US$450/month including Bluebeam seats and API; drone surveys charged to projects; 37 pw is realistic for the capture and scorer, thin for the engine. KKL fit (8): the best operational fit in the panel: nightly Python job on an OneDrive-synced office PC, DR Capture CSVHEAD ingest, project register with T0/T1/T2 tiers, Bluebeam tool chest keyed to the 38-code dictionary, claims roll-up shadowed against the QS's actual pack, and an explicit management dependency that time saved becomes tender capacity and reviewers are measured on catch rate. It is also the only design to note SharePoint sync conflicts and file locks as a risk.",
+    "gets_right": "Zero-behaviour-change capture as the first deliverable, so the engine is tested against real KKL sheets from week 6 instead of a synthetic drawing; the check-pattern calibration table (auto-accept bucket = patterns whose empirical error is <= 0.5% on >= 200 items) as the confidence proxy for deterministic geometry; proposals written back as ISO 32000 annotations so the QS reviews in the tool they already use; keeping confidential regression sheets off GitHub."
+   },
+   {
+    "design": "Surface Ledger: survey-first progress measurement",
+    "effort_reduction": 6,
+    "money_safety": 8,
+    "feasibility": 7,
+    "time_to_value": 5,
+    "cost": 3,
+    "kkl_fit": 8,
+    "total": 37,
+    "rationale": "Effort (6): the most honest curve in the panel (101% at month 3, 95% at 6, 84% at 12, 65% at 24) and the only one that admits the first-year saving is about 5% of QS effort, but that honesty exposes the problem: tender takeoff, 35-45% of QS hours, is untouched until month 9-12 and only reaches assist by month 12-24, so the MD funds a year of drone flights for a 5-16% reduction. The claims saving compounds across all contracts only if DR Capture coverage is >= 90% of claim-relevant rows, which the design itself marks unverified. Money safety (8): structurally the best story for the SOP Act: two independent sources per line (survey vs loads, DR chainage vs precast delivery notes, weighbridge tonnes vs area x thickness x density), SO certification and MC joint measurement as ground truth within weeks, an audit appendix listing DR row ids, ticket ids and surface hashes, back-to-back subcon certificates (where KKL is the SOPA respondent and silence means deemed acceptance), and loads kept as a KPI never a claim source. Weaknesses: SO certification catches over-claims, not under-claims (cash-flow loss is invisible to this truth signal), and drone imagery of MRT worksites raises Infrastructure Protection Act questions the design only flags. Feasibility (7): technically the lightest phase 1 (lxml, scipy Delaunay, numpy grid difference, PapaParse, SheetJS, no drawing understanding), but organisationally the heaviest: it needs drone vendor procurement with NDA, CAAS operator/UAPL/activity permits per site, controlled-airspace exclusions, MC agreement to a shared surface as the JM record (an open question), design surfaces as LandXML from clients, baseline LTA M&W Ch.3 surveys located, and site staff photographing tickets daily. Under-strut excavation, where most MRT money sits, cannot be flown and falls back to total-station lifts. Time to value (5): assisted claim packs on 5 pilot contracts by month 5-6; first surface-difference volumes validated on 2 flights by month 3; nothing for tender QSs until month 9. Cost (3): US$7,500/month run cost, dominated by S$9,000/month of vendor RTK flights, is roughly S$110k a year against a year-one saving the design itself puts at ~5% of QS effort; the ROI only closes if better-evidenced claims recover disputed m3 or replace surveyor hours, and neither is quantified (the design admits 'no KKL hourly cost in the digest'). Year-2 in-house pilot plus DroneDeploy/PIX4D is another S$15k one-off plus US$4k/yr. KKL fit (8): the deepest use of what KKL already produces: DR Capture CSVHEAD fields, DR Verify status, fleet register truck capacities, asphalt paid by weight under LTA M&W, staging-ground tonnage by stream (Good Earth S$1.20/t, Soft Clay S$5.00/t), PSSCOC provisional-quantity admeasurement, bq_map paid_on field for survey vs design-nett, and calibrated bulking and m3/load feeding tender rates. Single-file apps on GitHub Pages plus one local Python package.",
+    "gets_right": "Claims are a reconciliation problem with independent truth (SO, MC, subcon) arriving within weeks, making them the fastest place to build a real accuracy ledger; two-source agreement as the confidence proxy for pipeline quantities; the back-to-back subcon certificate and SOP Act audit appendix; the bq_map 'paid_on' distinction (survey vs design-nett vs DR rows vs tickets) that decides what a claim line may legitimately be built from; loads x capacity / bulking as a KPI that also calibrates tender productivity rates."
+   },
+   {
+    "design": "Rulebook: preamble-driven quantity engine",
+    "effort_reduction": 7,
+    "money_safety": 8,
+    "feasibility": 8,
+    "time_to_value": 8,
+    "cost": 9,
+    "kkl_fit": 8,
+    "total": 48,
+    "rationale": "Effort (7): 90% at 6 months is credible because the TRENCH/CHAMBER families are already produced by calc_trench.py and go into shadow at week 6 and Stage 2 by month 3, and because whole families of derived lines (EW-EXCT by band, EW-BF, EW-DISP, EW-HARD, RC-*, RW-* tonnage, kerb haunch) graduate together on rulebook confirmation plus golden tests rather than a per-class statistical programme. 73% at 12 months leans on claim roll-ups in assist on ~15 contracts and BQ binding. 55% at 24 months is not supported: it requires automated primitives from vector PDF at Stage 3, yet M7 budgets about 10 builder-days for the auto-measure work that TrueLine costs at ~20 person-weeks, so the QS keeps tracing and typing the primitives that make up the heavy measurement blocks (bulk excavation from levels 15-20%, runs 15-20%, RC 15% of tender hours). The honest 24-month figure is nearer 65-70% unless the auto-primitive budget is raised. Money safety (8): every rulebook parameter carries value, source page, extractor, confirmer and timestamp, unconfirmed parameters block the engine, engine and rulebook versions plus primitive hashes are stamped on every line, CI blocks release on any golden change, and judgement inputs (scale per viewport, levels on scans, soil split, working space, VO rate choice, claim signature) are human forever; the SOR rule that BQ quantities are not used for omissions is captured. The stated residual risk is real: one mistyped level propagates into twenty lines, mitigated by IL-monotonic, band-range and schedule-total cross-checks and the value rule. For a contracts manager, 'we measured per preamble clause X at page Y, confirmed by Z' is the strongest defensible position of any design. Feasibility (8): the lightest and most shippable plan: 36 pw, engine.js as a pure module with node --test goldens, rulebooks and item library as data edited by the QS team, typed tables that mirror their spreadsheets, .xlsx out, no server, no VLM on drawings, no detector, and it sidesteps real-sheet geometry in year one by letting the QS trace or type. Survives no-layers, pen-weight and outline-text sheets by not depending on them. Time to value (8): first shadow on a live tender at week 6-8, derived families drafted in Stage 2 by month 3, BQ binder pre-filling the quantity sheet, claim roll-up pilot at weeks 12-14. The fastest real minutes saved in the panel. Cost (9): US$150/month, no new licences, Bluebeam optional, drone survey only where a contract funds one, chief QS ~8 pw over 24 months stated. KKL fit (8): the item library is KKL's own civil taxonomy keyed to DR Capture struct/method/spec_element, rulebook templates per client (LTA, HDB SOR, PUB, MC back-to-back), Tier-A contracts get rulebooks typed by hand, VO pricing order BQ rate -> pro-rata -> star -> daywork, claims never auto-submitted, insurer confirmation listed as a dependency. It asks QSs to enter primitives into a new app, a behaviour change softened by the Bluebeam harvester and typed tables; it does not compare against buying.",
+    "gets_right": "The hours are in the arithmetic, bookkeeping and reconciliation around the lines, not in drawing them, so a versioned rules engine over four primitives graduates whole BQ families at once with correctness resting on confirmed contract rules and golden tests instead of an AI accuracy programme; rulebook parameters with page citations and a named confirmer; one item mapping reused across tender, claim, subcon certificate and VO; primitives.json as a stable interface so measurement automation plugs in later without reopening the safety argument."
+   },
+   {
+    "design": "KKL Takeoff Overlay: the in-house civils.ai",
+    "effort_reduction": 5,
+    "money_safety": 6,
+    "feasibility": 4,
+    "time_to_value": 7,
+    "cost": 4,
+    "kkl_fit": 6,
+    "total": 32,
+    "rationale": "Effort (5): 88% at 6 months requires counts at Stage 3 and linear runs at Stage 2 on real sheets by month 6 while the same builder is also shipping a VLM benchmark across Gemini 3 Pro, Claude Opus 5, GPT-5.x and a local Qwen, a confidentiality gateway, a FastAPI runner with Entra ID and a label store; the curve is then similar to TrueLine (74% / 58%) but the design's own month-24 note that section-based bulk volumes stay human-led 'caps the reduction near 40-45%' is the honest number. Money safety (6): the five-stage programme is enforced in the UI with numeric gates, a 'checked by' stamp and the value rule, and the VLM never emits a quantity; but a 'VLM verdict' sits inside the confidence composite that gates auto-accept, schedule and BQ extraction rely on VLM reads the digest scores at 25-37% recall and up to 56% hallucination zero-shot (mitigated by citations and sum checks, not eliminated), and the design proposes sending drawing crops to cloud models on T1 'client tender documents without NDA/OSA marking'. A contracts manager reading the Official Secrets Act (which covers drawings) and LTA NDA-gated tenders would default LTA/HDB/PUB drawings to T2, which strands the VLM lane and leaves the risk that a QS mis-tiers a project; an OSA breach is a money-bearing event of a different order (debarment). Feasibility (4): 76 person-weeks (the design's own number; 64 in the cost note) does not fit one builder at half-time over 24 months (about 52 pw), the FastAPI runner, DuckDB, YOLO training with 'a modest GPU', onnxruntime-web and a Gemini lane via Vertex all step outside the single-file GitHub Pages plus CSV house style, and the pdf.js in-browser route for T2 duplicates the PyMuPDF server route. The mitigation 'buy civils.ai Starter during any builder gap' concedes the point. Time to value (7): canvas with counts and schedule reads in assist by week 7 on a live tender is the fastest visible tool, though counts are under 10% of tender hours so the minutes saved are small. Cost (4): US$600/month plus VM plus possible GPU plus the builder scope; the model bill scales with sheets sent, which the tiering may prevent. KKL fit (6): claims module on DR keys, annotated PDF export readable in Bluebeam, egress log per project, template library per client, and the only design to compare honestly with civils.ai (US$270/user/month, US$9/takeoff, US servers, cut/fill 'coming soon', unaudited 97%) and Kreo (no civil classes, cloud-only) and to propose civils.ai Starter as an external benchmark on T0 sheets; but the runner, Entra sign-in and multi-vendor model routing are not how KKL ships software.",
+    "gets_right": "The honest buy-versus-build comparison and the idea of a cheap external benchmark (civils.ai Starter on T0 sheets) to keep the in-house engine honest; a cost readout (qty x KKL rate) on every item so review attention follows money; the 'checked by' stamp that mirrors DR Verify; a per-project egress log recording what left KKL, to which model, when; annotated-PDF export with /Measure and /Subj so Bluebeam users can open the engine's proposals."
+   }
+  ],
+  "ranking": [
+   "Rulebook: preamble-driven quantity engine",
+   "TrueLine: KKL vector-first takeoff engine",
+   "Shadow Ledger: capture-first takeoff flywheel",
+   "Surface Ledger: survey-first progress measurement",
+   "KKL Takeoff Overlay: the in-house civils.ai"
+  ],
+  "best_ideas_to_graft": [
+   {
+    "from_design": "Surface Ledger",
+    "idea": "Two-source reconciliation as the confidence proxy for every claim line: DR chainage roll-up vs precast delivery notes (units x 1.0 m / 0.5 m per SDRE, kerb 980 mm units), DR counts vs delivery notes for sumps, weighbridge tonnes vs area x thickness x density for asphalt (LTA M&W pays by weight), concrete DOs vs design m3, staging-ground receipts by stream for EW-DISP; lines that disagree beyond class tolerance go to the QS queue with both numbers shown and are never exported silently.",
+    "why": "Under the SOP Act every dollar must be calculated by reference to work done; two independent sources per line is the cheapest defensible evidence, needs no drawing understanding, and gives the claims module a calibrated gate months before drawing classes can reach one."
+   },
+   {
+    "from_design": "Surface Ledger",
+    "idea": "Back-to-back subcontractor certificate generated from the same reconciled lines, with the SO-certified upstream quantity fed back into the accuracy ledger, plus the SOP Act audit appendix (DR row ids, ticket ids, surface hashes, engine version, signatory) attached to every pack.",
+    "why": "KKL is the SOPA respondent on asphalt, RC and marking subcon claims; a missed response window means deemed acceptance, so a same-day certificate draft with an audit trail protects cash directly, and the appendix is what an SO, MC or adjudicator will ask for."
+   },
+   {
+    "from_design": "Surface Ledger",
+    "idea": "bq_map 'paid_on' and 'measure_rule' fields per BQ item (survey | design_nett | dr_rows | tickets; nett | bulked | per_load | tonne) and the loads x capacity / (1 + bulking) residual as a KPI that calibrates KKL-specific bulking, m3 per load and m3 per machine-hour.",
+    "why": "It prevents the engine from claiming bulk excavation on a survey when the preamble pays design-nett, and turns claims data into tender-rate intelligence KKL has never had, at zero extra data entry."
+   },
+   {
+    "from_design": "Surface Ledger",
+    "idea": "Surface-difference volume engine (LandXML, DXF 3DFACE, LAS via lxml, ezdxf, scipy Delaunay, numpy 2.5D grid) kept as a per-project module bought only where a bulk open-cut site, the contract's paid-on basis and airspace/IPA status justify a vendor RTK flight; joint-measurement pack with hashes and random check cells offered to the MC.",
+    "why": "Keeps the volumes capability without the S$9k/month platform-level run cost; each flight is charged to the contract it evidences and only where it can replace a manual progress takeoff or settle a disputed zone."
+   },
+   {
+    "from_design": "TrueLine",
+    "idea": "Sheet Geometry Model with per-quantity provenance (sheet hash, viewport, confirmed scale with source, path ids, rule-pack version), the per-viewport three-voter scale resolver with an OpenTakeoff-style dimension grader that blocks export beyond 1%/5%, dual-route PyMuPDF/pdf.js agreement, and pure-function kernels with shared JSON test vectors in Python and JS.",
+    "why": "This is the auto-primitive module the Rulebook design under-budgets; when it plugs in behind primitives.json it must carry the provenance a contracts manager can reconstruct in a VO or subcon dispute, and the grader is the cheapest guard against the systematic wrong-scale error that a single multi-scale LTA sheet can cause."
+   },
+   {
+    "from_design": "TrueLine",
+    "idea": "Real-sheet engineering details: clip-hierarchy viewport reconstruction with bbox clustering fallback, automatic outline-text detection (words == 0 with thousands of tiny fills) routed to local OCR, hatch strokes as their own IGNORE class, parallel-partner test for double-wall pipes and kerb faces, and a 30-sheet real LTA/KKL regression corpus measured in month 2 before any promise.",
+    "why": "These are the concrete answers to no-layers, pen-weight, multi-scale and outline-text sheets that the digest proved on real LTA PDFs; without them any auto-measure phase will stall below the gates."
+   },
+   {
+    "from_design": "Shadow Ledger",
+    "idea": "Week-1 inbox sample deciding whether the zero-behaviour-change markup harvester (PyMuPDF/pypdf over OneDrive-synced folders, verified on one real Revu file, Bluebeam tool chest keyed to KKL codes) is built at all, and if so, engine proposals written as an ISO 32000 annotation layer on a copy of the sheet so the QS reviews in the tool they already use and the nightly diff is the corrections log.",
+    "why": "If QSs do annotate, this is free labelled data and a review surface with no adoption risk; if they do not, KKL avoids paying for Bluebeam seats and a harvester nobody feeds."
+   },
+   {
+    "from_design": "Shadow Ledger",
+    "idea": "Confidence as a check pattern rather than a weighted sum: the auto-accept bucket is the set of check patterns whose empirical error on shadow data is <= 0.5% with >= 200 items; any missing check is sub-threshold; calibration table and reliability curve recomputed monthly; confidential regression cases stay on SharePoint and only synthetic round-trips run in GitHub Actions.",
+    "why": "The digest flags the confidence proxy for deterministic geometry as untested; a pattern table is auditable by the chief QS without statistics, and keeping client sheets out of GitHub is an OSA requirement, not a nicety."
+   },
+   {
+    "from_design": "Shadow Ledger",
+    "idea": "Management dependencies written into the plan: time saved becomes tender capacity in year one, reviewers are measured on catch rate not sheets per day, juniors work six months with reveal disabled, and a quarterly blind re-baseline checks unassisted skill stays within 5% of baseline.",
+    "why": "QSs will not correct and feed a system they believe will cost their jobs, and the reviewer of last resort must keep the skill to catch the engine's errors; these are the organisational conditions under which the flywheel actually turns."
+   },
+   {
+    "from_design": "KKL Takeoff Overlay",
+    "idea": "The honest buy-versus-build note and a three-month civils.ai Starter (US$90/month) trial on T0 sheets only as an external benchmark of the in-house engine, with a quarterly re-check of whether Kreo or civils.ai adds civil classes, Singapore hosting or an API.",
+    "why": "The MD needs a documented answer to 'why not just buy it'; the answer (US servers, no T2 drawings, no claims, no learning from DR, unaudited 97%) is only credible if KKL has actually measured a vendor against its own sheets."
+   },
+   {
+    "from_design": "KKL Takeoff Overlay",
+    "idea": "Cost readout (qty x KKL rate) on every proposed item so the review queue is sorted by money, the 'checked by' stamp that locks a sheet and writes CSV in DR Verify style, a per-project egress log of what left KKL to which model, and annotated-PDF export with /Measure and /Subj.",
+    "why": "Value-weighted attention is how the top-80%-of-value rule becomes a habit rather than a policy; the stamp and egress log are what the contracts manager shows an insurer or a client auditor."
+   }
+  ],
+  "fatal_flaws": [
+   {
+    "design": "KKL Takeoff Overlay",
+    "flaw": "Build scope of 64-76 person-weeks cannot be delivered by one builder at half-time in 24 months (about 52 pw available), and the plan adds a FastAPI runner with Entra ID, a multi-vendor VLM benchmark and Gemini-via-Vertex lane, YOLO training with a GPU and onnxruntime-web on top of the same real-sheet geometry work TrueLine budgets 42 pw for; the design's own fallback ('buy civils.ai Starter during any builder gap') concedes the single-point-of-failure risk. Separately, its premise that most non-rail tenders can be tiered T1 with drawing crops sent to cloud models conflicts with the Official Secrets Act covering client drawings and NDA-gated GeBIZ tenders; if contracts defaults LTA/HDB/PUB to T2, the VLM investment is stranded."
+   },
+   {
+    "design": "Surface Ledger",
+    "flaw": "As the primary design, the economics and dependencies do not close for the MD: US$7,500/month run cost (S$9,000/month vendor RTK flights) against a year-one saving the design itself puts at ~5% of QS effort, tender takeoff (35-45% of hours) untouched until month 9-12, and the critical path runs through things KKL does not control: CAAS permits and controlled airspace, Infrastructure Protection Act status of MRT worksites for drone imagery, main contractors accepting a shared surface as the joint-measurement record, clients supplying LandXML design surfaces, and DR Capture coverage >= 90% which is unverified. Its claims-reconciliation core survives as a module; its survey-first thesis does not."
+   },
+   {
+    "design": "Shadow Ledger",
+    "flaw": "Not fatal but premise-dependent: the entire capture thesis rests on QSs leaving measurement annotations in PDFs, which the digest lists as an open question; if the week-1 sample shows Excel-only or printed-sheet measurement, the design collapses into building a snapping Takeoff Pad (the same workbench TrueLine and Overlay build) with a 6-person-week engine budget for real sheets and Bluebeam Core seats as a new cost, while the first six months still deliver no booked capacity."
+   }
+  ],
+  "unsupported_claims": [
+   {
+    "design": "TrueLine",
+    "claim": "Claim 2: pen-weight, dash, closure, parallel-partner, hatch and label-regex features reach >= 90% per-path precision on measurable classes after no more than 20 corrected sheets from one originator template.",
+    "why_fragile": "No classifier has been run on a real sheet; the only real-sheet evidence in the digest is that a crude scale voter got 2 of 4 LTA pages and that one kerb sheet carries 3,614 hatch strokes; 20 sheets per template is a guess, and per-originator templates multiply the number of 20-sheet warm-ups across LTA, HDB, PUB, JTC and every consultant."
+   },
+   {
+    "design": "TrueLine",
+    "claim": "Claim 12: 42 person-weeks over 24 months fits a 0.4 FTE builder, with 30 pw in the first 12 months.",
+    "why_fragile": "0.4 FTE over 52 weeks is about 21 person-weeks, so the year-one plan is over-committed by roughly 45% before any real-sheet rework; the design's own refutation clause (M6-M8 slip a year) is the likely outcome."
+   },
+   {
+    "design": "TrueLine",
+    "claim": "Claim 6: QS touch time per item in Stage 2 is under 30% of hand measurement, so verification does not eat the saving.",
+    "why_fragile": "The only measured time study in the digest (Togal) is single-user on architectural plans and shows learning-curve effects masquerade as gains; on black-pen multi-viewport sheets the QS must confirm scale per viewport, relabel classes and check bridges, and the design's own risk register names this as the way effort fails to fall."
+   },
+   {
+    "design": "Shadow Ledger",
+    "claim": "At least half of the sheets QSs measure carry PDF measurement annotations, and annotation /M and /CreationDate timestamps give a usable per-sheet per-class effort baseline.",
+    "why_fragile": "The digest explicitly does not know which tools KKL QSs use (Bluebeam edition, Acrobat, Excel-only, printed sheets); real Revu keys (/VP, /BSIColumnData, Count) were only tested on a synthetic file; timestamps may be written at save time only, which would make the effort baseline (the criterion-1 evidence) worthless."
+   },
+   {
+    "design": "Shadow Ledger",
+    "claim": "55% of today's effort at 24 months, with claims roll-up at Stage 4 on all ~30 contracts and counts, linear and areas at Stage 4 on drawings.",
+    "why_fragile": "The design itself calls this 'an inference stacked on digest hour shares'; it needs two independent programmes (drawing classes and claims) to both reach Stage 4 with 12 months at Stage 3 each, on a 37 person-week budget of which only 6 pw goes to the engine on real sheets and 3 pw to claims."
+   },
+   {
+    "design": "Surface Ledger",
+    "claim": "Vendor RTK flights at S$2,500-5,000 per visit fortnightly on 2-3 bulk sites cost less than the QS and surveyor hours they replace plus the value of better-evidenced SOPA claims.",
+    "why_fragile": "The design admits there is no KKL hourly cost in the digest; at ~S$9,000/month the flights alone approach the plausible total year-one QS saving, and the claim-recovery benefit is unquantified; only the MD can supply the numbers and the design does not ask for them in M0."
+   },
+   {
+    "design": "Surface Ledger",
+    "claim": "DR Capture rows on claim-relevant contracts carry chainage, depth band, soil type and loads on >= 90% of rows after DR Verify, and at least half of main contractors will accept a shared, hashed survey surface as the joint-measurement record.",
+    "why_fragile": "Both are marked unverified or open in the digest; DR coverage is a site-discipline question KKL can fix but has not measured, and MC acceptance of a subcontractor's surface as the paid record is a commercial negotiation, not a technical feature; under-strut MRT excavation cannot be flown at all."
+   },
+   {
+    "design": "Rulebook",
+    "claim": "A QS can enter or trace the primitives for TRENCH, CHAMBER, RC-SECTION and PAVEMENT in 30-40% of the time they now spend producing those families by hand.",
+    "why_fragile": "The primitives are the measurement (lengths, levels, areas); experienced QSs usually already hold Excel templates that do the depth-band arithmetic, so the marginal saving of engine.js over a mature workbook may be the BQ entry and reconciliation share rather than the whole family; the timer and alternating-sheet A/B in months 3-6 must test this before the 6-month 90% is booked."
+   },
+   {
+    "design": "Rulebook",
+    "claim": "55% of today's effort at 24 months with counts and lengths from vector PDF at Stage 3.",
+    "why_fragile": "M7 allots about 10 builder-days over three months to the vector-PDF auto-measure work (viewport scale candidates, pen-weight clustering, legend learning, label attachment, two-route agreement) that TrueLine costs at roughly 20 person-weeks; without that budget the QS keeps measuring the heavy blocks by hand and the realistic 24-month figure is 65-70%."
+   },
+   {
+    "design": "Rulebook",
+    "claim": "Each contract's measurement preambles reduce to about 40 machine-checkable parameters without free-text exceptions the engine cannot apply.",
+    "why_fragile": "No public LTA BQ was retrievable for the digest; HDB SOR is 'deemed CESMM' per a secondary source only; the Sentosa FSOR example shows contract-specific departures; a single un-encodable clause (e.g. excavation for channels 'measured separately' with exceptions) blocks a whole family under the 'rulebook incomplete' rule."
+   },
+   {
+    "design": "KKL Takeoff Overlay",
+    "claim": "Contracts will classify most non-rail tenders as T1, permitting drawing crops to reach cloud models under zero-retention and region terms.",
+    "why_fragile": "The Official Secrets Act covers documents, drawings and photographs of public agencies, LTA tenders are NDA-gated with password-issued downloads, and agencies may require local hosting; a contracts manager's default is that nothing from a client drawing leaves KKL without written clearance, which makes T1 the exception, not the rule."
+   },
+   {
+    "design": "KKL Takeoff Overlay",
+    "claim": "Frontier VLMs with a global thumbnail plus crops reach >= 95% field accuracy on KKL title blocks, legends and schedules and >= 98% cell accuracy after prompt tuning.",
+    "why_fragile": "The digest's structured-extraction evidence is 25-37% recall and up to 56% hallucination zero-shot, with a fine-tuned 0.23B model beating closed models by 30-52 points; the design's own mitigation (fine-tune Florence-2 on KKL labels) is more builder scope on an already impossible budget."
+   }
+  ],
+  "recommendation": "From the MD and contracts manager's seat, the merged design should be the Rulebook spine with a realistic auto-primitive budget borrowed from TrueLine, the evidence layer from Shadow Ledger, and the claims-reconciliation core of Surface Ledger without its survey-first economics. Concretely: (1) Months 0-6, no drawing AI: item library and per-contract rulebook with page-cited, QS-confirmed parameters; engine.js ported from calc_trench.py with golden tests and CI; primitive capture app with typed tables, pdf.js viewer, per-viewport scale confirmation and the dimension grader; BQ binder; TRENCH and CHAMBER families in shadow on live tenders by week 6-8 and Stage 2 by month 3; claim roll-up from DR Capture rows joined through the item library with chainage-interval union, two-source reconciliation against delivery notes, DOs, weighbridge and staging-ground tickets, the back-to-back subcon certificate and the SOP Act audit appendix, in shadow on 2 contracts by month 3-5 and assist on 5 by month 6; nightly markup harvester only if the week-1 inbox sample shows QSs annotate. (2) Months 6-18, auto-primitives behind primitives.json with 15-20 person-weeks, not 2: TrueLine's Sheet Geometry Model, real-sheet regression corpus (30 LTA/KKL sheets in month 2), viewport and scale resolver, classifier trained on corrections, dual-route agreement, provenance per quantity, engine proposals written back as ISO annotations; per class x source gates verbatim from the digest with check-pattern calibration; DXF fast path and a standard request letter for DXF/LandXML/TrueType plots on every contract. (3) Volumes and surfaces as a per-project module: LandXML/DXF surface differencing built once (about 4 pw), vendor RTK flights bought only where a bulk open-cut site, the bq_map paid_on basis and airspace/IPA status justify it and charged to that contract; PDF contours and scanned sections stay Stage 2 indefinitely. (4) Governance the MD and contracts manager own before Stage 1: money-bearing error defined in writing (larger of 2% of item value or S$2,000 claims/subcon, S$10,000 tender line); confidentiality default is nothing leaves KKL for LTA/HDB/PUB and MC-issued documents unless contracts clears the project in the register, with the Claude API used for text only and an egress log; PI/CAR insurer notified of AI-assisted quantities with named sign-off; a named QS signs every bid, claim and certificate and the engine never signs; time saved is banked as tender capacity in year one, reviewers are scored on catch rate, juniors run six months with reveal disabled, one manual sheet per QS per week, quarterly blind re-baseline. (5) Builder risk: single-file apps plus one local Python package, no server, no VLM on drawings, kernels as pure functions with shared test vectors, rulebooks and item library as QS-owned data, README and runbook per milestone, and a named second maintainer by month 6. (6) Buy check: civils.ai Starter on T0 sheets for three months as an external benchmark and a quarterly vendor re-check, with the written conclusion that no vendor covers T2 drawings, claims, subcon certification or DR-based learning. (7) Stop-loss reviews at month 3 (timer shows derived-family minutes down >= 30% on pilot tenders; DR coverage on the two claim pilots >= 90%) and month 6 (claim packs within 2% of the QS pack for two months; zero money-bearing errors in engine lines); if either fails, the auto-primitive budget is not released. Expected outcome: year-one spend of roughly 20 builder person-weeks, 4-6 chief QS weeks and under US$3k of run cost for a 10-12% QS effort reduction concentrated in derived lines and claim drafting, then 30-40% by month 24 (about 2-3 FTE of QS capacity on a typical team) with the drawing-side automation graduating only on KKL's own ledger."
+ }
+]

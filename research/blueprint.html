@@ -1,0 +1,476 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- artifact-start -->
+<title>KKL Document AI Blueprint</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+  :root{
+    --paper:#f7f6f3; --ink:#26292b; --ink-soft:#5a5f63; --steel:#46606e; --steel-ink:#ffffff;
+    --accent:#c85a10; --accent-ink:#a34a0d; --line:#d9d6cf; --line-strong:#b9b5ac;
+    --card:#ffffff; --field:#fbfaf8; --good:#2e7d4f; --bad:#b3402e; --mark:#fdf1e3; --thead:#eef0ee;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){ --paper:#1e2022; --ink:#e6e3dc; --ink-soft:#a8aaa9; --steel:#93aebc; --steel-ink:#1e2022;
+      --accent:#e8823a; --accent-ink:#e8823a; --line:#3a3d3f; --line-strong:#55585a;
+      --card:#26292b; --field:#2c2f31; --good:#5cb884; --bad:#e07a63; --mark:#3a2f24; --thead:#2c3033; }
+  }
+  :root[data-theme="dark"]{ --paper:#1e2022; --ink:#e6e3dc; --ink-soft:#a8aaa9; --steel:#93aebc; --steel-ink:#1e2022;
+      --accent:#e8823a; --accent-ink:#e8823a; --line:#3a3d3f; --line-strong:#55585a;
+      --card:#26292b; --field:#2c2f31; --good:#5cb884; --bad:#e07a63; --mark:#3a2f24; --thead:#2c3033; }
+
+  *{box-sizing:border-box;}
+  html{background:var(--paper);}
+  body{margin:0; background:var(--paper); color:var(--ink); font-family:"Segoe UI",system-ui,-apple-system,sans-serif; font-size:16px; line-height:1.5;}
+  .mono{font-family:"Cascadia Mono",Consolas,"JetBrains Mono",monospace;}
+  .page{max-width:1180px; margin:0 auto; padding:20px 16px 80px;}
+
+  header.mast{border:2px solid var(--ink); background:var(--card); padding:16px 20px; display:flex; justify-content:space-between; align-items:flex-end; gap:16px; flex-wrap:wrap;}
+  header.mast h1{margin:0; font-size:26px; font-weight:650; letter-spacing:-.01em; text-wrap:balance;}
+  header.mast .sub{margin:4px 0 0; color:var(--ink-soft); font-size:15px; max-width:60ch;}
+  header.mast .tag{font-family:"Cascadia Mono",Consolas,"JetBrains Mono",monospace; font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-soft); text-align:right; line-height:1.7;}
+
+  .layout{display:grid; grid-template-columns:1fr; gap:24px; margin-top:20px;}
+  @media (min-width:1000px){ .layout{grid-template-columns:220px minmax(0,1fr);} nav.toc{position:sticky; top:16px;} }
+  nav.toc{align-self:start; border:1px solid var(--line-strong); background:var(--card); padding:12px 14px; border-radius:4px;}
+  nav.toc .eyebrow{margin:0 0 6px;}
+  nav.toc ol{list-style:none; margin:0; padding:0; font-size:13px;}
+  nav.toc li{padding:4px 0; border-bottom:1px solid var(--line);}
+  nav.toc li:last-child{border-bottom:none;}
+  nav.toc a{color:var(--ink); text-decoration:none;}
+  nav.toc a:hover{color:var(--accent-ink);}
+
+  article{min-width:0;}
+  section{margin:0 0 36px;}
+  .eyebrow{font-family:"Cascadia Mono",Consolas,"JetBrains Mono",monospace; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent-ink); font-weight:700; margin:0 0 4px;}
+  h2{font-size:22px; font-weight:650; margin:0 0 12px; text-wrap:balance;}
+  h3{font-size:16px; font-weight:650; margin:20px 0 6px;}
+  p{margin:0 0 12px; max-width:68ch;}
+  ul,ol{margin:0 0 12px; padding-left:22px; max-width:68ch;}
+  li{margin:0 0 4px;}
+  li::marker{color:var(--ink-soft);}
+  a{color:var(--accent-ink);}
+  small,.note{font-size:13px; color:var(--ink-soft);}
+
+  .decision{border:1.5px solid var(--ink); background:var(--card); border-radius:4px; overflow:hidden; margin:0 0 20px;}
+  .decision .head{background:var(--steel); color:var(--steel-ink); padding:8px 14px; font-family:"Cascadia Mono",Consolas,"JetBrains Mono",monospace; font-size:12px; font-weight:700; letter-spacing:.06em;}
+  .decision .body{padding:14px 16px;}
+  .decision ul{max-width:none;}
+  .decision li b{color:var(--accent-ink);}
+
+  .facts{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:0; border:1px solid var(--line-strong); border-right:none; border-bottom:none; border-radius:4px; overflow:hidden; background:var(--card); margin:0 0 14px;}
+  .facts div{padding:10px 12px; border-bottom:1px solid var(--line-strong); border-right:1px solid var(--line-strong);}
+  .facts dt{font-family:"Cascadia Mono",Consolas,"JetBrains Mono",monospace; font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-soft); margin:0 0 2px;}
+  .facts dd{margin:0; font-size:14px;}
+
+  .tablewrap{overflow-x:auto; border:1px solid var(--line-strong); border-radius:4px; background:var(--card); margin:0 0 14px;}
+  table{border-collapse:collapse; width:100%; font-size:13.5px;}
+  th{background:var(--thead); text-align:left; padding:7px 9px; border-bottom:1px solid var(--line); font-family:"Cascadia Mono",Consolas,"JetBrains Mono",monospace; font-size:10.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-soft); white-space:nowrap;}
+  td{padding:7px 9px; border-bottom:1px solid var(--line); vertical-align:top;}
+  tr:last-child td{border-bottom:none;}
+  td.num{text-align:right; font-family:"Cascadia Mono",Consolas,"JetBrains Mono",monospace; font-variant-numeric:tabular-nums; white-space:nowrap;}
+  td.k{font-weight:650; white-space:nowrap;}
+  .pill{display:inline-block; font-family:"Cascadia Mono",Consolas,"JetBrains Mono",monospace; font-size:10.5px; font-weight:700; letter-spacing:.04em; padding:1px 7px; border-radius:3px; border:1px solid var(--line-strong); color:var(--ink-soft); white-space:nowrap;}
+  .pill.now{background:var(--mark); color:var(--accent-ink); border-color:var(--accent);}
+  .pill.good{color:var(--good); border-color:var(--good);}
+  .pill.bad{color:var(--bad); border-color:var(--bad);}
+
+  ol.steps{list-style:none; padding:0; margin:0 0 14px; max-width:none; counter-reset:step;}
+  ol.steps li{display:grid; grid-template-columns:44px 1fr; gap:12px; padding:10px 0; border-bottom:1px solid var(--line); counter-increment:step;}
+  ol.steps li::before{content:counter(step,decimal-leading-zero); font-family:"Cascadia Mono",Consolas,"JetBrains Mono",monospace; font-weight:700; color:var(--accent-ink); font-size:14px; padding-top:2px;}
+  ol.steps li b{display:block; margin-bottom:2px;}
+
+  figure{margin:14px 0 18px; border:1px solid var(--line-strong); background:var(--card); border-radius:4px; padding:12px;}
+  figure svg{max-width:100%; height:auto; display:block; color:var(--ink);}
+  figcaption{font-size:13px; color:var(--ink-soft); margin-top:8px; max-width:80ch;}
+
+  .cols{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px; margin:0 0 14px;}
+  .cols > div{border:1px solid var(--line-strong); background:var(--card); border-radius:4px; padding:12px 14px;}
+  .cols h3{margin:0 0 6px; font-size:15px;}
+  .cols p,.cols ul{max-width:none; font-size:14px;}
+  .cols ul{padding-left:18px; margin:0;}
+  code{font-family:"Cascadia Mono",Consolas,"JetBrains Mono",monospace; font-size:13px; background:var(--field); border:1px solid var(--line); padding:0 4px; border-radius:3px;}
+  .sources{font-size:12.5px; color:var(--ink-soft); columns:2; column-gap:24px; max-width:none;}
+  .sources li{break-inside:avoid;}
+  @media (prefers-reduced-motion: reduce){ *{scroll-behavior:auto !important;} }
+</style>
+</head>
+<body>
+<div class="page">
+<header class="mast">
+  <div>
+    <h1>KKL Document AI Blueprint</h1>
+    <p class="sub">What civils.ai does, and how KKL builds its own: agents, architecture, costs and a twelve-week pilot.</p>
+  </div>
+  <div class="tag">Koh Kock Leong Enterprise<br>internal · 3 Sep 2026<br>research branch: civil-ai-research</div>
+</header>
+
+<div class="layout">
+<nav class="toc" aria-label="Contents">
+  <p class="eyebrow">Contents</p>
+  <ol>
+    <li><a href="#rec">Recommendation</a></li>
+    <li><a href="#glance">Civils.ai at a glance</a></li>
+    <li><a href="#sells">What they sell</a></li>
+    <li><a href="#moved">How they moved</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#works">How it works</a></li>
+    <li><a href="#kkl">What it means for KKL</a></li>
+    <li><a href="#usecases">Use cases</a></li>
+    <li><a href="#buy">Build, buy, or both</a></li>
+    <li><a href="#agents">The five agents</a></li>
+    <li><a href="#arch">Architecture by phase</a></li>
+    <li><a href="#cost">Cost</a></li>
+    <li><a href="#trust">Confidentiality and trust</a></li>
+    <li><a href="#plan">Twelve-week plan</a></li>
+    <li><a href="#risks">Risks and metrics</a></li>
+    <li><a href="#proto">The prototype</a></li>
+    <li><a href="#sources">Sources</a></li>
+  </ol>
+</nav>
+
+<article>
+
+<section id="rec">
+  <p class="eyebrow">Recommendation</p>
+  <h2>Build the document workbench. Buy the measured takeoffs, for now.</h2>
+  <div class="decision">
+    <div class="head">WHAT TO DO</div>
+    <div class="body">
+      <ul>
+        <li><b>Build now.</b> An internal tool where staff drop tender and project PDFs and run five agents on them: Ask, Check, Extract, Compare, Takeoff assist. Every answer cites the page it came from. A working prototype is in the repo at <code>ai/index.html</code>.</li>
+        <li><b>Buy or outsource.</b> Measured areas, lengths and volumes from drawings. Civils.ai still puts its own engineers between the model and the customer for these; KKL's estimators already have tools. Revisit in Phase 3.</li>
+        <li><b>Do what civils.ai cannot.</b> Point the same agents at KKL's own data: the machine register, DR Capture rows, soil and disposal streams, idle reasons, diesel, subcons.</li>
+        <li><b>Budget.</b> About US$800 a month in model usage for ten pilot users, US$2.5k at thirty; hosting US$100–300 a month from Phase 1; development in-house.</li>
+        <li><b>Guardrails.</b> Citations on every answer, a verify-before-use step like DR Verify, a per-project upload rule signed off by contracts, and an evaluation set so KKL measures its own accuracy.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="glance">
+  <p class="eyebrow">Civils.ai</p>
+  <h2>At a glance</h2>
+  <dl class="facts">
+    <div><dt>Company</dt><dd>Civils.ai Pte Ltd, Singapore (Prinsep St). Founded 2022.</dd></div>
+    <div><dt>Founders</dt><dd>Stevan Lukic (CEO), Mirko Vairo (COO), Mohamad Fadil (CTO)</dd></div>
+    <div><dt>Team and funding</dt><dd>About 15 people in 4 cities; ~US$1.4M pre-seed (Atlas, Iterative, Antler, The Gear)</dd></div>
+    <div><dt>Tagline today</dt><dd>“AI Takeoffs &amp; Checks for Earthworks Contractors”</dd></div>
+    <div><dt>Named customers</dt><dd>AECOM, Arup, Jacobs, WSP, Arcadis, Kajima, Penta Ocean, JTC, Asia Infrastructure Solutions</dd></div>
+    <div><dt>Claims</dt><dd>200+ firms in 8 countries; 432,812 tasks automated; 100,000+ boreholes digitised; “97% accuracy” on modern PDFs</dd></div>
+    <div><dt>Published case</dt><dd>JTC, 12 months: 38 users, 2,842 prompts, 528+ hours saved</dd></div>
+    <div><dt>Data handling</dt><dd>US servers; TLS and encryption at rest; documents anonymised; delete any time</dd></div>
+  </dl>
+</section>
+
+<section id="sells">
+  <p class="eyebrow">Product map</p>
+  <h2>What they sell</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Module</th><th>You give it</th><th>You get back</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td class="k">AI Takeoffs</td><td>PDF drawings, scanned or digital, and a scope typed in plain English</td><td>Quantities on an annotated sheet, Excel and PDF exports</td><td>The billable unit. Every result reviewed by their engineers; “within 24 hours”. Trades: roads and landscaping, drainage and utilities, fixtures, footings and wall runs, formwork and facade areas, openings, earthworks. Cut and fill “coming soon”.</td></tr>
+      <tr><td class="k">AI Checks</td><td>Documents plus a checklist, saved as a template</td><td>Findings with citations and mark-ups that open the source page</td><td>Code compliance, spec-vs-drawing discrepancies, contract risk, conflicting requirements. Bundled as unlimited.</td></tr>
+      <tr><td class="k">AI Search</td><td>A project archive, synced from SharePoint or Autodesk Construction Cloud</td><td>Cited answers; highlighted source sections</td><td>Reads scanned and handwritten pages with a vision model. Sold as an onboarding aid for junior staff.</td></tr>
+      <tr><td class="k">Workflows</td><td>Documents plus a template (bidding, site investigation, contract analysis, compliance, risk)</td><td>Excel or Word outputs with numbered citations</td><td>No-code, four steps. Multi-step agents priced separately.</td></tr>
+      <tr><td class="k">Borehole digitiser</td><td>Whole SI reports</td><td>AGS 4.1, Excel, shapefile, DXF; 2D sections and a 3D ground model</td><td>16+ AGS groups; about 10 minutes a borehole; human review before release.</td></tr>
+      <tr><td class="k">Proposal comparison</td><td>Sub-contractor proposals plus criteria</td><td>Like-for-like table, referenced to each proposal</td><td>Replaces the manual Excel comparison.</td></tr>
+    </tbody>
+  </table></div>
+  <p class="note">Also: geo-referencing drawings to GIS, free calculators as a funnel, a public library of about 1,740 Singapore regulatory documents, API and MCP access on Enterprise.</p>
+</section>
+
+<section id="moved">
+  <p class="eyebrow">2022 to 2026</p>
+  <h2>How the product moved, and what that tells us</h2>
+  <ol class="steps">
+    <li><div><b>2022: geotechnical AI.</b> Free calculators and a borehole-log digitiser; mapping city geology from public records.</div></li>
+    <li><div><b>2023–24: a document platform for AEC.</b> Search, cited Q&amp;A, compliance checks, contract review, a no-code workflow builder. Consultancies and JTC adopt it; pay-as-you-go from about US$5 a document.</div></li>
+    <li><div><b>2025–26: takeoffs and checks for contractors.</b> The homepage leads with measured quantities from PDF drawings, QA-reviewed by their engineers, and names the earthworks contractor as the customer.</div></li>
+  </ol>
+  <p>Document question-and-answer became table stakes as frontier models learned to read PDFs and cite pages natively, so civils.ai moved to a verified, per-unit deliverable. That deliverable is software plus people: results come back in a day, not seconds. Two lessons for KKL: the cited-answer layer is now cheap to build, and fully automatic measured takeoffs are still not reliable enough to ship without a human, even for a specialist team.</p>
+</section>
+
+<section id="pricing">
+  <p class="eyebrow">Pricing, September 2026, USD</p>
+  <h2>What it costs</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Plan</th><th>Price</th><th>Takeoffs</th><th>Searches and checks</th><th>Users</th><th>Storage</th><th>Extras</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Starter</td><td class="num">$90 / month</td><td class="num">10 / month</td><td>Unlimited, fair use</td><td class="num">1</td><td class="num">2 GB</td><td>Email support</td></tr>
+      <tr><td class="k">Professional</td><td class="num">$270 / month</td><td class="num">30 / month</td><td>Unlimited, fair use</td><td class="num">1</td><td class="num">50 GB</td><td>Revisions from comments; “learns your standards”; priority support</td></tr>
+      <tr><td class="k">Enterprise</td><td>Custom, annual</td><td>Custom</td><td>Unlimited</td><td>Unlimited</td><td>Custom</td><td>API and MCP; SSO/SAML; custom DPA and security review</td></tr>
+    </tbody>
+  </table></div>
+  <p>One takeoff is one trade on one drawing sheet up to 1:250, capped at five takeoffs a sheet. Searches and checks are a bundled freebie; the takeoff, at US$9 a sheet with a human in the loop, is where they believe the durable value is.</p>
+</section>
+
+<section id="works">
+  <p class="eyebrow">Under the hood, inferred</p>
+  <h2>How a job moves through civils.ai</h2>
+  <figure>
+    <svg viewBox="0 -14 900 266" role="img" aria-label="Inferred civils.ai pipeline: PDFs are rasterised and read by a vision model, indexed per page, run through agents that answer with page citations, takeoffs pass a human QA queue, and outputs are exported with citations that link back to the source pages.">
+      <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+      <g fill="none" stroke="currentColor" stroke-width="1.4">
+        <rect x="10" y="70" width="120" height="70" rx="3"/>
+        <rect x="180" y="70" width="140" height="70" rx="3"/>
+        <rect x="370" y="70" width="120" height="70" rx="3"/>
+        <rect x="540" y="40" width="150" height="130" rx="3"/>
+        <rect x="740" y="70" width="150" height="70" rx="3"/>
+        <rect x="545" y="195" width="140" height="42" rx="3" stroke="#c85a10"/>
+      </g>
+      <g font-family="Segoe UI, system-ui, sans-serif" font-size="12" fill="currentColor" text-anchor="middle">
+        <text x="70" y="98" font-weight="700">Upload</text><text x="70" y="116">PDF sheets, specs,</text><text x="70" y="130">SI reports</text>
+        <text x="250" y="98" font-weight="700">Ingest</text><text x="250" y="116">page image + OCR,</text><text x="250" y="130">vision for scans</text>
+        <text x="430" y="98" font-weight="700">Index</text><text x="430" y="116">per page, per</text><text x="430" y="130">sheet, per title</text>
+        <text x="615" y="62" font-weight="700">Agents</text><text x="615" y="82">Ask · Check</text><text x="615" y="98">Extract · Compare</text><text x="615" y="114">Takeoff geometry</text><text x="615" y="130">Borehole to AGS</text><text x="615" y="152" fill="#c85a10">answers carry page refs</text>
+        <text x="815" y="98" font-weight="700">Outputs</text><text x="815" y="116">annotated PDF, Excel,</text><text x="815" y="130">Word, AGS 4.1</text>
+        <text x="615" y="213" font-weight="700" fill="#c85a10">Human QA queue</text><text x="615" y="228" fill="#c85a10">takeoffs, boreholes</text>
+      </g>
+      <g stroke="currentColor" stroke-width="1.4" fill="none" marker-end="url(#ar)">
+        <line x1="130" y1="105" x2="178" y2="105"/>
+        <line x1="320" y1="105" x2="368" y2="105"/>
+        <line x1="490" y1="105" x2="538" y2="105"/>
+        <line x1="690" y1="105" x2="738" y2="105"/>
+      </g>
+      <g stroke="#c85a10" stroke-width="1.4" fill="none" marker-end="url(#ar)">
+        <path d="M615,170 L615,193"/>
+        <path d="M685,216 L815,216 L815,142" />
+      </g>
+      <g font-family="Cascadia Mono, Consolas, JetBrains Mono, monospace" font-size="10.5" fill="currentColor" text-anchor="middle">
+        <text x="154" y="97">sheets</text><text x="344" y="97">text</text><text x="514" y="97">pages</text><text x="714" y="97">results</text>
+        <text x="808" y="190" text-anchor="end" fill="#c85a10">~24 h, reviewed</text>
+      </g>
+      <path d="M815,70 C815,6 435,6 435,68" stroke="currentColor" stroke-width="1" stroke-dasharray="4 3" fill="none" marker-end="url(#ar)"/>
+      <text x="625" y="2" font-family="Cascadia Mono, Consolas, JetBrains Mono, monospace" font-size="10.5" fill="currentColor" text-anchor="middle">citation opens the source page</text>
+    </svg>
+    <figcaption>Inferred from product behaviour and public claims; civils.ai does not publish its architecture. The orange path is the part that makes their takeoffs sellable: a queue of their own engineers reviews measured quantities before release, which is why turnaround is a day and why they can promise 97%.</figcaption>
+  </figure>
+</section>
+
+<section id="kkl">
+  <p class="eyebrow">Implications</p>
+  <h2>What this means for KKL</h2>
+  <div class="cols">
+    <div><h3>The cheap 80%</h3><p>Ask, Check, Extract and Compare with page citations are what a frontier model does out of the box today on a 600-page PDF. This is product work, not AI research, and it fits the single-file style of DR Capture and the SKYTOPIA apps.</p></div>
+    <div><h3>The hard 20%</h3><p>Measured takeoffs need scale detection, vector geometry, classification of hatches and lines, and a person to confirm. Start with counts and schedule reads the model does well; keep measured quantities with existing estimating tools or buy them per sheet.</p></div>
+    <div><h3>KKL's edge</h3><p>A register of 1,421 machines (203 × 14 t excavators, 120 × 35–40 t, 100 × 20 t, 108 rollers), daily-report rows per activity code (EW-EXC, DR-PIPE, RC-CONC…), soil type and disposal stream, idle reasons, diesel and subcon records. “Ask the daily reports” is a KKL-only feature no vendor can offer.</p></div>
+  </div>
+</section>
+
+<section id="usecases">
+  <p class="eyebrow">Where the hours go</p>
+  <h2>Use cases, ranked</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Use case</th><th>Users</th><th>Value</th><th>Difficulty</th><th>Phase</th></tr></thead>
+    <tbody>
+      <tr><td>Ask the tender or spec: cited answers to “what does the spec require for X”</td><td>Tender, PM, engineers</td><td>High</td><td>Low</td><td><span class="pill now">0</span></td></tr>
+      <tr><td>Tender risk checklist: disposal, working hours, ERSS, TTM, silt control, LDs, payment terms, with citations</td><td>Tender, contracts</td><td>High</td><td>Low–Med</td><td><span class="pill now">0</span></td></tr>
+      <tr><td>Extract schedules to Excel: drainage, sump and manhole, pile, BQ items, borehole strata</td><td>QS, engineers</td><td>High</td><td>Low–Med</td><td><span class="pill now">0</span></td></tr>
+      <tr><td>Compare subcon quotes like-for-like on KKL's criteria</td><td>Contracts, purchasing</td><td>Med–High</td><td>Low</td><td><span class="pill now">0</span></td></tr>
+      <tr><td>Takeoff assist: counts and schedule reads, sheet index</td><td>Estimators</td><td>Med</td><td>Med</td><td><span class="pill now">0–1</span></td></tr>
+      <tr><td>SI report to soil profile, then expected disposal streams per zone</td><td>Tender, planners</td><td>High for earthworks pricing</td><td>Med</td><td><span class="pill">1–2</span></td></tr>
+      <tr><td>Ask the daily reports over DR Capture CSVs and the machine register</td><td>Office, plant, management</td><td>High, KKL-only</td><td>Med</td><td><span class="pill">2</span></td></tr>
+      <tr><td>Method statement drafting from spec and KKL templates</td><td>Engineers</td><td>Med</td><td>Med</td><td><span class="pill">2</span></td></tr>
+      <tr><td>Claims record assembly from DR rows, instructions and clauses</td><td>Contracts</td><td>High per claim</td><td>Med</td><td><span class="pill">2</span></td></tr>
+      <tr><td>Safety document checks against WSH, HDB and LTA requirements</td><td>Safety</td><td>Med</td><td>Med</td><td><span class="pill">2</span></td></tr>
+      <tr><td>Measured takeoffs: areas, lengths, volumes; cut and fill from levels</td><td>Estimators</td><td>High</td><td>High</td><td><span class="pill">3</span></td></tr>
+      <tr><td>Borehole logs to AGS(SG) for BCA submissions</td><td>Engineers</td><td>Low–Med</td><td>Med</td><td><span class="pill">3</span></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="buy">
+  <p class="eyebrow">Options</p>
+  <h2>Build, buy, or both</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Option</th><th>What you get</th><th>Cost signal</th><th>Fit</th></tr></thead>
+    <tbody>
+      <tr><td class="k">A. Subscribe to civils.ai</td><td>QA-reviewed takeoffs, checks, search, borehole digitiser, templates; Enterprise adds API, SSO, DPA</td><td>US$270 a user a month; Enterprise custom</td><td>Fastest for measured takeoffs. Data to a third party on US servers; nothing about KKL's own data; per-seat cost grows with users.</td></tr>
+      <tr><td class="k">B. Generic LLM workspace</td><td>Claude for Work or Microsoft 365 Copilot: upload documents, ask, some citations</td><td>US$25–30 a user a month</td><td>Good for ad-hoc questions. No trade checklists, no Excel outputs, no takeoff, weak page citation on drawings.</td></tr>
+      <tr><td class="k">C. Build in-house on a model API</td><td>Exactly the agents KKL needs on KKL documents and data, in KKL's app style; pay per token</td><td>US$1–3k a month usage at pilot scale; hosting US$100–300; in-house time</td><td>Highest fit and lowest run cost. Measured takeoffs are hard.</td></tr>
+      <tr><td class="k">D. Hybrid <span class="pill good">recommended</span></td><td>C for ask, check, extract, compare and DR data; A or existing tools for measured takeoffs until Phase 3</td><td>C's costs plus a small per-sheet takeoff budget</td><td>Most of the value quickly; money-bearing quantities stay under existing controls.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="agents">
+  <p class="eyebrow">Product definition, v1</p>
+  <h2>The five agents</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Agent</th><th>Input</th><th>Output</th><th>Model features</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Ask</td><td>Documents and a question</td><td>Cited answer; each citation opens the page</td><td>PDF input with page citations</td></tr>
+      <tr><td class="k">Check</td><td>Documents and a checklist, saved as a template</td><td>Table: item, Pass / Fail / Unclear / Not found, evidence with citations, notes</td><td>Citations; templates per authority and document type</td></tr>
+      <tr><td class="k">Extract</td><td>Documents and a column list or preset</td><td>Table with a page reference per row; CSV download</td><td>JSON-schema structured output</td></tr>
+      <tr><td class="k">Compare</td><td>Two or more documents and criteria</td><td>One column per document, one row per criterion; differences and gaps</td><td>JSON-schema structured output</td></tr>
+      <tr><td class="k">Takeoff assist</td><td>Drawings and a scope</td><td>Counts and schedule reads with sheet, basis and confidence</td><td>Structured output; explicitly no measured geometry until Phase 3</td></tr>
+    </tbody>
+  </table></div>
+  <p>Non-negotiable in the interface: no citation, no answer; a visible “checked by” step before export, as in DR Verify; a cost readout after every run; CSV, Excel and Markdown export, and later a save to the project's SharePoint folder. Not in v1: measured takeoffs, cut and fill, drawing mark-up, BIM, cross-project chat memory, or anything that acts without a person reviewing.</p>
+</section>
+
+<section id="arch">
+  <p class="eyebrow">Architecture</p>
+  <h2>Four phases, one setting for the model</h2>
+  <figure>
+    <svg viewBox="0 0 900 430" role="img" aria-label="KKL architecture by phase. Phase 0: a single-file page in the browser calls the model API directly. Phase 1: a small service on Azure with Entra ID sign-in, blob storage, Postgres and a job queue sits between the browser and the model API, and syncs with SharePoint. Phase 2 adds a spec library and a database of daily-report data the agents can query. Phase 3 adds a measurement tool for takeoffs. The model endpoint stays one setting so it can move to a Singapore region.">
+      <defs><marker id="ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+      <g font-family="Cascadia Mono, Consolas, JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#c85a10">
+        <text x="10" y="22">PHASE 0 · NOW</text>
+        <text x="10" y="132">PHASE 1 · PILOT SERVICE</text>
+        <text x="10" y="302">PHASE 2 · KNOWLEDGE AND DATA</text>
+        <text x="700" y="302">PHASE 3 · TAKEOFFS</text>
+      </g>
+      <g fill="none" stroke="currentColor" stroke-width="1.4">
+        <rect x="10" y="32" width="200" height="60" rx="3"/>
+        <rect x="620" y="32" width="200" height="60" rx="3" stroke="#c85a10"/>
+        <rect x="10" y="142" width="130" height="60" rx="3"/>
+        <rect x="200" y="142" width="330" height="130" rx="3"/>
+        <rect x="620" y="142" width="200" height="60" rx="3" stroke="#c85a10"/>
+        <rect x="620" y="222" width="200" height="50" rx="3"/>
+        <rect x="10" y="312" width="250" height="100" rx="3"/>
+        <rect x="290" y="312" width="250" height="100" rx="3"/>
+        <rect x="600" y="312" width="290" height="100" rx="3"/>
+      </g>
+      <g font-family="Segoe UI, system-ui, sans-serif" font-size="12" fill="currentColor">
+        <text x="20" y="52" font-weight="700">Browser · ai/index.html</text><text x="20" y="68">documents in memory, own API key,</text><text x="20" y="82">results kept in the browser</text>
+        <text x="630" y="52" font-weight="700">Model API</text><text x="630" y="68">PDF input · page citations · caching</text><text x="630" y="82">structured JSON · Files · Batch</text>
+        <text x="20" y="162" font-weight="700">Browser</text><text x="20" y="178">Entra ID sign-in,</text><text x="20" y="192">no keys on devices</text>
+        <text x="210" y="162" font-weight="700">KKL Document AI service</text><text x="210" y="178">one container on Azure</text><text x="210" y="196">Blob: documents, uploaded once</text><text x="210" y="212">Postgres: projects, runs, results, citations</text><text x="210" y="228">job queue · templates · audit log</text><text x="210" y="248">SharePoint connector: read project folder,</text><text x="210" y="262">write exports back to Site Logs</text>
+        <text x="630" y="162" font-weight="700">Model API</text><text x="630" y="178">file IDs instead of bytes;</text><text x="630" y="192">bulk checks overnight at half price</text>
+        <text x="630" y="242" font-weight="700">Endpoint is one setting</text><text x="630" y="258">global API, or a Singapore region</text>
+        <text x="20" y="332" font-weight="700">Spec library</text><text x="20" y="348">LTA M&amp;W, Civil Design Criteria,</text><text x="20" y="362">HDB specs, PUB drainage CoP,</text><text x="20" y="376">SS and BCA, WSH regulations;</text><text x="20" y="390">indexed once, reused per project</text>
+        <text x="300" y="332" font-weight="700">Daily-report database</text><text x="300" y="348">DR Capture and DR Verify CSVs,</text><text x="300" y="362">machine register, from SharePoint;</text><text x="300" y="376">the model writes SQL, runs it,</text><text x="300" y="390">explains the answer</text>
+        <text x="610" y="332" font-weight="700">Measurement tool</text><text x="610" y="348">vector geometry from PDF, scale from</text><text x="610" y="362">the title block; model proposes regions</text><text x="610" y="376">and counts, estimator confirms;</text><text x="610" y="390">cut and fill from levels</text>
+      </g>
+      <g stroke="#c85a10" stroke-width="1.6" fill="none" marker-end="url(#ar2)">
+        <line x1="210" y1="62" x2="618" y2="62"/>
+        <line x1="530" y1="172" x2="618" y2="172"/>
+      </g>
+      <g stroke="currentColor" stroke-width="1.4" fill="none" marker-end="url(#ar2)">
+        <line x1="140" y1="172" x2="198" y2="172"/>
+        <line x1="365" y1="310" x2="365" y2="274"/>
+        <line x1="230" y1="310" x2="230" y2="274"/>
+      </g>
+      <line x1="720" y1="222" x2="720" y2="204" stroke="currentColor" stroke-width="1.2" stroke-dasharray="3 3"/>
+      <path d="M600,340 L570,340 L570,250 L532,250" fill="none" stroke="currentColor" stroke-width="1.2" stroke-dasharray="3 3" marker-end="url(#ar2)"/>
+      <g font-family="Cascadia Mono, Consolas, JetBrains Mono, monospace" font-size="10.5" fill="#c85a10">
+        <text x="330" y="55">PDF + question, cached</text>
+        <text x="540" y="165">runs</text>
+      </g>
+      <g font-family="Cascadia Mono, Consolas, JetBrains Mono, monospace" font-size="10.5" fill="currentColor">
+        <text x="145" y="165">uploads</text>
+        <text x="372" y="296">queried by agents</text>
+        <text x="237" y="296">library set</text>
+        <text x="548" y="296">edits results</text>
+      </g>
+    </svg>
+    <figcaption>The orange edges are the only calls that carry documents to the model. In Phase 0 they leave the browser directly; from Phase 1 they leave the service, so keys, access control, audit and residency are decided in one place. Phases 2 and 3 add sources and tools around the same service, not a new one.</figcaption>
+  </figure>
+  <h3>Phase 0, in the repo now</h3>
+  <p>A single file, hosted on GitHub Pages like DR Capture. The browser calls the model API with the user's own key, documents are sent as PDF blocks with citations enabled and marked for prompt caching, structured agents use a JSON schema, pdf.js renders the cited page in a side panel, and runs are kept in the browser. Good for proving value on a live tender and agreeing the checklist templates. Not for shared use, large drawing sets or an audit trail.</p>
+  <h3>Phase 1, weeks 3 to 8</h3>
+  <p>One container on Azure (KKL runs Microsoft 365 and SharePoint), Blob for documents, Postgres for projects, runs, results and citations, Entra ID sign-in, a job queue with streaming progress, templates with named owners, and a SharePoint connector that reads a project folder and writes exports back. Documents are uploaded once to the Files API and referenced by ID; bulk checks go through the Batch API overnight.</p>
+  <h3>Phase 2, weeks 9 to 16</h3>
+  <p>A reusable spec library; “Ask the daily reports” over DR Capture, DR Verify and the machine register; SI report to soil profile to expected disposal streams per zone; claims assembly from DR rows, instructions and clauses.</p>
+  <h3>Phase 3, only after daily use</h3>
+  <p>Vector geometry from drawings, scale from the title block, a light measurement interface where the model proposes and the estimator confirms, cut and fill from levels. Or keep buying it per sheet if the volume does not justify the build.</p>
+</section>
+
+<section id="cost">
+  <p class="eyebrow">Cost model</p>
+  <h2>What a run costs</h2>
+  <p>Rates used: Claude Opus 5 at US$5 per million input tokens and US$25 per million output, cache writes at 1.25× and cache reads at 0.1× of input. A PDF page costs roughly 1,500–3,000 tokens as text plus image; 2,000 is used below.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Item</th><th>Tokens</th><th>US$</th></tr></thead>
+    <tbody>
+      <tr><td>Load a 200-page spec once (cache write)</td><td class="num">400k</td><td class="num">2.50</td></tr>
+      <tr><td>Each follow-up question on that spec within the cache window</td><td class="num">400k read + 1.5k out</td><td class="num">0.25</td></tr>
+      <tr><td>40-item checklist over the same spec in one run</td><td class="num">400k read + 6k out</td><td class="num">0.35</td></tr>
+      <tr><td>Extract a 30-row schedule from a 60-page drawing set</td><td class="num">120k write + 4k out</td><td class="num">0.85</td></tr>
+      <tr><td>Compare four 20-page subcon quotes</td><td class="num">160k write + 5k out</td><td class="num">1.15</td></tr>
+      <tr><td>Pilot month: 10 users × 10 prompts × 22 days, plus 150 first-pass loads</td><td class="num">—</td><td class="num">≈ 800</td></tr>
+      <tr><td>Same at 30 users</td><td class="num">—</td><td class="num">≈ 2,500</td></tr>
+      <tr><td>Civils.ai Professional, 10 users / 30 users, includes QA-reviewed takeoffs</td><td class="num">—</td><td class="num">2,700 / 8,100</td></tr>
+    </tbody>
+  </table></div>
+  <p class="note">Levers if usage grows: a one-hour cache TTL for a tender team on the same set all day; a cheaper model lane for routine extraction if it holds on KKL's own test set; page-range selection so a drainage question does not send the M&amp;E volume; the Batch API for anything that can wait overnight.</p>
+</section>
+
+<section id="trust">
+  <p class="eyebrow">Rules</p>
+  <h2>Confidentiality, accuracy and trust</h2>
+  <div class="cols">
+    <div><h3>Client documents</h3><ul><li>LTA, HDB and PUB documents often carry confidentiality clauses. Contracts confirms what may be processed by a third-party service before anything is uploaded, to civils.ai or to KKL's own tool.</li><li>A per-project “may upload / may not upload” rule, kept with the project file.</li><li>Commercial API terms do not train on inputs and retain data for a limited period; record the terms.</li></ul></div>
+    <div><h3>PDPA and residency</h3><ul><li>Safety and HR documents carry personal data; keep them out of v1 or redact first. Crew counts are fine, crew names are not needed.</li><li>If a client requires data to stay in Singapore, run the same model through a cloud region that offers it, subject to model availability; the endpoint is one setting.</li><li>Entra ID sign-in, project-level access, an audit log of who ran what on which documents.</li></ul></div>
+    <div><h3>Accuracy</h3><ul><li>Citations are the product. Check must say “Not found” rather than guess.</li><li>An evaluation set from three past tenders: 50 questions with known answers, two checklists with agreed results, three schedules with the correct Excel. Score every prompt and model change against it.</li><li>Results are drafts until initialled. Money-bearing quantities never leave without a named checker.</li><li>A corrections log: every user override is kept and becomes next quarter's test set.</li></ul></div>
+  </div>
+</section>
+
+<section id="plan">
+  <p class="eyebrow">Pilot</p>
+  <h2>Twelve weeks</h2>
+  <ol class="steps">
+    <li><div><b>Weeks 1–2 · Prototype in use.</b> Three people (tender, one PM, one QS) on one live tender. Done when 30 real prompts have run, three checklist templates are drafted, and the first cost readout is on the table.</div></li>
+    <li><div><b>Weeks 3–4 · Service skeleton.</b> Sign-in, projects, upload once, run, results with citations. Done when two projects are loaded and the same prompts answer from the service.</div></li>
+    <li><div><b>Weeks 5–6 · Templates and exports.</b> Extract presets, CSV and Excel export, SharePoint write-back. Done when the tender team runs the risk checklist on every new tender.</div></li>
+    <li><div><b>Weeks 7–8 · Measure.</b> Evaluation set built and scored; accuracy and cost dashboard. Go or no-go for wider rollout.</div></li>
+    <li><div><b>Weeks 9–12 · First Phase 2 slice.</b> Spec library and “Ask the daily reports” over DR Capture CSVs. Done when the plant department answers one weekly question from it.</div></li>
+  </ol>
+  <p>Team: the in-house builder part-time, one tender manager and one QS as owners of the templates, one contracts person for the upload rules. No new hires.</p>
+</section>
+
+<section id="risks">
+  <p class="eyebrow">Risks and metrics</p>
+  <h2>What could go wrong, and how we will know it is working</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Risk</th><th>Mitigation</th></tr></thead>
+    <tbody>
+      <tr><td>A client document that may not leave KKL is uploaded</td><td>Per-project rule signed off by contracts before any file is loaded; residency option in Phase 1</td></tr>
+      <tr><td>A wrong quantity reaches a bid</td><td>Takeoff assist limited to counts and schedule reads with citations; named checker before export; measured takeoffs stay with existing tools</td></tr>
+      <tr><td>Users trust an unsupported answer</td><td>“Not found” is a first-class result; citations mandatory; verify-before-use state</td></tr>
+      <tr><td>Costs run away on huge PDFs</td><td>Cost readout per run; page-range selection; caching; per-project monthly cap from Phase 1</td></tr>
+      <tr><td>Built but not used</td><td>Owners in the tender team; templates encode their questions; prompts per week measured from week 1</td></tr>
+      <tr><td>Model or price changes</td><td>Endpoint and model are one setting; the evaluation set makes switching safe</td></tr>
+      <tr><td>The builder is a single point of failure</td><td>Same single-file discipline as the other apps; templates and a runbook in the repo</td></tr>
+    </tbody>
+  </table></div>
+  <ul>
+    <li>Prompts a week and active users: 10 users and 100 prompts a week by week 8.</li>
+    <li>Minutes saved per prompt, sampled monthly; civils.ai's own assumption is 5–15.</li>
+    <li>Share of new tenders that get the risk checklist before bid/no-bid.</li>
+    <li>Accuracy on the evaluation set: 95% on Ask and Check, 98% cell accuracy on Extract.</li>
+    <li>Cost per prompt and per project.</li>
+  </ul>
+</section>
+
+<section id="proto">
+  <p class="eyebrow">In the repo</p>
+  <h2>The prototype</h2>
+  <p><code>ai/index.html</code> is a working Phase 0: add PDFs, text or CSV files; pick Ask, Check, Extract, Compare or Takeoff assist; insert a template (tender risk checklist, method statement review, subcon quote review, borehole strata, drainage schedule, sheet index); run. Answers stream in with page chips that open the cited page; Check verdicts colour-code Pass, Fail, Unclear and Not found; Extract, Compare and Takeoff assist come back as tables with CSV download; every run shows tokens and an estimated cost; a “Mark checked” step stamps initials before export. Settings hold the API key (this browser only), model, effort and output length.</p>
+  <p>To try it: open the page from GitHub Pages once the branch is merged, or open the file locally, put an API key in Settings, load one tender's spec and drawings, and run the tender risk checklist. Scanned drawings without a text layer are read visually but cannot be page-cited, and measured quantities are deliberately out of scope.</p>
+</section>
+
+<section id="sources">
+  <p class="eyebrow">Sources</p>
+  <h2>Where this comes from</h2>
+  <ul class="sources">
+    <li>civils.ai: homepage, /pricing, /about, /ai-for-quantity-takeoffs-estimation, /ai-takeoffs-for-earthworks-landscaping-and-subsurface-data, /geotechnical-engineering-ai-automation, /ai-for-construction-contractors, /ai-for-construction-consultants, /construction-contract-ai-automation, /construction-tender-ai-automation, blog posts on the no-code workflow builder and geological modelling data extraction</li>
+    <li>Civils.ai on LinkedIn; PitchBook, Tracxn and Crunchbase profiles; Cemex Ventures Top 50; aec+tech and toolbit listings</li>
+    <li>Competitor pricing: Quotr and Ruh AI takeoff comparisons, 2026</li>
+    <li>KKL: kohkockleong.com; Equipment Times profile; this repository (DR Capture activity codes, machine register, CR108 vocabulary)</li>
+    <li>Model API: Claude platform documentation on PDF support, citations, structured outputs, prompt caching and pricing, September 2026</li>
+  </ul>
+  <p class="note">Companion files in the repo: <code>research/civils-ai-study.md</code> and <code>research/kkl-ai-blueprint.md</code> carry the full text.</p>
+</section>
+
+</article>
+</div>
+</div>
+<!-- artifact-end -->
+</body>
+</html>

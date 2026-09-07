@@ -1,0 +1,7 @@
+{
+  "name": "kkl-earthworks",
+  "private": true,
+  "type": "module",
+  "scripts": { "test": "node --test test/*.test.mjs" },
+  "devDependencies": { "pdfjs-dist": "4.10.38" }
+}

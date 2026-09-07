@@ -1,0 +1,637 @@
+{
+ "name": "KKL Rulebook Takeoff System (merged design: calculation-first spine, evidence layer, real-sheet measurer, claims reconciliation)",
+ "summary": "KKL's QS hours go into the arithmetic, bookkeeping and monthly reconciliation around drawn lines more than into drawing them, so the system starts as a versioned rules engine (engine.js, ported from the existing calc_trench.py) that turns a small set of primitives a QS types or traces once into every derived BQ line under a per-contract rulebook whose parameters carry a page citation and a named confirmer. That spine gives first minutes back at month 3 (derived TRENCH, CHAMBER, RC-SECTION, PAVEMENT and KERB lines drafted for QS review), a BQ binder that pre-fills the quantity sheet, and by month 6 a claims roll-up that drafts monthly SOPA packs and back-to-back subcon certificates from DR Capture rows with two independent sources per line. Only after that, and only if month-3, month-6 and month-12 stop-loss reviews pass, is a real-sheet measurer (viewports, per-viewport scale, pen-weight classification, path-id provenance) built once in Python as a nightly shadow job with an honest 15.5 person-week budget, its proposals reviewed by QSs in their own PDF tool or the capture app, and each item class graduated per drawing source on KKL's own accuracy ledger. Total build 41.5 person-weeks over 24 months (20.5 year 1, 21.0 year 2), which is exactly a 0.4 FTE builder; run cost about US$250 a month; no server, no drawing pixels to any cloud model, confidential sheets never on GitHub. Expected QS effort: 93% of today at month 6, 82% at month 12, 65% at month 24 (55-60% upside if the claims roll-up and auto-lengths both graduate), measured by a start/pause timer and alternating-sheet A/B, never self-report. A named QS signs every bid, claim and certificate throughout; the engine never signs.",
+ "principles": [
+  "Calculation first: measure or type four primitives (count, length, area, levels) once; every derived line is versioned, golden-tested code over a per-contract rulebook, never a model's number.",
+  "No model-emitted number ever becomes a quantity: the Claude API reads text (preambles, BQ lines, schedules, legend wording); geometry code measures; the QS confirms.",
+  "Build once, in house style: single-file GitHub Pages apps, CSV/JSON on SharePoint, one office PC for nightly Python jobs; no server, no dual Python/JS implementations, no ML classifier until rule-based classification plateaus.",
+  "Evidence before promises: zero-behaviour-change capture where QSs already annotate, a real-sheet regression corpus kept off GitHub, and per class x source gates on KKL's own ledger decide every stage change.",
+  "Two kinds of gate: deterministic derived families graduate on rulebook confirmation + golden tests + 300 root-caused clean lines; measured primitives graduate on the digest's statistical gates (200/500 items, median <=1%, p95 <=5%, counts >=98%, zero confident-wrong).",
+  "Money-bearing safety is structural: unconfirmed rulebook parameter blocks output, entry cross-checks catch garbage-in, dimension grader blocks export beyond 5%, top-80%-of-value items always human, any money-bearing error in an auto stream rolls the class back.",
+  "Provenance on every quantity: engine version, rulebook version, primitive hash or path ids, viewport and scale source, checks passed, QS initials, so any figure can be rebuilt for an SO, MC, subcontractor or adjudicator.",
+  "Confidentiality by default: Tier A (nothing leaves KKL) for every LTA/HDB/PUB/MC document unless the contracts person clears it in the register; a code gateway enforces the tier and logs every egress.",
+  "Claims are reconciliation, not measurement: DR Capture rows joined through the item library, two sources per line, paid_on and measure_rule per BQ item, SO-certified quantity fed back as truth; never auto-submitted.",
+  "Effort is proven by logged minutes per sheet per class with start/pause timers and alternating-sheet A/B; time saved is banked as tender capacity in year one; reviewers are scored on catch rate, not throughput."
+ ],
+ "architecture": {
+  "components": [
+   {
+    "name": "Stage-0 instrumentation kit",
+    "role": "Per-sheet per-class timer page with start/pause and edit log; inbox-sample sheet (vector-with-text / vector-outline-text / scan / DXF / DGN, annotation present y/n, tool used); project register CSV with confidentiality tier; money-bearing error and per-class tolerance definitions.",
+    "tech": "Single-file HTML on GitHub Pages, CSV to SharePoint; register CSV owned by contracts",
+    "from_design": "TrueLine (timer), Shadow Ledger (inbox sample, register), all (definitions)",
+    "build_or_buy": "build",
+    "person_weeks": 1
+   },
+   {
+    "name": "Item library and per-contract rulebook",
+    "role": "items.json: KKL civil taxonomy keyed on kkl_code, unit, band set, attributes, inclusions, formula family and DR join keys (struct, method, spec_element). rules/<contract>.json: every measurement parameter as {value, source_page, extracted_by, confirmed_by, ts}; Preamble-to-Rules Extract preset (text pages only, Tier B/C) with diff view against the client template (LTA, HDB SOR, PUB, MC back-to-back); unconfirmed parameter blocks the engine ('rulebook incomplete'); Tier A rulebooks typed from template.",
+    "tech": "JSON + JSON-Schema (ajv), existing ai/index.html Extract agent, rulebooks stored on SharePoint (client templates only in git)",
+    "from_design": "Rulebook",
+    "build_or_buy": "build (content owned by chief QS)",
+    "person_weeks": 1.5
+   },
+   {
+    "name": "Rules engine engine.js with golden tests and CI",
+    "role": "Pure functions primitives x rulebook -> BQ lines for families TRENCH (EW-EXCT by depth band, EW-HARD, EW-BF, EW-DISP, DR-PIPE/DR-RCU/DR-BC m), CHAMBER (DR-SUMP nr by type/depth stage, CIS sump RC-FW/RC-CONC/RC-REB), RC-SECTION (RC-FW, RC-CONC rounded up 0.1 m3, RC-REB from BBS), PAVEMENT (RW-SUB, RW-BASE, RW-ACWC m2 and tonnes, RW-FP), KERB (RW-KERB, haunch, trench), DEMO, DISPOSAL (soil-stream split from SI percentages); stamps engine and rulebook versions and primitive hashes on every line; diff mode for VOs.",
+    "tech": "Plain ES module, node --test goldens including sample_drawing.truth.json, GitHub Actions blocks release on any golden change; used by capture app, claims page and tests",
+    "from_design": "Rulebook (ported from calc_trench.py)",
+    "build_or_buy": "build",
+    "person_weeks": 3
+   },
+   {
+    "name": "Primitive capture app v1 (takeoff/index.html)",
+    "role": "Typed tables mirroring QS spreadsheets (runs, chamber levels, areas, counts); pdf.js viewer with a per-viewport scale object seeded from title text and page size, confirmed by the QS, with an OpenTakeoff-style grader (green <=1%, amber <=5%, export blocked >5%); polyline/polygon/count tracing with snapping to vector paths, every trace saved as an ISO 32000 /Measure annotation with /Subj = KKL code; entry cross-checks (IL monotonic, GL-IL within band, run totals vs schedule read with citations); cost readout (qty x KKL rate) per line; 'checked by' stamp that locks the sheet and writes CSV in DR Verify style; .xlsx quantity sheet with engine vs QS columns; primitives.json and CSV to the project SharePoint folder.",
+    "tech": "Single HTML file, pdfjs-dist 4.10.38 pinned, pdf-lib for annotation write, SheetJS, localStorage drafts",
+    "from_design": "Rulebook (typed tables, xlsx), TrueLine (scale object, grader), Overlay (cost readout, stamp), Shadow Ledger (traces as annotations)",
+    "build_or_buy": "build",
+    "person_weeks": 3.5
+   },
+   {
+    "name": "BQ binder and bq_map",
+    "role": "GeBIZ Price Schedule PDF -> bq.json (item no, description hierarchy, unit, provisional qty, rate, page ref); classification of each line into the item library with a QS confirmation grid; per-item paid_on (survey | design_nett | dr_rows | tickets), measure_rule (nett | bulked | per_load | tonne), band_edges, measured_over_sumps; one binding reused for tender, claim, subcon certificate and VO.",
+    "tech": "Extract agent (text pages, Tier B/C) with item-library ids as label set; typed for Tier A; CSV/JSON on SharePoint",
+    "from_design": "Rulebook (binder), Surface Ledger (paid_on, measure_rule)",
+    "build_or_buy": "build on existing workbench",
+    "person_weeks": 1.5
+   },
+   {
+    "name": "Evidence layer: sheet fingerprint and nightly harvester (conditional)",
+    "role": "Built only if the week-1 sample shows >=50% of measured sheets carry PDF measurement annotations. sheet_id = SHA-256 of normalised get_cdrawings tuples plus words (independent of annotations and re-saves); nightly walk of OneDrive-synced tender and claims folders; reads Line/PolyLine/Polygon/Count annotations with /Measure, /VP, /Subj, /BSIColumnData, author, date; subject-to-code map and a Bluebeam tool chest with KKL codes; harvests QS BQ workbooks (openpyxl) as the second truth source; writes primitives with source=bluebeam and ledger rows. If not built, trace mode in the capture app is the label source and the 2.0 pw goes to capture app v2.",
+    "tech": "Python 3.12, PyMuPDF 1.28 (internal use), pypdf fallback, openpyxl, Windows Task Scheduler on the office PC; verified on one real KKL Revu file first",
+    "from_design": "Shadow Ledger",
+    "build_or_buy": "build (conditional)",
+    "person_weeks": 2
+   },
+   {
+    "name": "Claims roll-up, two-source reconciliation, subcon certificate (takeoff/claims.html)",
+    "role": "Monthly per contract: DR Capture/DR Verify CSV rows joined to bq.json through the item library on (activity_code, struct, method, spec_element, depth_band), chainage-interval union against double claiming, this-period/cumulative/to-complete vs provisional quantities; second source per line (precast delivery units x 1.0/0.5 m for DR-PIPE/DR-RCU, delivery counts for DR-SUMP, weighbridge tonnes vs m2 x thickness x density for RW-ACWC, concrete DOs vs design m3 for RC-CONC, staging-ground receipts by stream for EW-DISP); loads x capacity / (1+bulking) residual as a KPI only; lines disagreeing beyond class tolerance held for review, never exported silently; back-to-back subcon certificate; SOP Act audit appendix (DR row ids, ticket ids, surface hashes, engine version, signatory); DR coverage report per contract; SO-certified quantity entered back as truth.",
+    "tech": "Single-file HTML, PapaParse, SheetJS; ticket/DO Extract presets run only on KKL's own Tier C documents",
+    "from_design": "Rulebook (roll-up, chainage union), Surface Ledger (two-source reconciliation, subcon certificate, audit appendix, loads as KPI)",
+    "build_or_buy": "build",
+    "person_weeks": 3
+   },
+   {
+    "name": "Accuracy ledger, gate dashboard and bias controls",
+    "role": "ledger.csv one row per line/item (class, source, stage, engine qty, QS final qty, checks passed, minutes, reviewer, seeded flag); dashboard per class x source showing digest gates, automation rate and audited accuracy separately, rollback triggers computed automatically; confidence as a check pattern (auto-accept bucket = patterns with empirical error <=0.5% on >=200 items, missing check = sub-threshold) recomputed monthly; blind-then-reveal on a 20% sample; seeded known-error items with per-QS catch rate; top-80%-of-value list; named-QS sign-off record.",
+    "tech": "CSV on SharePoint, single-file dashboard page, small Python report script",
+    "from_design": "Shadow Ledger (check-pattern calibration, truth definition), TrueLine (ledger schema), digest framework",
+    "build_or_buy": "build",
+    "person_weeks": 2
+   },
+   {
+    "name": "Confidentiality gateway and egress log",
+    "role": "Reads the project tier from the register before any outbound call; Tier A sessions never receive an API key; Tier B permits text blocks only; Tier C permits KKL's own documents and public sheets; every egress logged (project, sheet, page, block type, model, tokens, time) to SharePoint; GitHub Actions runs synthetic sheets only.",
+    "tech": "About 200 lines in the workbench and nightly jobs",
+    "from_design": "Overlay",
+    "build_or_buy": "build",
+    "person_weeks": 0.5
+   },
+   {
+    "name": "Auto-primitives phase 1: Sheet Geometry Model, PDF importer, regression corpus",
+    "role": "sgm.schema.json per sheet (viewports with clip polygon/type/scale, paths with width/weight class/dash/closure/fill, text with direction, outline-text flag); PyMuPDF importer with clip-hierarchy viewport reconstruction (get_drawings(extended=True)) and bbox-clustering fallback, Bezier flattening, outline-text detection (words == 0 with thousands of tiny fills) routed to local OCR later; regression corpus of >=30 real LTA SDRE and KKL sheets with QS-confirmed quantities on SharePoint plus synthetic DXF-to-PDF round trips (ezdxf PyMuPdfBackend) in CI; corpus measurements published before any phase-2 budget is released.",
+    "tech": "Python, PyMuPDF 1.28.2 pinned, ezdxf drawing add-on; runs on the office PC; nothing in the browser",
+    "from_design": "TrueLine (SGM, viewports, outline-text), Shadow Ledger (corpus off GitHub)",
+    "build_or_buy": "build",
+    "person_weeks": 2.5
+   },
+   {
+    "name": "Auto-primitives phase 2: scale resolver, classifier v0, kernel, shadow scorer, proposal writer",
+    "role": "Per-viewport three-voter scale (title text corrected for page size, dimension-line detector, scale bar) with QS confirmation cached per originator template; rule classifier on quantised pen weight (0.36/0.72/1.08/1.44/2.16 pt), dash, closure/fill, parallel-partner offset (double-wall pipes, kerb face/back), hatch strokes as their own IGNORE class, symbol signature vs learned legend, label regex; 'detail and section viewports never supply plan lengths or counts'; measurement kernel (chaining, bounded gap bridging, double-wall collapse, chainage split, symbol de-dup); path-id provenance on every primitive; shadow scorer matching engine items to QS truth by buffered overlap/IoU with reason codes that become the builder's weekly backlog; proposals written as a KKL-ENGINE annotation layer on a copy of the PDF (never the QS's file) with /Measure, /Subj = code, custom columns = checks and path ids; dual-route PyMuPDF vs pdf.js agreement as a periodic corpus test, not a per-sheet feature. Built once, in Python.",
+    "tech": "Python, PyMuPDF, shapely 2.0; nightly shadow job; no JS port; ML class map only if rules plateau and only evaluated in Python",
+    "from_design": "TrueLine (all measurement engineering), Shadow Ledger (scorer, reason codes, annotation write-back)",
+    "build_or_buy": "build",
+    "person_weeks": 8.5
+   },
+   {
+    "name": "Areas: hatch-region polygonisation and SDRE thickness",
+    "role": "Closed loops and hatch-region loops with even-odd islands, contained-text naming, SDRE road-type layer stacks; mean-signed-error guard (|bias| <=1%) because independent evidence shows areas systematically under-measured.",
+    "tech": "Python kernel extension; corpus tests",
+    "from_design": "TrueLine",
+    "build_or_buy": "build",
+    "person_weeks": 2.5
+   },
+   {
+    "name": "Section tool and chainage ledger",
+    "role": "QS picks existing-ground and formation polylines in long/cross-section viewports (pre-selected by weight and dash, remembered per template); end areas by chainage with AEA and prismoidal both reported; GL/IL interpolation into trench depth bands; chainage ledger of designed quantity per activity code per interval exported to SharePoint and joined to DR Capture ch_from/ch_to so claim lines become lookups.",
+    "tech": "Capture app tool + engine.js SURFACE/section functions",
+    "from_design": "TrueLine",
+    "build_or_buy": "build",
+    "person_weeks": 2
+   },
+   {
+    "name": "Capture app v2: review surface",
+    "role": "Lasso and bulk accept, review queue sorted by cost readout, KKL-ENGINE overlay for QSs who do not use Bluebeam, blind-then-reveal switch, one-manual-sheet-per-week mode.",
+    "tech": "Same single file",
+    "from_design": "Overlay (queue by money), chief QS judge (lasso/bulk accept)",
+    "build_or_buy": "build",
+    "person_weeks": 2
+   },
+   {
+    "name": "VO differential runner",
+    "role": "Two primitive sets (revision A, B) through the same rulebook -> omissions and additions per BQ item with pricing-basis column (BQ rate / pro-rata / star / daywork) chosen by the QS; on SOR contracts BQ quantities not used for omissions.",
+    "tech": "engine.js diff mode, .xlsx report",
+    "from_design": "Rulebook",
+    "build_or_buy": "build",
+    "person_weeks": 1
+   },
+   {
+    "name": "DXF/DWG importer and request letter",
+    "role": "ezdxf: layers, INSERT block counts, LWPOLYLINE/HATCH lengths and areas, DIMENSION.get_measurement(), viewport scale; DWG via LibreDWG dwg2dxf as a separate process; Civil 3D proxies flagged; standard letter requesting DXF/DWG, LandXML and TrueType/PDFSHX plots on every contract.",
+    "tech": "Python, ezdxf 1.4.4, LibreDWG (GPLv3, internal, not redistributed); no ODA",
+    "from_design": "TrueLine, Rulebook",
+    "build_or_buy": "build",
+    "person_weeks": 1
+   },
+   {
+    "name": "Surface-difference module (per project)",
+    "role": "LandXML (lxml Pnts/Faces), DXF 3DFACE/contours, LAS via laspy -> TIN (scipy Delaunay) -> 0.25 m grid difference clipped to zone polygons with exclusion masks; JM pack (heat map, zone table, surface hashes, 10 random check cells); validated on synthetic prisms and against one vendor volume report before first claim use; used only where a bulk open-cut site, the bq_map paid_on basis and airspace/IPA status justify a flight charged to that contract.",
+    "tech": "Python on office PC; vendor RTK flight bought per project (S$2.5-10k per visit)",
+    "from_design": "Surface Ledger (engine and JM pack, without the fortnightly programme)",
+    "build_or_buy": "build engine; buy flights per project",
+    "person_weeks": 2.5
+   },
+   {
+    "name": "Scan route (conditional)",
+    "role": "300 dpi render, OpenCV skeleton for snap-to-centreline tracing, local PaddleOCR for scale text and labels; every trace logged; sub-300 dpi never money-bearing; built only if the inbox sample shows >=15% scanned sheets.",
+    "tech": "Python + capture app snapping on a downsampled skeleton",
+    "from_design": "TrueLine",
+    "build_or_buy": "build (conditional)",
+    "person_weeks": 1
+   },
+   {
+    "name": "Hardening and handover",
+    "role": "Runbook per job, README per app, named second maintainer walkthrough, monthly drift review (PSI on check-pattern distribution and edit rate, acted on only with an audit accuracy drop), quarterly blind re-baseline tooling, annual accuracy report.",
+    "tech": "Docs and small scripts",
+    "from_design": "all",
+    "build_or_buy": "build",
+    "person_weeks": 0.5
+   }
+  ],
+  "data_flow": "Tender: GeBIZ ZIP -> Price Schedule PDF -> BQ binder (Extract, text pages, Tier B/C only) -> bq.json + bq_map; preamble pages -> Preamble-to-Rules preset -> rulebook draft -> QS confirms each money-bearing parameter against its cited page -> rulebook v1 (Tier A: typed from template). Drawings stay on the QS PC: QS types or traces primitives in takeoff/index.html with per-viewport scale confirmed and graded (or the nightly harvester imports Bluebeam markups; or ezdxf reads DXF) -> primitives.json -> engine.js (primitives x rulebook x item library) -> .xlsx quantity sheet with engine vs QS columns and cost readout -> QS reconciles, stamps 'checked by', signs -> CSV, primitives.json, ledger rows to SharePoint. Claims (monthly): DR Capture/DR Verify CSVs + tickets/DOs/weighbridge (Extract on KKL's own Tier C documents) + surface volumes where a project has them -> claims.html joins to bq.json via item library with chainage union and two-source checks -> claim pack, subcon certificate, audit appendix (.xlsx) -> named QS signs -> SharePoint; SO-certified quantities entered back into the ledger. VOs: revision-B primitives -> engine diff -> omissions/additions with pricing basis. Auto-primitives (year 2): nightly job imports every measured sheet into sheet.json, resolves viewports and scale, classifies and measures, scores against QS truth (QS final after chief-QS adjudication plus the workbook figure) with reason codes, and in Stage 2 writes proposals as a KKL-ENGINE annotation layer on a PDF copy that the QS reviews in Bluebeam or the capture app; the nightly diff between proposals and final annotations is the corrections log and regression corpus. Ledger and dashboard recompute per class x source gates, calibration and rollback triggers weekly; the gateway logs every egress.",
+  "confidentiality_tiers": "Tier A (default for every LTA, HDB, PUB, JTC and MC-issued document, all NDA/OSA/IPA work): nothing leaves KKL; geometry, OCR and measurement in the browser or on the office PC; rulebook and bq_map typed from client templates; sessions carry no API key. Tier B (cleared per project by the contracts person in the register after reading the NDA): preamble, BQ and schedule text pages may go to the Claude API; no drawing pixels ever. Tier C (KKL's own documents such as tickets, DOs, weighbridge receipts and BQ workbooks, and public sheets such as LTA SDRE): text and images permitted; the civils.ai benchmark trial runs on Tier C sheets only. Enforced by the gateway in code with a per-project egress log; regression corpus of real sheets lives on SharePoint, GitHub Actions sees synthetic sheets only; the contracts person writes down the OSA and NDA reading before Stage 1 and notifies the PI/CAR insurer of AI-assisted quantities with named sign-off.",
+  "repo_layout": "GitHub (public house style, no client content): takeoff/index.html (capture app), takeoff/claims.html, takeoff/ledger.html, takeoff/engine.js, takeoff/library/items.json, takeoff/templates/<client>/ (rulebook templates, SDRE lookups, mesh kg/m2 by standard), takeoff/schema/ (sgm, primitives, rulebook, ledger, bq_map), takeoff/tests/*.golden.json and synthetic round trips, takeoff/jobs/ (harvest.py, import_pdf.py, import_dxf.py, scale.py, classify.py, kernel.py, shadow.py, propose.py, surface.py), takeoff/README.md and RUNBOOK.md, existing spikes kept as seeds. SharePoint: Takeoff Ledger library (ledger.csv, corrections.jsonl, calibration.csv, egress.csv, project register), per-project folders (primitives.json, sheet.json, bq.json, rules/<contract>.json, quantity sheets, claim packs), regression corpus of real sheets, Bluebeam tool chest. Office PC: nightly scheduled tasks for harvest, import, shadow, propose and surface jobs."
+ },
+ "roadmap": [
+  {
+   "phase": "Phase 0: instrument, decide, first shadow",
+   "months": "0-3",
+   "goal": "Establish the baseline and the safety definitions, seed the item library and two rulebooks, ship engine.js and capture app v1, and run TRENCH/CHAMBER in shadow on live tenders with no drawing AI.",
+   "deliverables": [
+    "Inbox sample and tool census; project register with tiers; money-bearing error, accuracy definition and per-class tolerances signed",
+    "Timer page; two-QS blind baseline on ~20 sheets",
+    "items.json v0 from 3-5 live Price Documents with a count of BQ lines by family",
+    "engine.js TRENCH and CHAMBER with goldens and CI; rulebooks for 2 live contracts 100% confirmed",
+    "Capture app v1 with per-viewport scale grader, typed tables, xlsx out; 3 live tenders in shadow (QS commits first)",
+    "Harvester go/no-go at week 8; claims.html v1 in shadow on 2 contracts by week 13"
+   ],
+   "gates": [
+    ">=200 derived lines across >=3 tenders with every engine-vs-QS difference root-caused (QS slip, rule gap or engine bug -> golden test)",
+    "Inter-QS disagreement per class tabulated and adopted as the accuracy ceiling",
+    "Month-3 stop-loss: TRENCH/CHAMBER to Stage 2 only if zero unexplained differences; DR coverage on the 2 claim pilots reported"
+   ],
+   "qs_effort_pct_of_today": 101
+  },
+  {
+   "phase": "Phase 1: derived families in assist, claims in assist on pilots",
+   "months": "3-6",
+   "goal": "Give QSs back arithmetic and BQ-entry minutes on every new tender and draft claim packs on five contracts, with the evidence layer capturing labels.",
+   "deliverables": [
+    "RC-SECTION, PAVEMENT, KERB, DEMO, DISPOSAL families in engine.js; BQ binder with bq_map paid_on/measure_rule",
+    "Harvester and Bluebeam tool chest (if go) or capture app trace mode as the label source",
+    "Claims roll-up with two-source reconciliation, subcon certificate and audit appendix: shadow on 2 contracts, assist on 5",
+    "Accuracy ledger, gate dashboard, check-pattern calibration table, blind-then-reveal, seeded errors; confidentiality gateway and egress log",
+    "Month-6 review with timer evidence and alternating-sheet A/B"
+   ],
+   "gates": [
+    "Timer shows derived-family minutes per sheet down >=30% vs baseline on A/B sheets",
+    "Zero money-bearing errors in engine lines; rulebook coverage 100% confirmed for each family in Stage 2",
+    "Claim pack within 2% of the QS pack for 2 consecutive months on >=3 pilot contracts; DR Verify coverage >=90% of claim-relevant rows on pilots",
+    "Month-6 stop-loss: if either fails, the auto-primitive budget is not released"
+   ],
+   "qs_effort_pct_of_today": 93
+  },
+  {
+   "phase": "Phase 2: derived families auto with audit, claims at scale, corpus",
+   "months": "6-12",
+   "goal": "Move derived families to confidence-gated auto-accept with random audit, auto-draft claims on 15 contracts, and build the real-sheet corpus and importer that decide whether auto-measurement is worth its budget.",
+   "deliverables": [
+    "Stage 3 for TRENCH, CHAMBER, RC-SECTION (RC-REB only from BBS), PAVEMENT, KERB with 10% -> 5% audit and the top-80%-of-value rule",
+    "Claims auto-draft with QS signature on 15 contracts; subcon certificates on asphalt and RC subcons; SO-certified quantities fed back",
+    "Auto-primitives phase 1: SGM, PyMuPDF importer with viewports and outline-text detection, 30-sheet real corpus on SharePoint, synthetic round trips in CI, corpus results published",
+    "civils.ai Starter 3-month trial on Tier C sheets as an external benchmark; buy-vs-build re-check",
+    "12-month review and annual accuracy report; runbook and second maintainer named"
+   ],
+   "gates": [
+    "300 clean lines per family and audited accuracy >=99.5% on engine lines",
+    "Claims within 2% for 3 consecutive months on >=10 contracts",
+    "Corpus: per-viewport scale proposal rate and per-path precision measured on real sheets; phase-2 budget (8.5 pw) released only if month-6 and month-12 stop-losses pass"
+   ],
+   "qs_effort_pct_of_today": 82
+  },
+  {
+   "phase": "Phase 3: auto-primitives in shadow, VO differential, DXF",
+   "months": "12-18",
+   "goal": "Run the real-sheet measurer blind on every sheet QSs measure, turn disagreements into a reason-coded backlog, and add VO and DXF routes.",
+   "deliverables": [
+    "Three-voter per-viewport scale resolver, classifier v0, measurement kernel, path-id provenance, shadow scorer, KKL-ENGINE annotation write-back",
+    "Capture app v2 (lasso, bulk accept, queue by cost, engine overlay)",
+    "VO differential runner; DXF/DWG importer and the DXF/LandXML request letter",
+    "Counts and lengths in Stage 1 shadow per class x source; counts to Stage 2 where the gate passes"
+   ],
+   "gates": [
+    "Counts: >=200 items across >=5 projects and >=2 sources, exact-match >=98%, zero confident-wrong",
+    "Scale resolver proposes correct scale on >=80% of corpus viewports; dimension grader green on every exported viewport",
+    "VO lists reconcile with the QS's manual differential on 5 VOs"
+   ],
+   "qs_effort_pct_of_today": 74
+  },
+  {
+   "phase": "Phase 4: graduate, extend, harden",
+   "months": "18-24",
+   "goal": "Graduate measured primitives where KKL's ledger says so, add areas, sections and per-project surfaces, and reach all ~30 contracts on claims.",
+   "deliverables": [
+    "Counts to Stage 3 on DXF and repeat-originator vector PDF; lengths DR-PIPE/DR-RCU/RW-KERB to Stage 2 on all vector sheets and Stage 3 where 500-item gates pass",
+    "Areas RW-ACWC/RW-FP/RW-SUB/RW-BASE shadow -> Stage 2 with the mean-signed-error guard",
+    "Section tool and chainage ledger joined to DR Capture; surface module validated on one project",
+    "Scan route if the sample justifies it; claims on all ~30 contracts; hardening, drift monitors, quarterly blind re-baseline"
+   ],
+   "gates": [
+    "Per class x source: >=500 verified items, accept-without-edit >=95%, escaped-error <=0.5%, no money-bearing error in last 300, auto-accept bucket error <=0.5%",
+    "Areas: |mean signed error| <=1%; sections within 5% of QS on >=80% of runs across >=5 contracts",
+    "Quarterly blind re-baseline within 5% of Stage 0 skill; zero rollbacks in the last two quarters for any Stage 4 class"
+   ],
+   "qs_effort_pct_of_today": 65
+  }
+ ],
+ "automation_order": [
+  {
+   "item_class": "TRENCH family (derived): EW-EXCT by depth band, EW-HARD, EW-BF, EW-DISP, DR-PIPE/DR-RCU/DR-BC metres",
+   "source": "QS-typed or traced run lengths, sizes and GL/IL pairs (or harvested markups / DXF) x rulebook working-space, bedding, OD and band tables",
+   "by_month_6": "Stage 2 on all new tenders (shadow from week 6)",
+   "by_month_12": "Stage 3 auto-accept with 10% -> 5% audit, top-80%-of-value human",
+   "by_month_24": "Stage 4 (2-5% audit)",
+   "gate": ">=200 lines across >=3 tenders with every difference root-caused; 300 clean lines; 100% of the family's rulebook parameters confirmed with page citations; goldens green; zero money-bearing error; entry cross-checks active"
+  },
+  {
+   "item_class": "CHAMBER family: DR-SUMP nr by type and depth stage; CIS sump RC-FW/RC-CONC/RC-REB",
+   "source": "Sump schedule read by the Extract agent with citations (Tier B/C) or QS click-count; depth from GL/IL",
+   "by_month_6": "Stage 2",
+   "by_month_12": "Stage 3",
+   "by_month_24": "Stage 4",
+   "gate": "Count exact-match >=98% vs QS on >=200 chambers; schedule total reconciles with plan count exactly; any row without a citation is sub-threshold"
+  },
+  {
+   "item_class": "RC-SECTION family: RC-FW, RC-CONC (rounded up 0.1 m3), RC-REB for CIS drains, RCBC, culverts",
+   "source": "Run length x section template (SDRE or contract detail) confirmed per contract; BBS totals via Extract; kg/m3 flagged as assumption",
+   "by_month_6": "Stage 2 (shadow from month 3)",
+   "by_month_12": "Stage 3 for RC-FW/RC-CONC; RC-REB Stage 3 only from an issued BBS",
+   "by_month_24": "Stage 4; RC-REB from kg/m3 stays Stage 2",
+   "gate": "Section templates confirmed; 300 clean lines; RC-CONC within rounding of QS on every line; RC-REB within 1% of BBS total"
+  },
+  {
+   "item_class": "PAVEMENT and KERB families (derived lines): RW-SUB, RW-BASE, RW-ACWC m2 and tonnes, RW-FP, RW-KERB with haunch and trench",
+   "source": "QS polygon areas and kerb polylines with type x SDRE road-type layer stacks; density from M&W (assumption until confirmed)",
+   "by_month_6": "Stage 2",
+   "by_month_12": "Stage 3 (derived lines only; the primitive stays QS-measured)",
+   "by_month_24": "Stage 4 derived; primitive follows the area/length classes below",
+   "gate": "Layer stacks and density confirmed per contract; 300 clean lines; tonnage within 1% of the QS's own calculation; kerb type is an explicit attribute"
+  },
+  {
+   "item_class": "BQ binding: Price Schedule lines to item library, bq_map paid_on and measure_rule",
+   "source": "Extract agent on text pages (Tier B/C); typed for Tier A",
+   "by_month_6": "Stage 2 (QS confirms every line)",
+   "by_month_12": "Stage 3 (mapping auto-accepted at >=95% accept-without-edit; unit and band never auto when the library disagrees)",
+   "by_month_24": "Stage 4",
+   "gate": ">=500 lines from >=5 tenders per client; paid_on confirmed by the contracts person per item"
+  },
+  {
+   "item_class": "Claims roll-up and subcon certificate: EW-EXC, EW-EXCT, EW-BF, EW-DISP, DR-PIPE, DR-RCU, DR-SUMP, RW-KERB, RW-ACWC, RC-CONC",
+   "source": "DR Capture/DR Verify rows joined via item library; second source per line from delivery notes, DOs, weighbridge, staging-ground receipts; surface volumes where a project has them; loads as KPI only",
+   "by_month_6": "Shadow on 2 contracts from month 3; assist on 5",
+   "by_month_12": "Auto-draft with QS signature on 15 contracts; Stage 3 for lines where two sources agree within tolerance",
+   "by_month_24": "All ~30 contracts; Stage 4 on linear, count and ticket classes; EW-EXC Stage 3 only on sites with signed JM cycles; never auto-submitted",
+   "gate": "Engine pack within 2% of the QS-certified pack for 3 consecutive months per contract; DR Verify coverage >=90% and >=95% of rows with chainage or zone; chainage union passes; SO-certified quantity fed back; escaped error (SO rejection) is the rollback trigger"
+  },
+  {
+   "item_class": "Measured counts: DR-SUMP, DR-BC from DXF blocks and vector PDF symbol signatures",
+   "source": "ezdxf INSERT counts; PyMuPDF legend-learned signatures outside legend/title/detail viewports",
+   "by_month_6": "None (corpus assembly only)",
+   "by_month_12": "Stage 1 shadow on corpus and live sheets",
+   "by_month_24": "Stage 3 on DXF and repeat-originator vector PDF; new originator routed to review until 50 clean items",
+   "gate": ">=200 items across >=5 projects and >=2 sources; exact-match >=98%; zero confident-wrong; legend decoys excluded; then 500 verified, accept-without-edit >=95%"
+  },
+  {
+   "item_class": "Measured lengths: DR-PIPE by dia, DR-RCU by size, RW-KERB by type",
+   "source": "Vector PDF chained paths and DXF polylines; long-section or schedule GL/IL for banding",
+   "by_month_6": "None",
+   "by_month_12": "None (importer and corpus only)",
+   "by_month_24": "Stage 2 assist on all vector sheets (shadow from month 13); Stage 3 on DXF and on originator templates that pass the 500-item gate",
+   "gate": "Median abs error <=1%, p95 <=5%, label attach >=98%, kerb-type accuracy >=97%, dimension grader green, dual-route corpus agreement <=1%; then 500 verified items, escaped-error <=0.5%, no money-bearing error in last 300; top-80%-of-value always human"
+  },
+  {
+   "item_class": "Measured areas: RW-ACWC, RW-FP, RW-SUB, RW-BASE m2 from vector PDF hatch regions and fills",
+   "source": "Hatch-region loops and closed polygons with islands; SDRE thickness lookup",
+   "by_month_6": "None",
+   "by_month_12": "None",
+   "by_month_24": "Stage 2 (shadow from month 16, assist by month 20); Stage 3 not before month 24",
+   "gate": "Median <=1%, p95 <=3-5%, |mean signed error| <=1% (guard against systematic under-measurement), islands handled on the corpus"
+  },
+  {
+   "item_class": "EW-EXC / EW-BF bulk volumes from sections or surfaces",
+   "source": "Section tool (QS picks ground and formation polylines) on vector sections; LandXML/DXF/drone surfaces per project via the surface module",
+   "by_month_6": "Manual",
+   "by_month_12": "Manual",
+   "by_month_24": "Stage 2 indefinitely (code computes, QS owns); exact where a surface pair exists; PDF contours and scanned sections never above Stage 2",
+   "gate": "Within 5% of QS on >=80% of runs across >=5 contracts; AEA and prismoidal both reported; surface module within 1% of vendor volume report; bq_map paid_on confirms survey vs design-nett basis"
+  },
+  {
+   "item_class": "VO differential (all families)",
+   "source": "Two primitive sets through the same rulebook; valuation order stays with the QS",
+   "by_month_6": "None",
+   "by_month_12": "None (built months 13-15)",
+   "by_month_24": "Measurement diff Stage 3; valuation human forever",
+   "gate": "Lists reconcile with the QS manual differential on 5 VOs; recall >=98% of QS-identified changes over >=30 VOs"
+  },
+  {
+   "item_class": "Judgement and low-quality inputs: scans, soil-class split for EW-DISP streams, working space, bulking, under-strut staging, existing-condition demolition",
+   "source": "QS tracing with snapping on >=300 dpi renders; SI strata; DR soil_type history; preambles",
+   "by_month_6": "Assist only",
+   "by_month_12": "Assist only",
+   "by_month_24": "Assist only; never automated in this plan; sub-300 dpi scans not money-bearing",
+   "gate": "Not applicable; engine records the assumption per line"
+  }
+ ],
+ "first_90_days": [
+  {
+   "weeks": "1",
+   "action": "Inbox sample and tool census: classify every incoming drawing sheet for one week (vector-with-text, vector-outline-text, scan, DXF/DWG, DGN-origin), record which tool each QS measures with and whether saved PDFs carry measurement annotations; run extract_markups.py on one real KKL marked-up PDF if one exists",
+   "owner": "chief QS with builder (0.5 day)",
+   "done_when": "A CSV of the week's sheets with counts per route, annotation share per QS and the real-file key test result (/Measure, /VP, /BSIColumnData, Count) is in the SharePoint ledger folder"
+  },
+  {
+   "weeks": "1",
+   "action": "Sign the money-bearing error definition (larger of 2% of item value or S$2,000 for claims and subcon lines, S$10,000 for a tender line), the accuracy definition (item-level, value-weighted reported alongside) and per-class tolerances (counts exact, lengths 2%, areas 3%, volumes 5%) as provisional until the baseline replaces them",
+   "owner": "contracts person and chief QS, MD approves",
+   "done_when": "One-page definition committed to the repo README and referenced by the ledger schema"
+  },
+  {
+   "weeks": "1-2",
+   "action": "Project register: tag all ~30 live contracts with confidentiality tier (A default for LTA/HDB/PUB/JTC/MC documents, B only after reading the NDA, C for KKL's own documents); write down the OSA and NDA reading; notify the PI/CAR insurer of AI-assisted quantities with named sign-off",
+   "owner": "contracts person",
+   "done_when": "register.csv has a tier for every project and the written OSA/NDA position and insurer note are filed"
+  },
+  {
+   "weeks": "1-2",
+   "action": "Stage-0 timer page with start/pause and edit log deployed; QSs log minutes per sheet per class on every tender from week 2",
+   "owner": "builder (1.0 pw incl. sample tooling)",
+   "done_when": "timer.csv on SharePoint holds >=2 weeks of rows from every QS"
+  },
+  {
+   "weeks": "2",
+   "action": "Item library v0 from 3-5 live Price Documents (LTA, HDB SOR, PUB, one MC subcontract) and a count of BQ lines by family to test the >=50%-by-count claim; two-week QS time log started to replace the digest's hour shares",
+   "owner": "chief QS (2 days) with builder",
+   "done_when": "items.json v0 in the repo with the family count recorded; time-log template issued"
+  },
+  {
+   "weeks": "2-4",
+   "action": "Two-QS blind baseline: two QSs independently measure the same ~20 sheets covering counts, lengths, areas and one section",
+   "owner": "chief QS assigns; two QSs",
+   "done_when": "Inter-QS disagreement per class tabulated in the ledger and adopted as the accuracy ceiling"
+  },
+  {
+   "weeks": "3-5",
+   "action": "engine.js TRENCH and CHAMBER ported from calc_trench.py with band allocation for both contract and DR band sets; golden tests including sample_drawing.truth.json; GitHub Actions gate; rulebook schema and Preamble-to-Rules Extract preset; rulebooks for 2 live contracts confirmed parameter by parameter against cited pages (typed for Tier A)",
+   "owner": "builder (3.0 pw incl. later families); chief QS 1.5 days",
+   "done_when": "Goldens green in CI; both rulebooks show 100% of money-bearing parameters with value, source_page and confirmed_by; every clause that could not be typed is logged"
+  },
+  {
+   "weeks": "6-8",
+   "action": "Capture app v1: typed primitive tables, pdf.js 4.10.38 viewer with per-viewport scale object and dimension/scale-bar grader, traces saved as /Measure annotations, entry cross-checks, cost readout, xlsx with engine vs QS columns, primitives.json/CSV to SharePoint; first live tender run in shadow with the QS committing their own figures first",
+   "owner": "builder (3.5 pw); one QS runs the pilot tender",
+   "done_when": "One live tender's TRENCH/CHAMBER lines produced by the engine and diffed against the QS's sheet with every difference root-caused and filed as QS slip, rule gap or engine bug"
+  },
+  {
+   "weeks": "8",
+   "action": "Harvester go/no-go: if >=50% of measured sheets carry annotations, build the nightly harvester and Bluebeam tool chest in weeks 9-12; otherwise trace mode is the label source, no Bluebeam seats are bought and the 2.0 pw moves to capture app v2",
+   "owner": "chief QS and builder; MD informed",
+   "done_when": "Decision recorded in the repo with the sample numbers"
+  },
+  {
+   "weeks": "9-11",
+   "action": "RC-SECTION, PAVEMENT, KERB, DEMO and DISPOSAL families in engine.js with SDRE section and layer templates; BQ binder with bq_map paid_on/measure_rule and confirmation grid; ledger CSV writer; confidentiality gateway with egress log; second and third live tenders in shadow",
+   "owner": "builder; chief QS 2 days for templates; contracts person confirms paid_on per item",
+   "done_when": ">=200 derived lines across 3 tenders root-caused; BQ binder pre-fills one quantity sheet; egress log shows every API call with project and tier"
+  },
+  {
+   "weeks": "9-12",
+   "action": "Conditional harvester: nightly job on the office PC over synced tender and claims folders with sheet fingerprint, markup extraction, subject-to-code map, BQ workbook harvest; Bluebeam tool chest with KKL codes issued to QSs",
+   "owner": "builder (2.0 pw); chief QS reviews the mapping table weekly",
+   "done_when": ">=100 markups from >=3 projects paired to fingerprinted sheets in the ledger with <5% unmapped subjects"
+  },
+  {
+   "weeks": "12-13",
+   "action": "claims.html v1: DR Capture/DR Verify CSV join to bq.json through the item library, chainage-interval union, DR row ids per line, DR coverage report; shadow on 2 contracts against the QS's actual claim pack for the month",
+   "owner": "builder (start of 3.0 pw); contracts person and site QS 1 day per contract",
+   "done_when": "Engine pack vs QS pack diff produced for 2 contracts and DR coverage (% rows verified, % with chainage or zone) is known per contract"
+  },
+  {
+   "weeks": "13",
+   "action": "Month-3 stop-loss review: stage decision per derived family (Stage 2 only with zero unexplained differences), harvester outcome, DR coverage on pilots, time-log hour shares replacing the digest's, go/no-go for Phase 1",
+   "owner": "MD, chief QS, contracts person, builder",
+   "done_when": "Written minutes record the stage per family, the revised hour shares and the Phase 1 decision"
+  }
+ ],
+ "effort_curve": {
+  "month_6": 93,
+  "month_12": 82,
+  "month_24": 65,
+  "assumptions": [
+   "Hour shares are the digest's low-confidence inference (tender 40%, claims and subcon certification 27%, VOs 12%, ordering and final account 12%, other 9%) until the week-2 time log replaces them; every figure below is re-derived from the measured shares at month 3.",
+   "Within tender hours, arithmetic and bookkeeping (CIS RC build-ups ~15%, trench runs and derived lines ~15-20%, BQ entry and reconciliation ~15-20%) are ~50%; the Stage 2 saving on that block is taken as 30% at month 6 (not the Rulebook's 40%, per the MD judge's point that QS Excel templates already do some arithmetic), 50% at month 12 (Stage 3) and 60% at month 24.",
+   "Claims: assist on 5 of ~30 contracts at 30% faster by month 6 (1.4 points); auto-draft on 15 contracts at 50% faster by month 12 (6.8 points); all ~30 at 60% faster by month 24 (16 points); each conditional on DR coverage >=90% on the contract.",
+   "Measured primitives contribute nothing before month 13; by month 24 counts and lengths at Stage 2/3 on vector PDF and DXF cut the measuring share of tender hours (~20%) by 40% and the section tool cuts the bulk-from-levels share (~17%) by 20%, together ~5 points.",
+   "VO differential 35% faster on 12% share (4 points) and ordering/final account 30% faster on 12% share (3.6 points) by month 24.",
+   "Verification overhead, rulebook confirmation, blind-then-reveal, seeded errors, audits and one manual sheet per QS per week cost +1 point at month 6 and about 3 points at steady state; 15-20% of items stay human-touched in every graduated class.",
+   "Month 6 = 100 - 6 (tender arithmetic) - 1.4 (claims) + 1 (overhead) ~ 93; month 12 = 100 - 10 - 6.8 - 1.8 (ordering) + 1 ~ 82; month 24 = 100 - 12 - 5 - 16 - 4 - 3.6 + 3 ~ 62-65, quoted as 65 with 55-60 as the upside if claims reach Stage 4 on most contracts and lengths graduate on >=3 originator templates; 68-72 if auto-lengths stay in Stage 1 or DR coverage lags.",
+   "Builder at 0.4 FTE (21 pw/yr); at 0.3 FTE the 24-month figure becomes the 30-month figure."
+  ],
+  "how_measured": "Wall-clock minutes per sheet per class from the in-app start/pause timer (self-report and annotation timestamps are not accepted), aggregated weekly as minutes per sheet by class and source, QS-touch rate, automation rate and audited accuracy (reported separately, medical-coding vocabulary), escaped-error rate, time-to-first-quantity on a new tender, claim-pack minutes per contract, and QS minutes per S$1m of measured quantity. Reduction is proven by alternating-sheet A/B assignment inside the same tender and alternating-month A/B on the same contract for claims, so learning-curve effects cannot masquerade as gains. The denominator is KKL's own two-week time log per QS, not the digest's shares. Effort figures are published on the ledger dashboard against the Stage 0 baseline; the month-3, month-6 and month-12 stop-loss reviews read only these numbers."
+ },
+ "costs": {
+  "build_person_weeks_year1": 20.5,
+  "build_person_weeks_year2": 21,
+  "run_cost_per_month_usd": 250,
+  "one_off_and_services": "Run cost breakdown (planning figure US$250/month): Claude API text-only about US$100-150/month (about 5 tenders/month x preamble, BQ-line and schedule extraction plus ticket/DO extraction on KKL's own documents, Sonnet-class lane, Batch API overnight); provision of about US$100/month covering either an Artifex commercial licence for PyMuPDF if legal rejects the internal-use AGPL position (US$1-2k/yr, assumption) or Bluebeam Core seats for QSs who annotate but lack Core (US$330/user/yr; 4-6 seats = US$110-165/month; zero if not needed or already licensed). Already paid: GitHub Pages, SharePoint/M365, one office PC. One-off: civils.ai Starter benchmark trial 3 months x US$90 = US$270 on Tier C sheets only; optional Kreo not bought. Per-project, charged to the contract and excluded from the monthly figure: vendor RTK drone survey S$2.5-10k per visit (only where a bulk open-cut site, the bq_map paid_on basis and airspace/IPA status justify it), CAAS permits handled by the vendor. Not in scope: GPU, Azure VM, Gemini/Vertex lane, YOLO training, FastAPI runner (all rejected). Builder capacity: 41.5 pw over 24 months equals 0.4 FTE with no slack; at 0.3 FTE year-2 items slip about six months; at 0.5 FTE the slack goes to the scan route and capture app v2 earlier.",
+  "qs_time_cost": "Chief QS: about 1 day/week for months 0-3 (item library, two rulebooks, root-causing shadow differences, baseline), then about 0.5 day/week (rulebook confirmation per tender under 1 hour, weekly triage of reason-coded disagreements sorted by value, monthly audits) = roughly 11 person-weeks over 24 months. Two QSs: the blind baseline on ~20 sheets (about 2 days each). All QSs: about 2 hours/week each in year 1 for corrections, blind-then-reveal sheets and seeded-error review, plus one fully manual sheet per week from month 6 (skill maintenance), which the timer counts as overhead in the effort curve. Contracts person: about 2 person-weeks over 24 months (tiers, NDA and OSA readings, preamble and paid_on confirmations, insurer note, stop-loss reviews). MD: three stop-loss reviews of about half a day each. Site QSs: 1 day per claim pilot contract to align DR coverage. The Shadow Ledger's '1 hour/week' chief QS figure is not used; disagreement volume on real sheets is triaged by reason code and value so that only money-bearing disagreements are adjudicated."
+ },
+ "build_vs_buy": "Build the spine, buy only what no in-house code can replace, and measure a vendor against KKL's own sheets rather than argue about it. No surveyed product covers KKL's actual work: civils.ai (Singapore company, US servers, Starter US$90 and Professional US$270 per user per month, US$9 per takeoff with engineer QA in 24 hours, one takeoff = one trade on one sheet up to 1:250, cut/fill 'coming soon', '97%' self-reported, API/MCP and DPA only on Enterprise) cannot receive Tier A drawings under the OSA, LTA NDAs or the Infrastructure Protection Act, exposes no geometry or per-class accuracy, and knows nothing of per-contract preambles, DR Capture, monthly SOPA claims or subcon certification, which is where most of the recurring hours sit; Kreo (US$35-175/month) has building classes only, is cloud-only and returns measurements via API only on Pro by request or Enterprise; Togal exports Excel only with no API; STACK and PlanSwift return quantities, not vertices. Bluebeam is a capture source, not a takeoff engine: seats are bought only if the week-1 sample shows QSs annotate and lack Core. What KKL buys: Claude API usage for text-only reading on cleared tiers (already in the workbench); a three-month civils.ai Starter trial on Tier C sheets (public LTA SDRE sheets and KKL's own past tenders) purely as an external benchmark of the in-house engine's counts, lengths and areas, with results written into the ledger; vendor RTK flights per project; possibly a PyMuPDF commercial licence. Quarterly re-check owned by the builder and contracts person: does civils.ai or Kreo now offer civil classes, Singapore hosting, per-class audited accuracy or an API that returns geometry; if all four appear, the item library, rulebooks, bq_map, ledger and claims module remain KKL's and only the measurer underneath would be swapped. The 'buy civils.ai during a builder gap' fallback applies to Tier C sheets only and never to claims. Written conclusion for the MD: the in-house route is the only route for Tier A contracts and for claims regardless of price; for Tier C tender sheets it costs about 15.5 builder person-weeks (auto-primitives) against US$9 per sheet-trade, which the benchmark trial will price in KKL's own error terms before phase-2 budget is released.",
+ "governance_summary": "The staged framework is applied per item class x drawing source with two kinds of gate: deterministic derived families (TRENCH, CHAMBER, RC-SECTION, PAVEMENT, KERB) graduate on 100% page-cited, QS-confirmed rulebook parameters plus golden tests plus 300 root-caused clean lines, while measured primitives graduate on the digest's statistical gates (>=200 items, >=5 projects, >=2 sources, median <=1% vector or <=3% scan, p95 <=5%, counts >=98% exact, zero confident-wrong, then >=500 verified items, accept-without-edit >=95%, escaped-error <=0.5%, no money-bearing error in the last 300, auto-accept bucket empirical error <=0.5% by check pattern). Money-bearing error is defined in writing before Stage 1 (larger of 2% of item value or S$2,000 for claims and subcon lines, S$10,000 for a tender line). Rollback is automatic: any money-bearing error in an auto-accepted stream returns the class to Stage 2 until 300 clean items; audit error rate above 2x baseline raises the audit rate to 10%; any new originator template or source routes to review until 50 clean items; any engine, rulebook, library or code change re-runs the full regression corpus and returns the class to shadow for 100 items on any regression; monthly drift review acts only when a distribution shift coincides with an audit accuracy drop. Automation-bias and deskilling controls: blind-then-reveal on a 20% sample, seeded known-error items with catch rate >=90% per QS, one fully manual sheet per QS per week, juniors six months with reveal disabled, quarterly blind re-baseline within 5% of Stage 0 skill, reviewers scored on catch rate not throughput, time saved banked as tender capacity in year one. Roles: chief QS and builder jointly own the engine's mistakes through an incident log where every escaped error gets a root cause and a regression test; the contracts person owns tiers, NDA/OSA readings, paid_on confirmations and the insurer notification; a named QS signs every bid, claim, VO and subcon certificate and the engine never signs; PSSCOC Module A and SOP Act exposure stays with the named signatory. Budget control: stop-loss reviews at month 3 (derived-family minutes down >=30% on pilot tenders; DR coverage >=90% on claim pilots), month 6 (claim packs within 2% for two months; zero money-bearing errors in engine lines) and month 12 (corpus results) release each subsequent budget tranche, including the 8.5 pw auto-primitive phase 2. Builder risk: single-file apps plus one Python job package, pure functions with golden tests, rulebooks and item library as QS-owned data, README and runbook per milestone, a named second maintainer by month 6, confidential regression sheets on SharePoint only.",
+ "key_claims": [
+  {
+   "claim": "At least 50% of BQ lines by count (and 40% by value) on KKL's live LTA/HDB/PUB Price Documents are deterministic functions of four primitives plus the rulebook and SDRE lookups (digest inference ~60%).",
+   "why_it_matters": "It is the basis of the calculation-first spine and of the month-6 and month-12 tender savings.",
+   "how_to_test": "Week-2 count of BQ lines by family on 3-5 live Price Documents while seeding items.json.",
+   "if_false": "Below 40%: the derived-family saving halves, month-12 is ~88; the plan re-weights to claims roll-up and BQ binding and the auto-primitive budget is brought forward only if the inbox sample is vector-heavy."
+  },
+  {
+   "claim": "Each contract's measurement preambles reduce to about 40 machine-checkable parameters without free-text exceptions the engine cannot apply.",
+   "why_it_matters": "An un-encodable clause blocks a whole family under 'rulebook incomplete', and two QSs already read 'measured over sumps' differently (both judges flagged this).",
+   "how_to_test": "Encode 3 contracts in weeks 3-5 and log every clause that could not be typed; compare two QSs' readings of the same preamble.",
+   "if_false": "Add an exception-clause field per family that routes the affected family to Stage 2 on that contract permanently; families graduate per contract, never globally; chief QS confirmation time rises."
+  },
+  {
+   "claim": "A QS can type or trace the primitives for a family in no more than 40% of the time now spent producing the family's lines by hand, i.e. their existing Excel templates do not already absorb most of the arithmetic (MD judge's objection to the Rulebook's 30-40%).",
+   "why_it_matters": "This is the whole month-6 tender saving; verification work must be less than measuring removed.",
+   "how_to_test": "Stage 0 timer plus alternating-sheet A/B inside the same tender in months 3-6 on >=10 sheets per QS.",
+   "if_false": "Stage 2 sheets at >=80% of baseline minutes means the saving is only BQ entry and reconciliation (~15-20% of tender hours); month-12 becomes ~88-90; effort shifts to the harvester (zero-entry primitives) and claims, and typed tables are dropped for direct workbook import."
+  },
+  {
+   "claim": "At least half of the sheets QSs measure carry PDF measurement annotations readable by PyMuPDF (Shadow Ledger's premise; unverified, and real Revu keys were tested only on a synthetic file).",
+   "why_it_matters": "Decides whether the zero-behaviour-change harvester exists, whether Bluebeam seats are bought, and where Stage 2 review happens.",
+   "how_to_test": "Week-1 inbox and folder sample; extract_markups.py on one real KKL Revu file checking /VP, /BSIColumnData and Count.",
+   "if_false": "Harvester not built, 2.0 pw moves to capture app v2, no Bluebeam seats; traces in the capture app are written as ISO /Measure annotations so labels still accrue; engine proposals are reviewed as an overlay in the capture app rather than in Bluebeam."
+  },
+  {
+   "claim": "DR Capture/DR Verify rows on the claim pilot contracts carry activity_code, struct/method/spec_element, chainage or zone and depth_band on >=90% of claim-relevant rows (unverified per all three judges).",
+   "why_it_matters": "About 16 of the 35 points saved by month 24 come from the claims roll-up; under the SOP Act every claimed dollar must trace to work done.",
+   "how_to_test": "DR coverage report on 2 pilot contracts in weeks 12-13 and per contract before any promotion.",
+   "if_false": "Claims stay in shadow on that contract; validation rules are pushed into DR Capture and site coaching follows the coverage report; the claims contribution slips six months and month-12 is ~88."
+  },
+  {
+   "claim": "Inter-QS disagreement per class today is at least as large as the engine's post-gate error (>=1% on lengths, >=3% on areas), so the digest's gates are passable, and engine-vs-QS disagreement on derived lines after rule reconciliation is smaller than inter-QS disagreement.",
+   "why_it_matters": "Gates set below the human ceiling can never be passed; gates set above it would certify errors humans would not make.",
+   "how_to_test": "Two-QS blind baseline on ~20 sheets in weeks 2-4; shadow ledger versus that baseline from week 6.",
+   "if_false": "Set each class's gate to the measured ceiling; classes where the ceiling is tighter than the engine can reach stay in assist; derived families whose disagreement exceeds the ceiling are root-caused before any Stage 2."
+  },
+  {
+   "claim": "Vector PDF with extractable paths is at least 70% of the drawing pages QSs measure at tender.",
+   "why_it_matters": "It sizes the value of the 15.5 person-week auto-primitive investment versus a DXF-plus-tracing product.",
+   "how_to_test": "Week-1 inbox sample by route and by client.",
+   "if_false": "Below 50%: phase 2 (8.5 pw) is cut to DXF, counts and tracing; the scan route budget rises; month-24 stays ~72-75 with the spine and claims carrying the saving."
+  },
+  {
+   "claim": "On real layerless, all-black sheets, pen weight, dash, closure, parallel-partner offset, hatch class, symbol signature and label regex reach >=80% per-path precision on measurable classes after no more than 20 corrected sheets from one originator template (TrueLine's >=90% lowered per the judges; no civil dataset exists to pre-train on).",
+   "why_it_matters": "Without it auto-lengths never leave shadow and the tender measuring share is never touched.",
+   "how_to_test": "Measured on the 30-sheet corpus in months 10-12 before the phase-2 budget is released, then in live shadow months 13-18.",
+   "if_false": "Auto-lengths stay Stage 1; only counts and DXF routes graduate; month-24 loses ~3 points to ~68; no ML class map is trained because the rules never plateaued."
+  },
+  {
+   "claim": "The three-voter per-viewport scale resolver (title text corrected for page size, dimension-line detector, scale bar) proposes the correct scale on >=80% of corpus viewports, against 2 of 4 for the digest's crude voter.",
+   "why_it_matters": "A wrong scale is a systematic money-bearing error on multi-scale LTA sheets; mandatory QS confirmation plus the grader are the backstop, but per-viewport confirmation time decides whether assist saves anything.",
+   "how_to_test": "Corpus hit rate published in month 12; time per viewport confirmation from the timer.",
+   "if_false": "QS sets scale from a known length per viewport as today, grader still blocks exports beyond 5%; assist still works at about 30 s more per viewport; originator-template memory reduces repeats."
+  },
+  {
+   "claim": "A check-pattern confidence (scale confirmed, single viewport, dual-route agreement, unambiguous legend mapping, label attached, template familiarity, topology) can be calibrated so the auto-accept bucket's empirical error is <=0.5% with an automation rate >=60% for counts and lengths on vector sheets (digest marks this untested).",
+   "why_it_matters": "Stage 3 for measured primitives delivers effort only if enough items clear the bucket after the top-80%-of-value rule.",
+   "how_to_test": "Calibration table from Stage 1 shadow data with >=200 items per pattern, recomputed monthly; reliability curve reviewed at the Stage 3 gate.",
+   "if_false": "Automation rate under 30% at 0.5%: measured primitives stay at Stage 2 and their saving is counted as review-only; the value rule is relaxed per class only after two clean audit windows; month-24 ~68."
+  },
+  {
+   "claim": "Running all geometry, OCR and measurement inside KKL, with only preamble, BQ and schedule text sent to the Claude API on projects the contracts person has cleared, satisfies the OSA, LTA NDAs and MC subcontracts; Tier A is the default for public-sector and MC documents.",
+   "why_it_matters": "An OSA or NDA breach is a different order of loss than any takeoff error (debarment); the Overlay's T1 assumption was rejected on this point.",
+   "how_to_test": "Contracts person reads 3 live NDAs and the OSA position and records the reading in writing in weeks 1-4; egress log reviewed at each stop-loss.",
+   "if_false": "If text is also barred, rulebooks and bq_map are typed from client templates on all public-sector contracts, API cost falls to near zero and chief QS time rises about 1 hour per tender; the plan otherwise stands."
+  },
+  {
+   "claim": "The builder's allocation is about 0.4 FTE (21 person-weeks a year) and a second maintainer can be named by month 6.",
+   "why_it_matters": "The 41.5 pw plan has no slack at 0.4 FTE; TrueLine's arithmetic failed on exactly this point.",
+   "how_to_test": "Logged builder hours in the first 12 weeks against the 6.5 pw planned; MD confirms the allocation and names the second maintainer.",
+   "if_false": "At 0.3 FTE the year-1 spine ships by month 14 and phase 2 runs months 16-24, so month-24 figures become month-30 figures; at any FTE the order of milestones does not change, so a stalled plan still leaves a working engine, capture app and claims tool."
+  }
+ ],
+ "open_questions": [
+  "QS headcount and actual hour split between tender takeoff, monthly claims, subcon certification, VOs and ordering (two-week time log per QS replaces the digest's 40/27/12/12 inference).",
+  "Which tools QSs measure with today (Bluebeam edition, Acrobat, Foxit, Excel-only, printed sheets) and where marked-up PDFs and BQ workbooks are stored (SharePoint library vs file server); whether Revu writes per-viewport /VP scales and custom columns in KKL's files.",
+  "Exact wording of the Measurement and Payment preambles on live LTA, HDB and PUB contracts: depth-band sets, trench per m vs m3, disposal nett vs per load vs tonne, working space, 'measured over sumps', and whether bulk excavation is paid on survey or design-nett (sets bq_map paid_on per item).",
+  "How bulk-excavation claim quantities are agreed with main contractors today on MRT subcontracts (KKL strut-level survey, MC surveyor, loads), whether MCs already fly drones, and whether any MC would accept a shared hashed surface as the joint-measurement record.",
+  "Current DR Capture and DR Verify coverage on live contracts: share of rows with chainage or zone, depth band, soil type and loads after countersign.",
+  "Will LTA, PUB, HDB, JTC or MCs release DXF/DWG, DGN conversions or LandXML surfaces on request, under what NDA terms, and do LTA NDAs or MC subcontracts bar third-party processing of extracted text as well as drawings.",
+  "PI/CAR insurer position on AI-assisted quantities with a named QS sign-off and audit trail.",
+  "Is rebar priced from an issued BBS at tender or from kg/m3 assumptions, and who prepares the BBS for CIS drains and culverts.",
+  "Are subcontractor (asphalt, RC, marking) payments certified back-to-back on KKL's upstream claim or on separate site measurement, and what is the SOP Act response window in the current contracts (14 vs 21 days).",
+  "How many money-bearing errors escape today (caught by SO, MC or subcon per year), to judge whether a 0.5% escaped-error gate is stricter or looser than current practice.",
+  "KKL's asphalt density and M&W values, PUB COP 7th Edition values and the mesh kg/m2 standard used, before lookups are hard-coded; the SI-based soil-class split method used for disposal pricing.",
+  "Whether any tippers or excavators carry payload weighing or telematics that would give tonnes per load instead of load counts.",
+  "The builder's confirmed FTE allocation, who the second maintainer is, and whether legal requires an Artifex commercial licence for internal PyMuPDF use.",
+  "Confirmation that the office PC can run nightly scheduled tasks over OneDrive-synced folders without sync conflicts, and which SharePoint library will hold the ledger and regression corpus."
+ ],
+ "rejected": [
+  {
+   "idea": "FastAPI local runner with Entra ID sign-in, DuckDB ledger and an Azure VM",
+   "from_design": "KKL Takeoff Overlay",
+   "why_rejected_or_deferred": "A server outside the single-file plus CSV house style that one part-time builder cannot maintain; every job runs as a nightly Python task on the office PC and every app is a static page."
+  },
+  {
+   "idea": "Four-model VLM benchmark harness (Gemini 3 Pro via Vertex, Claude, GPT-5.x, local Qwen2.5-VL) and a Gemini lane for dense drawing reads",
+   "from_design": "KKL Takeoff Overlay",
+   "why_rejected_or_deferred": "Fragments the Claude workbench KKL already has, adds scope to an over-committed builder, and drawing pixels cannot leave KKL on Tier A anyway; the only benchmark bought is civils.ai Starter on Tier C sheets."
+  },
+  {
+   "idea": "VLM schedule reads (sizes, IL/GL, BBS totals) promoted to Stage 3 by month 6 on a claimed 98% cell accuracy",
+   "from_design": "KKL Takeoff Overlay",
+   "why_rejected_or_deferred": "These are money-bearing attributes and the digest's structured-extraction evidence is 25-37% recall with up to 56% hallucination zero-shot; Extract stays in Stage 2 with mandatory citations, column-sum reconciliation and plan-count cross-checks, Stage 3 only after >=500 verified rows."
+  },
+  {
+   "idea": "T1 tier sending drawing crops to cloud models for client tender documents without NDA/OSA marking",
+   "from_design": "KKL Takeoff Overlay",
+   "why_rejected_or_deferred": "The Official Secrets Act covers drawings regardless of marking and LTA tenders are NDA-gated; the default is Tier A and only text may leave on cleared projects."
+  },
+  {
+   "idea": "YOLOv8/ultralytics symbol detector exported to ONNX and run with onnxruntime-web, with GPU training",
+   "from_design": "Overlay, TrueLine, Shadow Ledger",
+   "why_rejected_or_deferred": "Deferred beyond month 24: no civil dataset exists, it needs >=2,000 logged instances per symbol family and a licence-clean detector, and counts on vector sheets come exactly from geometry."
+  },
+  {
+   "idea": "Every module implemented twice (import_pdf.py and import-pdfjs.js, scale.py and scale.js, kernel.py and kernel.js, calc in both) with shared test vectors, plus a HistGradientBoosting class map exported to a hand-rolled JSON tree for the browser",
+   "from_design": "TrueLine",
+   "why_rejected_or_deferred": "A one-person maintenance trap in which every fix lands twice; the measurer is built once in Python as a nightly shadow job, pdf.js is used only for on-screen snapping, dual-route agreement is a periodic corpus test, and an ML class map is trained only if rules plateau and evaluated only in Python."
+  },
+  {
+   "idea": "TrueLine's 42 person-week total with 30 in year one at 0.4 FTE, and the Rulebook's ~10 builder-days for vector-PDF auto-measure",
+   "from_design": "TrueLine and Rulebook",
+   "why_rejected_or_deferred": "Both arithmetic claims fail per the judges: 0.4 FTE is 21 pw a year, and ten days cannot buy viewports, scale, classification and a kernel on real sheets; the merged plan holds year one to 20.5 pw and gives auto-primitives 15.5 pw across phases 2-4."
+  },
+  {
+   "idea": "Fortnightly vendor RTK drone flights as a platform cost (S$9,000/month, US$7,500/month run cost) and survey-first sequencing with tender deferred to month 9",
+   "from_design": "Surface Ledger",
+   "why_rejected_or_deferred": "The economics do not close against a first-year saving the design itself put at ~5%, the critical path runs through CAAS permits, IPA status of MRT sites and MC acceptance of a shared surface, and the brief asks for drawing takeoff; the surface engine survives as a per-project module with flights charged to the contract."
+  },
+  {
+   "idea": "Annotation timestamps (/M, /CreationDate) as the per-sheet per-class effort baseline",
+   "from_design": "Shadow Ledger",
+   "why_rejected_or_deferred": "Revu may write dates at save and a markup span conflates thinking, site calls and lunch with measuring; the start/pause timer is the only accepted effort evidence."
+  },
+  {
+   "idea": "Chief QS adjudication of shadow disagreements in 1 hour per week",
+   "from_design": "Shadow Ledger",
+   "why_rejected_or_deferred": "Real layerless sheets will produce hundreds of engine-noise disagreements in the first months; the plan budgets 1 day/week for three months then 0.5 day/week, triages by reason code and value, and adjudicates only money-bearing disagreements so un-adjudicated noise never enters truth."
+  },
+  {
+   "idea": "Loads x truck capacity / bulking as a claim quantity",
+   "from_design": "Surface Ledger (as cross-check) and DR practice",
+   "why_rejected_or_deferred": "Truck-count volumes are systematically unreliable; loads are a KPI and calibration source for m3/load, bulking and m3/h feeding tender rates, never the claim source unless the preamble pays per load."
+  },
+  {
+   "idea": "Kreo Pro as a second-opinion measurement API; Bluebeam Max for AI/MCP features; ODA File Converter",
+   "from_design": "Rulebook (Kreo option), digest (Bluebeam tiers), TrueLine (converters)",
+   "why_rejected_or_deferred": "Kreo has no civil classes and is cloud-only; Bluebeam Max features are irrelevant to capture; ODA's terms are non-commercial for non-members, so LibreDWG dwg2dxf runs as a separate process instead."
+  },
+  {
+   "idea": "Contour-to-DEM reconstruction from PDF or scanned contour sheets, and IFC/CORENET X tooling",
+   "from_design": "Surface Ledger, digest",
+   "why_rejected_or_deferred": "Scan-to-DEM is research-grade with no turnkey pipeline; IFC-SG is a building-permit regime that does not reach civil earthworks in 2026-27; volumes come from surfaces or QS-picked sections, and IFC is handled ad hoc if it ever arrives."
+  },
+  {
+   "idea": "A global rulebook or client-wide rule defaults applied without per-contract confirmation",
+   "from_design": "Overlay (rules/<client>.json defaults)",
+   "why_rejected_or_deferred": "Preambles are contract-specific under PSSCOC Module A; client templates seed a draft but every money-bearing parameter is confirmed per contract against its cited page or the family is blocked."
+  },
+  {
+   "idea": "Counting labels as the product or promising the 24-month figure as 55%",
+   "from_design": "Overlay (confirmations as labels), Rulebook and Shadow Ledger (55% curves)",
+   "why_rejected_or_deferred": "Labels are a by-product; only timer minutes count. The 55% figure is quoted as the upside, not the plan, because it needs both the claims roll-up at Stage 4 on most contracts and auto-lengths graduating, neither evidenced yet."
+  }
+ ]
+}

@@ -1,0 +1,28 @@
+{
+  "scale": 500,
+  "drains": [
+    {
+      "id": "D1",
+      "spec": "300 dia RC pipe",
+      "length_m": 95.25
+    },
+    {
+      "id": "D2",
+      "spec": "450 dia RC pipe",
+      "length_m": 59.97
+    },
+    {
+      "id": "D3",
+      "spec": "U-drain 600x600",
+      "length_m": 134.06
+    },
+    {
+      "id": "D4",
+      "spec": "600 dia RC pipe",
+      "length_m": 77.75
+    }
+  ],
+  "sump_count": 8,
+  "road_area_m2": 2103.2,
+  "footpath_area_m2": 485.4
+}
