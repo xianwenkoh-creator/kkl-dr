@@ -58,12 +58,19 @@ shared with the tests. No drawing leaves the machine.
 4. **Stage levels.** Cut-offs for stage volumes, for example `+4, -6, -12`: pre-cut to +4, bulk
    excavation to -6, then to -12, then to formation. The construction sequence on the sections gives
    them.
-5. **Trace the platforms.** Draw each platform along the toe of its slopes (the formation outline)
+5. **Platforms from the drawing's own pens.** A vector PDF lists its pens (colour, line weight, dashed
+   or solid) with the number of closed outlines each draws. Press **Platforms** on the pen that draws the
+   toe lines: every closed outline in that pen becomes a platform with the level written inside it (a
+   smaller outline inside a larger one keeps its own label, two labels inside one outline make a ramp);
+   **Boundary** takes the largest closed outline of the boundary pen. Berm and top-of-slope lines are
+   normally a lighter or dashed pen and stay out. Outlines that are broken, or shared with hatching in
+   the same pen, are traced instead.
+6. **Or trace the platforms.** Draw each platform along the toe of its slopes (the formation outline)
    and give it the formation level written on the plan: type it, pick it off the sheet, or take it
    from the design list. A ramp gets two end levels and two clicks for the ends; the level grades
    between them. A sump or local deepening is a platform inside a platform. A platform retained by a
    wall (the sheetpiled pre-cut over the whole site, for instance) has vertical sides.
-6. **Boundary and compute.** Draw the excavation boundary (the contractor boundary or the sheetpile
+7. **Boundary and compute.** Draw the excavation boundary (the contractor boundary or the sheetpile
    line) or let the tool take the platforms plus their slopes. The excavated surface at every cell is
    the lowest of every platform's floor and of the batter rising from its edge under the rules,
    capped by the existing ground; adjacent platforms, sumps and ramps combine on their own, the
@@ -132,7 +139,7 @@ layout plan (contractor boundary, a sheetpiled pre-cut at +4.00 over a +5.50 pla
 -12, -18 and -6, a sump at -21.6, a graded ramp, berm and top-of-slope outlines, section marks,
 boreholes, gradients, dimensions, a title block with `Scale- 1:1000`) and a truth file computed
 independently in numpy on a 0.25 m grid. `npm test` (Node 22, `pdfjs-dist` pinned to 4.10.38)
-checks: every spot level found and placed on its marker with no decoy leaking; grid georeference
+checks: every spot level found and placed on its marker with no decoy leaking; the sample plan's toe-line pen yielding exactly its platforms and the boundary pen its boundary; grid georeference
 within 0.5 percent; zone volumes within 2 percent of truth for all three surface methods; every datum
 label on the platform plan read with its sign where it is written; a single battered rectangle
 within 0.4 percent of the closed-form mitred-offset volume; and the whole sample plan within
@@ -141,9 +148,10 @@ within 0.4 percent of the closed-form mitred-offset volume; and the whole sample
 ## Limits to know
 
 - Scanned sheets have no text: levels must be added by hand, or the sheet OCR'd first.
-- On a PDF the platform outlines are traced by the QS (the real sheets carry slope hatching, berm
-  lines and structure outlines in one pen); with the DXF they come from the drawing's layers, and the
-  QS's job is to pick the right layer and check the labels.
+- On a PDF the platform outlines come from the pen picker when the toe lines are closed paths in their
+  own pen; on sheets where toe lines share a pen with hatching or are drawn open, the QS traces them.
+  With a DXF they come from the layers. Either way the QS's job is to pick the right pen or layer and
+  check the labels.
 - The DXF reader handles LWPOLYLINE, POLYLINE, LINE, CIRCLE, TEXT, MTEXT and block INSERTs (translate,
   scale, rotate). Splines, arcs with bulges and hatches are ignored; a curved toe line drawn as an arc
   needs to be redrawn or traced.

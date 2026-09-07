@@ -97,7 +97,7 @@
     <div class="row" style="margin-top:6px"><button class="tiny on" id="showTopo">Show base</button><button class="tiny" id="showDesign" disabled>Show design</button><button class="tiny" id="loadSample" title="Synthetic topo survey and design sheet">Sample: topo</button><button class="tiny" id="loadSamplePlat" title="Synthetic ERSS layout plan with platforms, ramp and sump, traced">Sample: ERSS plan</button><button class="tiny" id="loadSampleDxf" title="Synthetic ERSS layout as a DXF in SVY21 coordinates">Sample: DXF</button></div>
     <div class="stat" id="designStat"></div>
     <div class="list" id="dxfLayers" hidden></div>
-    <p class="hint" id="dxfHint" hidden>DXF layers with their entity counts. “Platforms” makes a platform from every closed polyline on the layer and gives it the level written inside it (two levels inside make a ramp); “Boundary” takes the largest closed polyline. Coordinates are the drawing’s own (SVY21 metres), so no scale is needed.</p>
+    <p class="hint" id="dxfHint" hidden>Pens of the PDF (colour, line weight, dashed or solid) or layers of the DXF, with the number of closed outlines each draws. “Platforms” makes a platform from every closed outline in that pen or layer and gives it the level written inside it (two levels inside make a ramp); “Boundary” takes its largest closed outline. Pick the pen that draws the toe lines; berm and top-of-slope lines are usually a lighter or dashed pen.</p>
     <div class="list" id="designLevels" hidden></div>
     <p class="hint">Levels found on the design sheet are listed with their text; press “→ FEL” to use one for the selected zone.</p>
   </fieldset>
@@ -178,7 +178,7 @@
 "use strict";
 import * as pdfjsLib from "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs";
 import { levelsInText, parseSpotLevels, gradientsInText, clusterMarkers, associateMarkers, georeferenceFromGrid, declaredScaleFromText, scaleFromDeclared, calibrateTwoPoints, scaledTransform, georefTwoPoints, parseCoordinateList, proximity, idw, tin, gridVolumes, batterAllowance, polygonArea, toCSV, fmt, flatSurface, slopeRules, parseSlopeText, parseBermText, formatRules, designSurface } from "./engine.js";
-import { parseDxf, platformsFromDxf, levelTextsFromDxf } from "./dxf.js";
+import { parseDxf, platformsFromDxf, platformsFromPolys, levelTextsFromDxf } from "./dxf.js";
 import { pageTextItems, pageGeometry } from "./pdfgeom.js";
 pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.worker.min.mjs";
 const $ = s => document.querySelector(s);
@@ -214,7 +214,7 @@ async function loadTopoPage(no) {
   const t = state.topo; t.pageNo = no; const page = await t.doc.getPage(no); t.page = page;
   t.items = await pageTextItems(page); t.geom = await pageGeometry(page, pdfjsLib.OPS);
   state.zones = []; state.excluded = new Set(); state.manual = []; state.sel = null; state.checked = null; state.boundary = null; state.platformResult = null; state.schedule = []; $("#dxfLayers").hidden = $("#dxfHint").hidden = true;
-  readLevels(); autoScale(); autoModel(); renderSchedule(); await renderPage(t.doc, no, true); showTopo(); renderZoneTable(); boundaryStat(); renderResults(); status();
+  readLevels(); autoScale(); autoModel(); renderSchedule(); renderPens(); await renderPage(t.doc, no, true); showTopo(); renderZoneTable(); boundaryStat(); renderResults(); status();
   const key = "kkl_ew_" + t.name; try { const saved = JSON.parse(localStorage.getItem(key) || "null"); if (saved && saved.page === no) applyProject(saved); } catch (e) {}
 }
 function readLevels() {
@@ -250,7 +250,7 @@ function setModel(m) {
   $("#platOpts").hidden = !plat; $("#platZoneRow").hidden = !plat; $("#batterWrap").hidden = plat;
   $("#zoneLegend").textContent = plat ? "Platforms and formation levels" : "Zones and final excavation levels"; $("#drawZone").textContent = plat ? "Draw platform" : "Draw zone";
   $("#zoneHint").textContent = plat ? "Draw each platform along the toe of its slopes (the formation outline) and give it the formation level written on the plan: type it, pick it from the sheet, or take it from the design list. A ramp gets its two end levels instead. Sumps and local deepenings are platforms too." : "Draw a zone by clicking its corners on the base sheet; double-click or Finish to close. Every zone needs one final excavation level; use several zones for stepped levels.";
-  renderResults(); drawOverlay(); status();
+  renderResults(); drawOverlay(); status(); if (state.topo && !state.topo.isDxf) renderPens();
 }
 $("#model").addEventListener("change", e => setModel(e.target.value));
 $("#eglMode").addEventListener("change", () => { $("#eglLevel").disabled = $("#eglMode").value !== "flat"; });
@@ -311,6 +311,33 @@ function addPlatformsFromLayer(layer) {
 function boundaryFromLayer(layer) {
   const t = state.topo; if (!t?.isDxf) return; const u = t.unit; const cands = t.dxf.polylines.filter(p => p.layer === layer && p.closed).sort((a, b) => b.area - a.area); if (!cands.length) return;
   state.boundary = cands[0].pts.map(([X, Y]) => { const q = state.T.fromWorld(X * u, Y * u); return { x: q.x, y: q.y }; }); state.platformResult = null; boundaryStat(); drawOverlay();
+}
+// ---------- PDF pens: closed outlines drawn in one pen become platforms ----------
+function renderPens() {
+  const t = state.topo; const box = $("#dxfLayers"); if (!t || t.isDxf) return; const pens = Object.values(t.geom.pens || {}).filter(p => p.closed > 0).sort((a, b) => b.closed - a.closed);
+  const show = state.model === "platforms" && pens.length > 0; box.hidden = $("#dxfHint").hidden = !show; if (!show) return;
+  box.innerHTML = pens.slice(0, 40).map(p => `<div><span title="${esc(p.key)}"><span style="display:inline-block;width:22px;height:0;border-top:${Math.max(1, Math.min(6, p.width * 2))}px ${p.dashed ? "dashed" : "solid"} ${esc(p.rgb)};vertical-align:middle;margin-right:6px"></span>${esc(p.rgb)} · ${p.width} pt · ${p.dashed ? "dashed" : "solid"} · <b>${p.closed}</b> closed of ${p.count}</span><span style="flex:0 0 auto"><button class="tiny" data-penplat="${esc(p.key)}">Platforms</button> <button class="tiny" data-penbnd="${esc(p.key)}">Boundary</button></span></div>`).join("");
+  box.querySelectorAll("[data-penplat]").forEach(b => b.addEventListener("click", () => addPlatformsFromPen(b.dataset.penplat)));
+  box.querySelectorAll("[data-penbnd]").forEach(b => b.addEventListener("click", () => boundaryFromPen(b.dataset.penbnd)));
+}
+function pageLevelTexts() { return state.levels.filter(l => l.datum).map(l => ({ x: l.px, y: l.py, value: l.value, raw: l.raw })); }
+function addPlatformsFromPen(key) {
+  const t = state.topo; if (!t || t.isDxf) return; const polys = t.geom.paths.filter(q => q.pen.key === key && q.closed);
+  const cands = platformsFromPolys(polys, pageLevelTexts(), { namePrefix: "Pen", minArea: 20 }); let added = 0, ramps = 0, unlabelled = 0;
+  for (const c of cands) {
+    const poly = c.pts.map(p => ({ x: p.X, y: p.Y }));
+    if (state.zones.some(z => z.poly.length === poly.length && Math.abs(z.poly[0].x - poly[0].x) < 1e-6 && Math.abs(z.poly[0].y - poly[0].y) < 1e-6)) continue;
+    const z = { name: c.name, fel: c.fel, grade: null, sides: "rules", note: `PDF pen ${key}` + (c.label ? ": " + c.label : ""), poly, result: null };
+    if (c.ambiguous && c.labels.length === 2) { const [a, b] = c.labels; z.grade = { p1: { x: a.x, y: a.y }, z1: a.value, p2: { x: b.x, y: b.y }, z2: b.value }; z.name = c.name + " ramp"; ramps++; }
+    else if (c.fel == null) unlabelled++;
+    state.zones.push(z); added++;
+  }
+  state.sel = null; state.platformResult = null; renderZoneTable(); drawOverlay(); status();
+  $("#designStat").innerHTML = `pen ${esc(key)}: <b>${added}</b> platform${added === 1 ? "" : "s"} added` + (ramps ? `, ${ramps} ramp${ramps === 1 ? "" : "s"} from two labels` : "") + (unlabelled ? `, <b style="color:var(--bad)">${unlabelled} without a level inside</b> (type or pick their levels, or delete them)` : "");
+}
+function boundaryFromPen(key) {
+  const t = state.topo; if (!t || t.isDxf) return; const cands = t.geom.paths.filter(q => q.pen.key === key && q.closed && q.pts.length > 2).sort((a, b) => b.area - a.area); if (!cands.length) return;
+  state.boundary = cands[0].pts.map(([x, y]) => ({ x, y })); state.platformResult = null; boundaryStat(); drawOverlay();
 }
 // ---------- surveyed coordinates and georeference ----------
 const worldMode = () => state.T && ["grid", "georef", "dxf"].includes(state.T.mode);
@@ -563,7 +590,7 @@ window.addEventListener("beforeunload", saveLocal);
 function status() { const n = state.zones.length; $("#tstat").innerHTML = state.topo ? `${esc(state.topo.name)} p${state.topo.pageNo} · ${state.T ? state.T.mode + " " + state.T.mPerPt.toFixed(5) + " m/pt" : "scale not set"} · ${state.model === "platforms" ? `${n} platform${n === 1 ? "" : "s"}` : `${n} zone${n === 1 ? "" : "s"}`}` : "no sheet loaded"; }
 
 // test and scripting hooks
-window.__ew = { state, compute, readLevels, setModel, setDeclared, summaryRows, settings, applyProject, project, platformRows, loadDxf, addPlatformsFromLayer, boundaryFromLayer, renderSchedule, parseScheduleCsv, finishGeoref,
+window.__ew = { state, compute, readLevels, setModel, setDeclared, summaryRows, settings, applyProject, project, platformRows, loadDxf, addPlatformsFromLayer, boundaryFromLayer, addPlatformsFromPen, boundaryFromPen, renderPens, renderSchedule, parseScheduleCsv, finishGeoref,
   addZone: (name, fel, poly, note = "", extra = {}) => { state.zones.push({ name, fel, note, poly, result: null, grade: null, sides: "rules", ...extra }); renderZoneTable(); drawOverlay(); },
   setBoundary: poly => { state.boundary = poly; state.platformResult = null; boundaryStat(); drawOverlay(); } };
 </script>

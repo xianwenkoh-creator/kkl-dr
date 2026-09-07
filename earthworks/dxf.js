@@ -92,18 +92,22 @@ export function parseDxf(text) {
   return out;
 }
 /**
- * Candidate platforms from closed polylines on the chosen layers, each given the level label written inside it
- * (the smallest enclosing polygon owns a label, so a sump inside a platform keeps its own level).
- * levelTexts: [{x, y, value, raw}] in drawing units. Returns [{name, layer, pts:[{X,Y}], area, fel, label, labels}] largest first.
+ * Candidate platforms from closed polygons (DXF polylines on chosen layers, or PDF paths in one pen), each given the
+ * level label written inside it: the smallest enclosing polygon owns a label, so a sump inside a platform keeps its
+ * own level; two different levels inside one polygon mark a ramp. polys: [{pts:[[x,y]], closed, area, bbox, layer?}];
+ * levelTexts: [{x, y, value, raw}] in the same coordinates. Returns [{name, layer, pts:[{X,Y}], area, fel, label,
+ * labels, ambiguous}] largest first.
  */
-export function platformsFromDxf(dxf, layers, levelTexts, opts = {}) {
-  const minArea = opts.minArea ?? 4, set = new Set(layers);
-  const polys = dxf.polylines.filter(p => p.closed && set.has(p.layer) && p.area >= minArea).map(p => ({ layer: p.layer, pts: p.pts.map(([X, Y]) => ({ X, Y })), area: p.area, bbox: p.bbox, labels: [] }));
+export function platformsFromPolys(polys, levelTexts, opts = {}) {
+  const minArea = opts.minArea ?? 4;
+  const P = polys.filter(p => p.closed && p.pts.length > 2 && p.area >= minArea).map(p => ({ layer: p.layer || "", pts: p.pts.map(([X, Y]) => ({ X, Y })), area: p.area, bbox: p.bbox, labels: [] }));
   const inside = (x, y, pts) => { let c = false; for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) { const a = pts[i], b = pts[j]; if ((a.Y > y) !== (b.Y > y) && x < (b.X - a.X) * (y - a.Y) / (b.Y - a.Y) + a.X) c = !c; } return c; };
-  for (const t of levelTexts) { let best = null; for (const p of polys) { if (t.x < p.bbox.x0 || t.x > p.bbox.x1 || t.y < p.bbox.y0 || t.y > p.bbox.y1) continue; if (inside(t.x, t.y, p.pts) && (!best || p.area < best.area)) best = p; } if (best) best.labels.push(t); }
-  polys.sort((a, b) => b.area - a.area);
-  return polys.map((p, i) => { const vals = [...new Set(p.labels.map(l => l.value))]; return { name: opts.namePrefix ? `${opts.namePrefix} ${i + 1}` : `P${i + 1}`, layer: p.layer, pts: p.pts, area: p.area, fel: vals.length === 1 ? vals[0] : null, label: p.labels.length ? p.labels.map(l => l.raw).join(" | ") : "", labels: p.labels, ambiguous: vals.length > 1 }; });
+  for (const t of levelTexts) { let best = null; for (const p of P) { if (t.x < p.bbox.x0 || t.x > p.bbox.x1 || t.y < p.bbox.y0 || t.y > p.bbox.y1) continue; if (inside(t.x, t.y, p.pts) && (!best || p.area < best.area)) best = p; } if (best) best.labels.push(t); }
+  P.sort((a, b) => b.area - a.area);
+  return P.map((p, i) => { const vals = [...new Set(p.labels.map(l => l.value))]; return { name: opts.namePrefix ? `${opts.namePrefix} ${i + 1}` : `P${i + 1}`, layer: p.layer, pts: p.pts, area: p.area, fel: vals.length === 1 ? vals[0] : null, label: p.labels.length ? p.labels.map(l => l.raw).join(" | ") : "", labels: p.labels, ambiguous: vals.length > 1 }; });
 }
+/** DXF: closed polylines on the chosen layers to platforms (see platformsFromPolys). */
+export function platformsFromDxf(dxf, layers, levelTexts, opts = {}) { const set = new Set(layers); return platformsFromPolys(dxf.polylines.filter(p => set.has(p.layer)), levelTexts, opts); }
 /** Level labels among the DXF texts, using the engine's level parser (levelsInText): [{x,y,value,raw,datum,layer,text}]. */
 export function levelTextsFromDxf(dxf, levelsInText, opts = {}) {
   const out = []; const datumOnly = opts.datumOnly ?? true;
