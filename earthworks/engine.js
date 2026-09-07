@@ -122,6 +122,30 @@ export function associateMarkers(levels, markers, opts = {}) {
 export const M_PER_PT_AT_1 = 25.4 / 72 / 1000;                    // metres per point at 1:1
 export function scaleFromDeclared(scale) { return M_PER_PT_AT_1 * scale; }
 export function calibrateTwoPoints(p1, p2, metres) { return metres / Math.hypot(p2.x - p1.x, p2.y - p1.y); }
+/**
+ * Georeference from two page points with known E/N (a similarity transform: scale, rotation, translation), the
+ * QS's way of registering a sheet that has no coordinate grid: two boundary corners with surveyed coordinates.
+ * p1,p2: {x,y} page pt; w1,w2: {E,N}. Returns {ok, mPerPt, rotationDeg, toWorld, fromWorld}.
+ */
+export function georefTwoPoints(p1, w1, p2, w2) {
+  const dx = p2.x - p1.x, dy = p2.y - p1.y, dE = w2.E - w1.E, dN = w2.N - w1.N; const dp = Math.hypot(dx, dy), dw = Math.hypot(dE, dN);
+  if (dp < 1e-9 || dw < 1e-9) return { ok: false };
+  const mPerPt = dw / dp, a = Math.atan2(dN, dE) - Math.atan2(dy, dx), c = Math.cos(a), sn = Math.sin(a);
+  const toWorld = (x, y) => { const ux = x - p1.x, uy = y - p1.y; return { X: w1.E + mPerPt * (ux * c - uy * sn), Y: w1.N + mPerPt * (ux * sn + uy * c) }; };
+  const fromWorld = (X, Y) => { const vx = (X - w1.E) / mPerPt, vy = (Y - w1.N) / mPerPt; return { x: p1.x + vx * c + vy * sn, y: p1.y - vx * sn + vy * c }; };
+  return { ok: true, mPerPt, rotationDeg: a * 180 / Math.PI, toWorld, fromWorld };
+}
+/** Coordinate lists as written on boundary schedules: 'N:35032.442 E:45933.837', 'E 45933.837 N 35032.442', 'N=..., E=...', or 'E,N' per line. Returns [{E,N}]. */
+export function parseCoordinateList(text) {
+  const out = []; const re = /([EN])\s*[:=]?\s*([+-]?\d{3,7}(?:\.\d+)?)/gi; let m; let cur = {};
+  const lines = String(text || "").split(/\r?\n|;/);
+  for (const line of lines) {
+    let found = false; re.lastIndex = 0;
+    while ((m = re.exec(line))) { found = true; cur[m[1].toUpperCase()] = parseFloat(m[2]); if (cur.E != null && cur.N != null) { out.push({ E: cur.E, N: cur.N }); cur = {}; } }
+    if (!found) { const nums = line.match(/[+-]?\d{3,7}(?:\.\d+)?/g); if (nums && nums.length >= 2) out.push({ E: parseFloat(nums[0]), N: parseFloat(nums[1]) }); }
+  }
+  return out;
+}
 /** Read 'SCALE 1:500' style text; ignores gradients like 1:12 by requiring >= 50. */
 export function declaredScaleFromText(items) {
   const txt = items.map(i => i.str).join(" ");

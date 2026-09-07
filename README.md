@@ -32,8 +32,10 @@ or derived from a slab level less deductions), then computes cut and fill per zo
 From an excavation layout plan with formation platforms (an ERSS plan and its sections) it reads the
 levels written to datum (`-12.00m SHD`) and the gradients on the sheet, takes the slope rules and
 berms from the sections, and builds the excavated surface as the lowest of every platform and its
-batter, giving the cut per platform, on the slopes, by depth band and by construction stage. Colour
-overlay for checking, CSV export and a checked-by stamp. `earthworks/engine.js` holds the arithmetic
+batter, giving the cut per platform, on the slopes, by depth band and by construction stage. A DXF exported
+from the DWG gives the platform outlines and their labels straight from the layers, with no tracing;
+surveyed boundary coordinates can be pasted; a measurement schedule (the QS's dims list) drives the
+tracing. Colour overlay for checking, CSV export and a checked-by stamp. `earthworks/engine.js` holds the arithmetic
 and is tested with `npm test` against two synthetic sheets with independent truth volumes (see
 `earthworks/README.md`).
 

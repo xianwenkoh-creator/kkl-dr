@@ -71,7 +71,37 @@ shared with the tests. No drawing leaves the machine.
    result table gives, per platform, the footprint area, the cut within the footprint, the cut on its
    slopes, the total, the depth bands and the stage volumes, with a total row.
 
-## Check, stamp, export (both workflows)
+## Workflow C: the DWG itself (exact outlines, no tracing)
+
+When the main contractor's CAD file is available, export it to DXF (AutoCAD: SAVEAS, type AutoCAD 2018 DXF;
+ASCII DXF only) and load it as the base sheet. The drawing's own coordinates are used (SVY21 metres on
+Singapore projects; millimetre files are converted), so there is no scale to set and the mouse reads E/N.
+
+1. The layer list shows every layer with its polylines (how many closed), lines and texts. Press
+   **Platforms** on the toe-line layer: every closed polyline becomes a platform with the level label
+   written inside it (a smaller polygon inside a larger one keeps its own label, so sumps work; two
+   labels inside one polygon make a ramp graded between them). Press **Boundary** on the boundary
+   layer to take its largest closed polyline. Text inside blocks and MTEXT formatting are handled.
+2. Levels written to datum anywhere in the drawing are shown as blue dots and can be picked as before;
+   platforms without a label inside are flagged and get their level typed or picked.
+3. Slope rules, berms, stages and existing ground are entered from the sections as in Workflow B, and
+   the volumes are computed the same way. Areas are exact to the drawing.
+
+## Surveyed coordinates and georeferencing
+
+A boundary schedule with surveyed coordinates (`N: 35032.442 E: 45933.837` per corner) can be pasted
+and turned into the boundary or a platform. On a PDF without a coordinate grid, first georeference the
+sheet by entering the E/N of two points (two boundary corners) and clicking them: the tool derives
+scale and rotation together, and reports the equivalent 1:n for a check against the title block.
+
+## Measurement schedule
+
+The QS's dims list before measuring. Import a CSV (columns `name, level, sides, note`, or `z1, z2` for a
+ramp) or build it from the zones already drawn. Each row has a **Trace** button that starts drawing that
+item with its name, level and sides set; once traced the row shows its area, so nothing is missed or
+measured twice. The schedule is saved in the project and exported with areas and status.
+
+## Check, stamp, export (all workflows)
 
 Mark the result checked with initials, export the summary CSV (one row per zone or platform with
 every setting, the slope rules, the existing level, the scale source, the sheet and the vertices, so
@@ -106,15 +136,17 @@ checks: every spot level found and placed on its marker with no decoy leaking; g
 within 0.5 percent; zone volumes within 2 percent of truth for all three surface methods; every datum
 label on the platform plan read with its sign where it is written; a single battered rectangle
 within 0.4 percent of the closed-form mitred-offset volume; and the whole sample plan within
-0.5 percent of the numpy truth in total, per platform and per stage. The browser smoke tests repeat
-both through the interface.
+0.5 percent of the numpy truth in total, per platform and per stage. A synthetic DXF (`make_sample_dxf.py`, ezdxf) with TEXT, MTEXT and block labels checks the layer-to-platform step exactly. The browser smoke tests repeat all of it through the interface.
 
 ## Limits to know
 
 - Scanned sheets have no text: levels must be added by hand, or the sheet OCR'd first.
-- Platform outlines are traced by the QS; the tool does not yet pick the toe lines out of the drawing
-  itself (the real sheets carry slope hatching, berm lines and structure outlines in one pen, and
-  that separation is the next step once a real sheet has been tested).
+- On a PDF the platform outlines are traced by the QS (the real sheets carry slope hatching, berm
+  lines and structure outlines in one pen); with the DXF they come from the drawing's layers, and the
+  QS's job is to pick the right layer and check the labels.
+- The DXF reader handles LWPOLYLINE, POLYLINE, LINE, CIRCLE, TEXT, MTEXT and block INSERTs (translate,
+  scale, rotate). Splines, arcs with bulges and hatches are ignored; a curved toe line drawn as an arc
+  needs to be redrawn or traced.
 - Real survey sheets place labels on any side of the marker and sometimes split a level into two
   text runs; the association uses the nearest marker within 14 pt and falls back to the label
   position, so check the dots on a new surveyor's template the first time.

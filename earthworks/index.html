@@ -32,6 +32,8 @@
   label{display:block; font-size:12px; font-weight:600; color:var(--ink-soft); margin:8px 0 3px;}
   input,select{width:100%; font:inherit; font-size:13px; color:var(--ink); background:var(--field); border:1px solid var(--line-strong); border-radius:4px; padding:6px 8px; min-height:34px;}
   input[type=file]{padding:4px;}
+  textarea{width:100%; font:12px "Cascadia Mono",Consolas,monospace; color:var(--ink); background:var(--field); border:1px solid var(--line-strong); border-radius:4px; padding:6px; resize:vertical;}
+  #ov .sched{fill:none; stroke:#2e7d4f; stroke-width:1.2; stroke-dasharray:2 2;}
   button{font:inherit; font-weight:600; border:1.5px solid var(--ink); border-radius:4px; padding:6px 10px; cursor:pointer; background:var(--card); color:var(--ink); font-size:13px;}
   button.primary{background:var(--accent); border-color:var(--accent-ink); color:#fff;}
   button.on{background:var(--steel); color:#fff; border-color:var(--steel);}
@@ -88,12 +90,14 @@
 <aside>
   <fieldset>
     <legend>Sheets</legend>
-    <label>Base sheet PDF: topographical survey (spot levels) or excavation layout plan (platform levels)</label>
-    <div class="row"><input type="file" id="topoFile" accept=".pdf,application/pdf"><select id="topoPage" style="flex:0 0 74px" title="page"></select></div>
+    <label>Base sheet: topo survey PDF (spot levels), excavation layout PDF (platform levels), or a DXF exported from the DWG</label>
+    <div class="row"><input type="file" id="topoFile" accept=".pdf,.dxf,application/pdf"><select id="topoPage" style="flex:0 0 74px" title="page"></select></div>
     <label>Design or section PDF (levels to read off)</label>
     <div class="row"><input type="file" id="designFile" accept=".pdf,application/pdf"><select id="designPage" style="flex:0 0 74px" title="page"></select></div>
-    <div class="row" style="margin-top:6px"><button class="tiny on" id="showTopo">Show base</button><button class="tiny" id="showDesign" disabled>Show design</button><button class="tiny" id="loadSample" title="Synthetic topo survey and design sheet">Sample: topo</button><button class="tiny" id="loadSamplePlat" title="Synthetic ERSS layout plan with platforms, ramp and sump, traced">Sample: ERSS plan</button></div>
+    <div class="row" style="margin-top:6px"><button class="tiny on" id="showTopo">Show base</button><button class="tiny" id="showDesign" disabled>Show design</button><button class="tiny" id="loadSample" title="Synthetic topo survey and design sheet">Sample: topo</button><button class="tiny" id="loadSamplePlat" title="Synthetic ERSS layout plan with platforms, ramp and sump, traced">Sample: ERSS plan</button><button class="tiny" id="loadSampleDxf" title="Synthetic ERSS layout as a DXF in SVY21 coordinates">Sample: DXF</button></div>
     <div class="stat" id="designStat"></div>
+    <div class="list" id="dxfLayers" hidden></div>
+    <p class="hint" id="dxfHint" hidden>DXF layers with their entity counts. “Platforms” makes a platform from every closed polyline on the layer and gives it the level written inside it (two levels inside make a ramp); “Boundary” takes the largest closed polyline. Coordinates are the drawing’s own (SVY21 metres), so no scale is needed.</p>
     <div class="list" id="designLevels" hidden></div>
     <p class="hint">Levels found on the design sheet are listed with their text; press “→ FEL” to use one for the selected zone.</p>
   </fieldset>
@@ -108,6 +112,8 @@
       <div class="row" style="margin-top:6px"><button id="drawBoundary">Draw excavation boundary</button><button class="tiny" id="clearBoundary" disabled>Clear</button></div>
       <div class="stat" id="bndStat">boundary: none, the platforms plus their slopes will be used</div>
       <div class="stat" id="gradStat"></div>
+      <label>Surveyed coordinates (paste “N: … E: …” pairs; needs an E/N grid, a georeference or a DXF)</label><textarea id="coordText" rows="2" placeholder="N:35032.442 E:45933.837&#10;N:35049.488 E:45941.077 …"></textarea>
+      <div class="row"><button class="tiny" id="coordBnd">→ Boundary</button><button class="tiny" id="coordPlat">→ Platform</button><span class="stat" id="coordStat" style="margin:0"></span></div>
       <p class="hint">Platforms are drawn like zones, along the toe of the slope at formation level. The excavated surface is the lowest of every platform floor and of the batter rising from its edge under the rules, so adjacent platforms, sumps and ramps combine on their own. A platform with vertical sides is one retained by a wall (a sheetpiled pre-cut, for example).</p>
     </div>
   </fieldset>
@@ -116,7 +122,8 @@
     <div class="stat" id="scaleStat">not set</div>
     <div class="row"><input type="number" id="declared" placeholder="declared scale, e.g. 500" min="50" step="1"><button id="useDeclared">Use 1:n</button></div>
     <div class="row" style="margin-top:6px"><input type="number" id="calibDist" placeholder="known distance, m" step="0.01"><button id="calibBtn">Calibrate: 2 clicks</button></div>
-    <p class="hint">Best: an E/N coordinate grid on the sheet (read automatically). Otherwise the declared scale from the title block, checked with two clicks across a known dimension, a grid interval or the bar scale. A sheet printed at a different size than the title block says needs the calibration.</p>
+    <div class="row" style="margin-top:6px"><input type="number" id="gE1" placeholder="E of point 1" step="0.001"><input type="number" id="gN1" placeholder="N of point 1" step="0.001"><input type="number" id="gE2" placeholder="E of point 2" step="0.001"><input type="number" id="gN2" placeholder="N of point 2" step="0.001"><button id="georefBtn" title="Enter the surveyed E/N of two points (boundary corners), then click them on the sheet">Georef: 2 clicks</button></div>
+    <p class="hint">Best: an E/N coordinate grid on the sheet (read automatically). Otherwise the declared scale from the title block, checked with two clicks across a known dimension, a grid interval or the bar scale. A sheet printed at a different size than the title block says needs the calibration. With two surveyed coordinates (boundary corners from the worksite layout) the sheet is georeferenced: scale and rotation together, and pasted coordinate lists land in the right place.</p>
   </fieldset>
   <fieldset>
     <legend>Levels on the sheet</legend>
@@ -137,6 +144,12 @@
       <label>Note (where the level came from)</label><input id="zNote" placeholder="e.g. C-102 Rev B note 1: SSL 99.000 - 400 - 50 - 50">
     </div>
     <p class="hint" id="zoneHint">Draw a zone by clicking its corners on the base sheet; double-click or Finish to close. Every zone needs one final excavation level; use several zones for stepped levels.</p>
+  </fieldset>
+  <fieldset>
+    <legend>Measurement schedule</legend>
+    <div class="row"><input type="file" id="schedFile" accept=".csv,.txt,.json" style="flex:1;padding:3px" title="CSV with columns name, level, sides, note (or z1, z2 for ramps)"><button class="tiny" id="schedFromZones" title="List the zones already drawn">From zones</button><button class="tiny" id="schedExport" disabled>Export CSV</button></div>
+    <div class="tablewrap" style="margin-top:6px"><table id="schedTable"><thead><tr><th>#</th><th>Item</th><th>Level</th><th>Status</th><th></th></tr></thead><tbody><tr><td colspan="5" class="hint">no schedule loaded: import the dims list (name, level, sides, note per row) and trace against it</td></tr></tbody></table></div>
+    <p class="hint">The QS's dims list before measuring: every platform, ramp and sump with the level read off the plan. “Trace” starts drawing that item with its name and level set; a traced item shows its area, so nothing is missed or measured twice.</p>
   </fieldset>
   <fieldset>
     <legend>Method</legend>
@@ -164,20 +177,21 @@
 <script type="module">
 "use strict";
 import * as pdfjsLib from "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs";
-import { levelsInText, parseSpotLevels, gradientsInText, clusterMarkers, associateMarkers, georeferenceFromGrid, declaredScaleFromText, scaleFromDeclared, calibrateTwoPoints, scaledTransform, proximity, idw, tin, gridVolumes, batterAllowance, polygonArea, toCSV, fmt, flatSurface, slopeRules, parseSlopeText, parseBermText, formatRules, designSurface } from "./engine.js";
+import { levelsInText, parseSpotLevels, gradientsInText, clusterMarkers, associateMarkers, georeferenceFromGrid, declaredScaleFromText, scaleFromDeclared, calibrateTwoPoints, scaledTransform, georefTwoPoints, parseCoordinateList, proximity, idw, tin, gridVolumes, batterAllowance, polygonArea, toCSV, fmt, flatSurface, slopeRules, parseSlopeText, parseBermText, formatRules, designSurface } from "./engine.js";
+import { parseDxf, platformsFromDxf, levelTextsFromDxf } from "./dxf.js";
 import { pageTextItems, pageGeometry } from "./pdfgeom.js";
 pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.worker.min.mjs";
 const $ = s => document.querySelector(s);
 const RENDER_SCALE = 1.5;
 const PREVIEW = !!window.__EW_PREVIEW;
 const state = { model: "zones", topo: null, design: null, showing: "topo", T: null, levels: [], excluded: new Set(), manual: [], zones: [], sel: null, mode: "pan", draft: [], calib: [], zoom: 1, checked: null, vp: null,
-  boundary: null, platformResult: null, pickTarget: "fel", grading: [], gradients: [] };
+  boundary: null, platformResult: null, pickTarget: "fel", grading: [], gradients: [], georef: [], schedule: [], tracing: null };
 
 // ---------- loading ----------
 async function loadPdf(file) { const data = new Uint8Array(await file.arrayBuffer()); const doc = await pdfjsLib.getDocument({ data }).promise; return { doc, name: file.name, pages: doc.numPages }; }
-$("#topoFile").addEventListener("change", async e => { const f = e.target.files[0]; if (!f) return; state.topo = await loadPdf(f); fillPages($("#topoPage"), state.topo.pages); await loadTopoPage(1); });
+$("#topoFile").addEventListener("change", async e => { const f = e.target.files[0]; if (!f) return; if (/\.dxf$/i.test(f.name)) { await loadDxf(await f.text(), f.name); return; } state.topo = await loadPdf(f); fillPages($("#topoPage"), state.topo.pages); await loadTopoPage(1); });
 $("#designFile").addEventListener("change", async e => { const f = e.target.files[0]; if (!f) return; state.design = await loadPdf(f); fillPages($("#designPage"), state.design.pages); $("#showDesign").disabled = false; await scanDesign(); });
-$("#topoPage").addEventListener("change", e => loadTopoPage(+e.target.value));
+$("#topoPage").addEventListener("change", e => { if (!state.topo?.isDxf) loadTopoPage(+e.target.value); });
 $("#designPage").addEventListener("change", () => { if (state.showing === "design") renderPage(state.design.doc, +$("#designPage").value, false); });
 function sampleBytes(name) { if (window.__EW_SAMPLES && window.__EW_SAMPLES[name]) { const bin = atob(window.__EW_SAMPLES[name]); const u8 = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i); return Promise.resolve(u8); } return fetch("./" + name).then(r => { if (!r.ok) throw new Error(name + ": " + r.status); return r.arrayBuffer(); }).then(b => new Uint8Array(b)); }
 async function sampleFile(name) { return new File([await sampleBytes(name)], name, { type: "application/pdf" }); }
@@ -194,12 +208,13 @@ $("#loadSamplePlat").addEventListener("click", async () => {
     state.sel = null; renderZoneTable(); boundaryStat(); drawOverlay(); status();
   } catch (e) { alert("Could not load the sample plan: " + e.message); }
 });
+$("#loadSampleDxf").addEventListener("click", async () => { try { await loadDxf(new TextDecoder().decode(await sampleBytes("sample_platforms.dxf")), "sample_platforms.dxf"); $("#eglMode").value = "flat"; $("#eglLevel").value = 5.5; $("#rulesText").value = "1V:1H to -6, 1V:2.5H"; $("#bermsText").value = "3 @ -12, 3 @ -6"; $("#stagesText").value = "+4, -6, -12"; } catch (e) { alert("Could not load the sample DXF: " + e.message); } });
 function fillPages(sel, n) { sel.innerHTML = Array.from({ length: n }, (_, i) => `<option value="${i + 1}">p${i + 1}</option>`).join(""); }
 async function loadTopoPage(no) {
   const t = state.topo; t.pageNo = no; const page = await t.doc.getPage(no); t.page = page;
   t.items = await pageTextItems(page); t.geom = await pageGeometry(page, pdfjsLib.OPS);
-  state.zones = []; state.excluded = new Set(); state.manual = []; state.sel = null; state.checked = null; state.boundary = null; state.platformResult = null;
-  readLevels(); autoScale(); autoModel(); await renderPage(t.doc, no, true); showTopo(); renderZoneTable(); boundaryStat(); renderResults(); status();
+  state.zones = []; state.excluded = new Set(); state.manual = []; state.sel = null; state.checked = null; state.boundary = null; state.platformResult = null; state.schedule = []; $("#dxfLayers").hidden = $("#dxfHint").hidden = true;
+  readLevels(); autoScale(); autoModel(); renderSchedule(); await renderPage(t.doc, no, true); showTopo(); renderZoneTable(); boundaryStat(); renderResults(); status();
   const key = "kkl_ew_" + t.name; try { const saved = JSON.parse(localStorage.getItem(key) || "null"); if (saved && saved.page === no) applyProject(saved); } catch (e) {}
 }
 function readLevels() {
@@ -244,15 +259,95 @@ $("#drawBoundary").addEventListener("click", () => { state.draft = []; setMode("
 $("#clearBoundary").addEventListener("click", () => { state.boundary = null; state.platformResult = null; boundaryStat(); renderResults(); drawOverlay(); });
 function boundaryStat() { const b = state.boundary; $("#clearBoundary").disabled = !b; $("#bndStat").innerHTML = b && state.T ? `boundary: <b>${fmt(polygonArea(b.map(p => state.T.toWorld(p.x, p.y))), 0)} m²</b>, ${b.length} vertices` : b ? `boundary: ${b.length} vertices` : "boundary: none, the platforms plus their slopes will be used"; }
 
+// ---------- DXF: the drawing itself, in its own coordinates ----------
+function fakeViewport(Wpt, Hpt) { return { width: Wpt * RENDER_SCALE, height: Hpt * RENDER_SCALE, convertToViewportPoint: (x, y) => [x * RENDER_SCALE, (Hpt - y) * RENDER_SCALE], convertToPdfPoint: (px, py) => [px / RENDER_SCALE, Hpt - py / RENDER_SCALE] }; }
+async function loadDxf(text, name) {
+  const d = parseDxf(text); const unit = d.unitsGuess === "mm" ? 0.001 : 1; const ex = d.extents;
+  const w = (ex.x1 - ex.x0) * unit, h = (ex.y1 - ex.y0) * unit; if (!(w > 0 && h > 0)) { alert("No geometry found in the DXF (only ASCII DXF is read; export from AutoCAD as DXF, not DWG)."); return; }
+  const pad = 0.03 * Math.max(w, h), mPerPt = (Math.max(w, h) + 2 * pad) / 3000, x0 = ex.x0 * unit - pad, y0 = ex.y0 * unit - pad, Wpt = (w + 2 * pad) / mPerPt, Hpt = (h + 2 * pad) / mPerPt;
+  state.topo = { name, pages: 1, pageNo: 1, isDxf: true, dxf: d, unit, items: d.texts.map(t => ({ str: t.text, x: 0, y: 0 })), geom: { markers: [], lines: [] }, Wpt, Hpt };
+  state.T = { mode: "dxf", mPerPt, unit, toWorld: (x, y) => ({ X: x0 + x * mPerPt, Y: y0 + y * mPerPt }), fromWorld: (X, Y) => ({ x: (X - x0) / mPerPt, y: (Y - y0) / mPerPt }) };
+  state.vp = fakeViewport(Wpt, Hpt); fillPages($("#topoPage"), 1);
+  state.zones = []; state.excluded = new Set(); state.manual = []; state.sel = null; state.checked = null; state.boundary = null; state.platformResult = null; state.schedule = [];
+  state.levels = levelTextsFromDxf(d, levelsInText).map(l => { const p = state.T.fromWorld(l.x * unit, l.y * unit); return { value: l.value, decimals: (String(l.raw).split(".")[1] || "").replace(/\D.*$/, "").length, datum: l.datum, raw: l.raw, prefix: "", px: p.x, py: p.y, source: "text", layer: l.layer }; });
+  state.gradients = gradientsInText(state.topo.items); readLevelsStat();
+  $("#scaleStat").innerHTML = `DXF coordinates: <b>${unit === 1 ? "metres" : "millimetres, converted"}</b> · extents ${fmt(w, 0)} × ${fmt(h, 0)} m · E ${fmt(ex.x0 * unit, 1)} to ${fmt(ex.x1 * unit, 1)}, N ${fmt(ex.y0 * unit, 1)} to ${fmt(ex.y1 * unit, 1)}`;
+  setModel("platforms"); renderDxf(); renderLayers(); renderZoneTable(); renderSchedule(); boundaryStat(); renderResults(); status(); showTopo();
+}
+function renderDxf() {
+  const t = state.topo; if (!t?.isDxf) return; const d = t.dxf, u = t.unit; const canvas = $("#pg"); canvas.width = state.vp.width; canvas.height = state.vp.height;
+  $("#ov").setAttribute("width", canvas.width); $("#ov").setAttribute("height", canvas.height); $("#ov").setAttribute("viewBox", `0 0 ${canvas.width} ${canvas.height}`);
+  const ctx = canvas.getContext("2d"); ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, canvas.width, canvas.height);
+  const P = (X, Y) => { const q = state.T.fromWorld(X * u, Y * u); return toPx(q.x, q.y); };
+  ctx.lineWidth = 0.8; ctx.strokeStyle = "#555";
+  for (const l of d.lines) { const a = P(l.x1, l.y1), b = P(l.x2, l.y2); ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke(); }
+  for (const pl of d.polylines) { ctx.beginPath(); pl.pts.forEach(([X, Y], i) => { const q = P(X, Y); i ? ctx.lineTo(q[0], q[1]) : ctx.moveTo(q[0], q[1]); }); if (pl.closed) ctx.closePath(); ctx.strokeStyle = pl.closed ? "#1f3f66" : "#666"; ctx.stroke(); }
+  for (const c of d.circles) { const q = P(c.x, c.y); ctx.beginPath(); ctx.arc(q[0], q[1], Math.max(1, c.r * u / state.T.mPerPt * RENDER_SCALE), 0, Math.PI * 2); ctx.stroke(); }
+  ctx.fillStyle = "#333";
+  for (const tx of d.texts) { const q = P(tx.x, tx.y); const px = Math.max(7, (tx.height || 2) * u / state.T.mPerPt * RENDER_SCALE); ctx.font = `${px.toFixed(1)}px "Segoe UI", sans-serif`; ctx.save(); ctx.translate(q[0], q[1]); if (tx.rot) ctx.rotate(-tx.rot * Math.PI / 180); ctx.fillText(tx.text.slice(0, 60), 0, 0); ctx.restore(); }
+  drawOverlay(); fit();
+}
+function renderLayers() {
+  const t = state.topo; const box = $("#dxfLayers"); if (!t?.isDxf) { box.hidden = $("#dxfHint").hidden = true; return; }
+  const names = Object.keys(t.dxf.layers).sort(); box.hidden = $("#dxfHint").hidden = false;
+  box.innerHTML = names.map(n => { const c = t.dxf.layers[n]; const closed = t.dxf.polylines.filter(p => p.layer === n && p.closed).length; return `<div><span title="${esc(n)}">${esc(n)} · ${c.polylines} pl (${closed} closed) · ${c.lines} ln · ${c.texts} tx</span><span style="flex:0 0 auto"><button class="tiny" data-plat="${esc(n)}" ${closed ? "" : "disabled"}>Platforms</button> <button class="tiny" data-bnd="${esc(n)}" ${closed ? "" : "disabled"}>Boundary</button></span></div>`; }).join("");
+  box.querySelectorAll("[data-plat]").forEach(b => b.addEventListener("click", () => addPlatformsFromLayer(b.dataset.plat)));
+  box.querySelectorAll("[data-bnd]").forEach(b => b.addEventListener("click", () => boundaryFromLayer(b.dataset.bnd)));
+}
+function addPlatformsFromLayer(layer) {
+  const t = state.topo; if (!t?.isDxf) return; const u = t.unit; const lt = levelTextsFromDxf(t.dxf, levelsInText);
+  const cands = platformsFromDxf(t.dxf, [layer], lt, { namePrefix: layer }); let added = 0, ramps = 0, unlabelled = 0;
+  for (const c of cands) {
+    const poly = c.pts.map(p => { const q = state.T.fromWorld(p.X * u, p.Y * u); return { x: q.x, y: q.y }; });
+    if (state.zones.some(z => z.poly.length === poly.length && Math.abs(z.poly[0].x - poly[0].x) < 1e-6 && Math.abs(z.poly[0].y - poly[0].y) < 1e-6)) continue;
+    const z = { name: c.name, fel: c.fel, grade: null, sides: "rules", note: `DXF ${layer}` + (c.label ? ": " + c.label : ""), poly, result: null };
+    if (c.ambiguous && c.labels.length === 2) { const [a, b] = c.labels; const pa = state.T.fromWorld(a.x * u, a.y * u), pb = state.T.fromWorld(b.x * u, b.y * u); z.grade = { p1: { x: pa.x, y: pa.y }, z1: a.value, p2: { x: pb.x, y: pb.y }, z2: b.value }; z.name = c.name + " ramp"; ramps++; }
+    else if (c.fel == null) unlabelled++;
+    state.zones.push(z); added++;
+  }
+  state.sel = null; state.platformResult = null; renderZoneTable(); drawOverlay(); status();
+  $("#designStat").innerHTML = `layer ${esc(layer)}: <b>${added}</b> platform${added === 1 ? "" : "s"} added` + (ramps ? `, ${ramps} ramp${ramps === 1 ? "" : "s"} from two labels` : "") + (unlabelled ? `, <b style="color:var(--bad)">${unlabelled} without a level inside</b> (type or pick their levels)` : "");
+}
+function boundaryFromLayer(layer) {
+  const t = state.topo; if (!t?.isDxf) return; const u = t.unit; const cands = t.dxf.polylines.filter(p => p.layer === layer && p.closed).sort((a, b) => b.area - a.area); if (!cands.length) return;
+  state.boundary = cands[0].pts.map(([X, Y]) => { const q = state.T.fromWorld(X * u, Y * u); return { x: q.x, y: q.y }; }); state.platformResult = null; boundaryStat(); drawOverlay();
+}
+// ---------- surveyed coordinates and georeference ----------
+const worldMode = () => state.T && ["grid", "georef", "dxf"].includes(state.T.mode);
+function polyFromCoords() { if (!worldMode()) { alert("Coordinates need a sheet in E/N: an E/N grid, a two-point georeference or a DXF."); return null; } const pts = parseCoordinateList($("#coordText").value); if (pts.length < 3) { alert("Paste at least three E/N pairs."); return null; }
+  const poly = pts.map(p => { const q = state.T.fromWorld(p.E, p.N); return { x: q.x, y: q.y }; }); $("#coordStat").innerHTML = `${pts.length} points · ${fmt(polygonArea(pts.map(p => ({ X: p.E, Y: p.N }))), 0)} m²`; return poly; }
+$("#coordBnd").addEventListener("click", () => { const poly = polyFromCoords(); if (!poly) return; state.boundary = poly; state.platformResult = null; boundaryStat(); drawOverlay(); });
+$("#coordPlat").addEventListener("click", () => { const poly = polyFromCoords(); if (!poly) return; const row = state.tracing; const z = { name: row ? row.name : "From coordinates " + (state.zones.length + 1), fel: row ? row.fel : null, grade: null, sides: row?.sides || "rules", note: (row?.note ? row.note + " · " : "") + "surveyed coordinates", poly, result: null }; state.zones.push(z); state.sel = state.zones.length - 1; if (row) row.zone = z.name; state.tracing = null; renderZoneTable(); renderSchedule(); drawOverlay(); status(); });
+$("#georefBtn").addEventListener("click", () => { const v = ["gE1", "gN1", "gE2", "gN2"].map(id => parseFloat($("#" + id).value)); if (v.some(x => !isFinite(x))) { alert("Enter E and N for both points first."); $("#gE1").focus(); return; } state.georef = []; setMode("georef"); });
+function finishGeoref() { const [E1, N1, E2, N2] = ["gE1", "gN1", "gE2", "gN2"].map(id => parseFloat($("#" + id).value)); const g = georefTwoPoints(state.georef[0], { E: E1, N: N1 }, state.georef[1], { E: E2, N: N2 }); if (!g.ok) { alert("The two points must differ."); state.georef = []; return; }
+  state.T = { mode: "georef", ...g, points: { p1: state.georef[0], w1: { E: E1, N: N1 }, p2: state.georef[1], w2: { E: E2, N: N2 } } }; $("#scaleStat").innerHTML = `georeferenced: <b>${g.mPerPt.toFixed(5)} m/pt</b> (≈ 1:${Math.round(g.mPerPt / scaleFromDeclared(1))}), rotation ${g.rotationDeg.toFixed(2)}°`; state.georef = []; boundaryStat(); status(); }
+// ---------- measurement schedule ----------
+function parseScheduleCsv(text) {
+  const lines = text.split(/\r?\n/).filter(l => l.trim()); if (!lines.length) return []; const split = l => l.split(/,|\t|;/).map(c => c.trim().replace(/^"|"$/g, ""));
+  const head = split(lines[0]).map(h => h.toLowerCase()); const has = head.some(h => /name|item|platform|zone/.test(h)); const rows = has ? lines.slice(1) : lines; const idx = k => head.findIndex(h => k.test(h));
+  const iName = has ? idx(/name|item|platform|zone/) : 0, iLv = has ? idx(/^(level|fel|formation)/) : 1, iSides = has ? idx(/side/) : -1, iNote = has ? idx(/note|remark|source/) : -1, iZ1 = has ? idx(/z1|start/) : -1, iZ2 = has ? idx(/z2|end/) : -1;
+  return rows.map(l => { const c = split(l); const lv = iLv >= 0 ? (levelsInText(c[iLv] || "")[0]?.value ?? parseFloat(c[iLv])) : NaN; const z1 = iZ1 >= 0 ? parseFloat(c[iZ1]) : NaN, z2 = iZ2 >= 0 ? parseFloat(c[iZ2]) : NaN;
+    return { name: c[iName] || "item", fel: isFinite(lv) ? lv : null, sides: iSides >= 0 && /vert|wall|retain/i.test(c[iSides] || "") ? "vertical" : "rules", note: iNote >= 0 ? c[iNote] || "" : "", grade: isFinite(z1) && isFinite(z2) ? { z1, z2 } : null, zone: null }; }).filter(r => r.name);
+}
+$("#schedFile").addEventListener("change", async e => { const f = e.target.files[0]; if (!f) return; const text = await f.text(); state.schedule = /\.json$/i.test(f.name) ? JSON.parse(text) : parseScheduleCsv(text); e.target.value = ""; renderSchedule(); });
+$("#schedFromZones").addEventListener("click", () => { state.schedule = state.zones.map(z => ({ name: z.name, fel: z.fel, sides: z.sides || "rules", note: z.note || "", grade: z.grade ? { z1: z.grade.z1, z2: z.grade.z2 } : null, zone: z.name })); renderSchedule(); });
+$("#schedExport").addEventListener("click", () => { const rows = state.schedule.map((r, i) => { const z = state.zones.find(q => q.name === r.zone); const a = z && state.T ? polygonArea(z.poly.map(p => state.T.toWorld(p.x, p.y))) : ""; return { no: i + 1, item: r.name, level: r.fel ?? "", ramp: r.grade ? `${r.grade.z1} to ${r.grade.z2}` : "", sides: r.sides, traced: z ? "yes" : "no", area_m2: a === "" ? "" : a.toFixed(1), note: r.note }; }); download(fileBase() + "_schedule.csv", toCSV(rows, ["no", "item", "level", "ramp", "sides", "traced", "area_m2", "note"]), "text/csv"); });
+function renderSchedule() {
+  const tb = $("#schedTable tbody"); const S = state.schedule; $("#schedExport").disabled = !S.length;
+  if (!S.length) { tb.innerHTML = `<tr><td colspan="5" class="hint">no schedule loaded: import the dims list (name, level, sides, note per row) and trace against it</td></tr>`; return; }
+  tb.innerHTML = S.map((r, i) => { const z = state.zones.find(q => q.name === r.zone); const area = z && state.T ? fmt(polygonArea(z.poly.map(p => state.T.toWorld(p.x, p.y))), 0) + " m²" : "—";
+    return `<tr class="${state.tracing === r ? "sel" : ""}"><td>${i + 1}</td><td title="${esc(r.note)}">${esc(r.name)}${r.sides === "vertical" ? " ▯" : ""}</td><td class="num">${r.grade ? r.grade.z1 + "→" + r.grade.z2 : r.fel != null ? r.fel.toFixed(2) : "?"}</td><td>${z ? `<span style="color:var(--good)">traced ${area}</span>` : "to trace"}</td><td><button class="tiny" data-trace="${i}">${z ? "Re-trace" : "Trace"}</button></td></tr>`; }).join("");
+  tb.querySelectorAll("[data-trace]").forEach(b => b.addEventListener("click", () => { state.tracing = state.schedule[+b.dataset.trace]; state.draft = []; setMode("zone"); renderSchedule(); drawOverlay(); }));
+}
 // ---------- rendering ----------
 async function renderPage(doc, no, isTopo) {
   const page = await doc.getPage(no); const vp = page.getViewport({ scale: RENDER_SCALE }); if (isTopo) state.vp = vp;
   const canvas = $("#pg"); canvas.width = vp.width; canvas.height = vp.height; $("#ov").setAttribute("width", vp.width); $("#ov").setAttribute("height", vp.height); $("#ov").setAttribute("viewBox", `0 0 ${vp.width} ${vp.height}`);
   await page.render({ canvasContext: canvas.getContext("2d"), viewport: vp }).promise; $("#ov").innerHTML = ""; if (isTopo) drawOverlay(); fit();
 }
-function showTopo() { state.showing = "topo"; $("#showTopo").classList.add("on"); $("#showDesign").classList.remove("on"); if (state.topo) renderPage(state.topo.doc, state.topo.pageNo, true); }
+function showTopo() { state.showing = "topo"; $("#showTopo").classList.add("on"); $("#showDesign").classList.remove("on"); if (state.topo?.isDxf) renderDxf(); else if (state.topo) renderPage(state.topo.doc, state.topo.pageNo, true); }
 $("#showTopo").addEventListener("click", showTopo);
-$("#showDesign").addEventListener("click", () => { state.showing = "design"; $("#showDesign").classList.add("on"); $("#showTopo").classList.remove("on"); renderPage(state.design.doc, +$("#designPage").value, false); });
+$("#showDesign").addEventListener("click", () => { if (!state.design) return; state.showing = "design"; $("#showDesign").classList.add("on"); $("#showTopo").classList.remove("on"); renderPage(state.design.doc, +$("#designPage").value, false); });
 const toPx = (x, y) => state.vp.convertToViewportPoint(x, y), toPdf = (px, py) => state.vp.convertToPdfPoint(px, py);
 const ptsAttr = pts => pts.map(p => p.join(",")).join(" ");
 function drawOverlay() {
@@ -265,6 +360,7 @@ function drawOverlay() {
     if (z.grade) for (const [p, v] of [[z.grade.p1, z.grade.z1], [z.grade.p2, z.grade.z2]]) { const [px, py] = toPx(p.x, p.y); s += `<circle class="ramp" cx="${px}" cy="${py}" r="4"></circle><text class="rl" x="${px + 5}" y="${py - 4}">${v.toFixed(2)}</text>`; } });
   if (state.draft.length) { const pts = state.draft.map(p => toPx(p.x, p.y)); s += `<polyline class="draft" points="${ptsAttr(pts)}"></polyline>` + pts.map(p => `<circle cx="${p[0]}" cy="${p[1]}" r="3" fill="#c85a10"></circle>`).join(""); }
   if (state.grading.length) { const pts = state.grading.map(p => toPx(p.x, p.y)); s += pts.map(p => `<circle class="ramp" cx="${p[0]}" cy="${p[1]}" r="5"></circle>`).join(""); }
+  if (state.georef.length) { const pts = state.georef.map(p => toPx(p.x, p.y)); s += pts.map((p, i) => `<circle class="calib" cx="${p[0]}" cy="${p[1]}" r="6"></circle><text class="rl" x="${p[0] + 7}" y="${p[1] - 5}">${i + 1}</text>`).join(""); }
   if (state.calib.length) { const pts = state.calib.map(p => toPx(p.x, p.y)); s += pts.map(p => `<circle class="calib" cx="${p[0]}" cy="${p[1]}" r="5"></circle>`).join(""); if (pts.length === 2) s += `<line class="calib" x1="${pts[0][0]}" y1="${pts[0][1]}" x2="${pts[1][0]}" y2="${pts[1][1]}"></line>`; }
   const labels = $("#showLabels").checked;
   state.levels.forEach((l, i) => { const [px, py] = toPx(l.px, l.py); const ex = state.excluded.has(i);
@@ -293,9 +389,9 @@ function setZoom(z) { state.zoom = Math.max(0.15, Math.min(6, z)); $("#inner").s
 function fit() { const v = $("#viewer"); setZoom(Math.min((v.clientWidth - 4) / $("#pg").width, (v.clientHeight - 4) / $("#pg").height)); }
 $("#zoomIn").addEventListener("click", () => setZoom(state.zoom * 1.25)); $("#zoomOut").addEventListener("click", () => setZoom(state.zoom / 1.25)); $("#zoomFit").addEventListener("click", fit);
 $("#viewer").addEventListener("wheel", e => { if (!e.ctrlKey) return; e.preventDefault(); setZoom(state.zoom * (e.deltaY < 0 ? 1.15 : 1 / 1.15)); }, { passive: false });
-const MODE_TEXT = { pan: "PAN", calib: "CALIBRATE: click 2 points", zone: "DRAW: click corners, double-click to finish", boundary: "DRAW BOUNDARY: click corners, double-click to finish", excl: "EXCLUDE / INCLUDE: click dots", add: "ADD LEVEL: click a point", pick: "PICK: click a level written on the sheet", grade: "RAMP: click end 1, then end 2" };
+const MODE_TEXT = { pan: "PAN", calib: "CALIBRATE: click 2 points", georef: "GEOREFERENCE: click point 1, then point 2", zone: "DRAW: click corners, double-click to finish", boundary: "DRAW BOUNDARY: click corners, double-click to finish", excl: "EXCLUDE / INCLUDE: click dots", add: "ADD LEVEL: click a point", pick: "PICK: click a level written on the sheet", grade: "RAMP: click end 1, then end 2" };
 function setMode(m) { state.mode = m; $("#modeTag").textContent = MODE_TEXT[m];
-  $("#modeExcl").classList.toggle("on", m === "excl"); $("#modeAdd").classList.toggle("on", m === "add"); $("#drawZone").classList.toggle("on", m === "zone"); $("#drawBoundary").classList.toggle("on", m === "boundary"); $("#zPick").classList.toggle("on", m === "pick" && state.pickTarget === "fel"); $("#pickEgl").classList.toggle("on", m === "pick" && state.pickTarget === "egl"); $("#zGrade").classList.toggle("on", m === "grade");
+  $("#modeExcl").classList.toggle("on", m === "excl"); $("#modeAdd").classList.toggle("on", m === "add"); $("#drawZone").classList.toggle("on", m === "zone"); $("#drawBoundary").classList.toggle("on", m === "boundary"); $("#zPick").classList.toggle("on", m === "pick" && state.pickTarget === "fel"); $("#pickEgl").classList.toggle("on", m === "pick" && state.pickTarget === "egl"); $("#zGrade").classList.toggle("on", m === "grade"); $("#georefBtn").classList.toggle("on", m === "georef");
   const drawing = m === "zone" || m === "boundary"; $("#finishZone").disabled = !drawing; $("#cancelZone").disabled = !drawing; }
 $("#modeExcl").addEventListener("click", () => setMode(state.mode === "excl" ? "pan" : "excl"));
 $("#modeAdd").addEventListener("click", () => setMode(state.mode === "add" ? "pan" : "add"));
@@ -305,12 +401,13 @@ $("#finishZone").addEventListener("click", finishDraft);
 $("#zPick").addEventListener("click", () => { state.pickTarget = "fel"; setMode(state.mode === "pick" ? "pan" : "pick"); });
 $("#zGrade").addEventListener("click", () => { if (state.sel == null) return; state.grading = []; setMode("grade"); drawOverlay(); });
 $("#zGradeClear").addEventListener("click", () => { const z = state.zones[state.sel]; if (!z) return; z.grade = null; z.result = null; renderZoneTable(); drawOverlay(); });
-document.addEventListener("keydown", e => { if (e.key === "Escape") { state.draft = []; state.calib = []; state.grading = []; setMode("pan"); drawOverlay(); } if (e.key === "Enter" && (state.mode === "zone" || state.mode === "boundary")) finishDraft(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape") { state.draft = []; state.calib = []; state.grading = []; state.georef = []; state.tracing = null; setMode("pan"); renderSchedule(); drawOverlay(); } if (e.key === "Enter" && (state.mode === "zone" || state.mode === "boundary")) finishDraft(); });
 function pagePointFromEvent(e) { const r = $("#inner").getBoundingClientRect(); const px = (e.clientX - r.left) / state.zoom, py = (e.clientY - r.top) / state.zoom; const [x, y] = toPdf(px, py); return { x, y }; }
-$("#inner").addEventListener("mousemove", e => { if (!state.vp || state.showing !== "topo") return; const p = pagePointFromEvent(e); const w = state.T ? state.T.toWorld(p.x, p.y) : null; $("#xy").textContent = w ? `${state.T.mode === "grid" ? "E " + w.X.toFixed(2) + "  N " + w.Y.toFixed(2) : "x " + w.X.toFixed(2) + "  y " + w.Y.toFixed(2) + " m"}` : `${p.x.toFixed(1)}, ${p.y.toFixed(1)} pt`; });
+$("#inner").addEventListener("mousemove", e => { if (!state.vp || state.showing !== "topo") return; const p = pagePointFromEvent(e); const w = state.T ? state.T.toWorld(p.x, p.y) : null; $("#xy").textContent = w ? `${worldMode() ? "E " + w.X.toFixed(2) + "  N " + w.Y.toFixed(2) : "x " + w.X.toFixed(2) + "  y " + w.Y.toFixed(2) + " m"}` : `${p.x.toFixed(1)}, ${p.y.toFixed(1)} pt`; });
 $("#inner").addEventListener("click", e => {
   if (!state.vp || state.showing !== "topo") return; const p = pagePointFromEvent(e);
   if (state.mode === "calib") { state.calib.push(p); if (state.calib.length === 2) { const m = calibrateTwoPoints(state.calib[0], state.calib[1], +$("#calibDist").value); state.T = { mode: "calibrated", ...scaledTransform(m) }; $("#scaleStat").innerHTML = `calibrated: <b>${m.toFixed(5)} m/pt</b> (≈ 1:${Math.round(m / scaleFromDeclared(1))})`; setMode("pan"); boundaryStat(); status(); } drawOverlay(); }
+  else if (state.mode === "georef") { state.georef.push(p); if (state.georef.length === 2) { finishGeoref(); setMode("pan"); } drawOverlay(); }
   else if (state.mode === "zone" || state.mode === "boundary") { state.draft.push(p); drawOverlay(); }
   else if (state.mode === "excl") { const el = e.target.closest("[data-l]"); if (el) { const i = +el.dataset.l; state.excluded.has(i) ? state.excluded.delete(i) : state.excluded.add(i); readLevelsStat(); drawOverlay(); } const m = e.target.closest("[data-m]"); if (m) { state.manual.splice(+m.dataset.m, 1); readLevelsStat(); drawOverlay(); } }
   else if (state.mode === "add") { let v = parseFloat($("#manualVal").value); if (!isFinite(v)) { const s = prompt("Level (m)"); v = parseFloat(s); if (!isFinite(v)) return; } state.manual.push({ x: p.x, y: p.y, value: v }); readLevelsStat(); drawOverlay(); }
@@ -327,8 +424,11 @@ $("#inner").addEventListener("click", e => {
 $("#inner").addEventListener("dblclick", e => { if (state.mode === "zone" || state.mode === "boundary") { e.preventDefault(); finishDraft(); } });
 function finishDraft() {
   if (state.mode === "boundary") { if (state.draft.length >= 3) { state.boundary = state.draft.slice(); state.platformResult = null; } state.draft = []; setMode("pan"); boundaryStat(); drawOverlay(); return; }
-  if (state.draft.length >= 3) { const z = { name: (state.model === "platforms" ? "Platform " : "Zone ") + String.fromCharCode(65 + state.zones.length % 26), fel: null, grade: null, sides: "rules", note: "", poly: state.draft.slice(), result: null }; state.zones.push(z); state.sel = state.zones.length - 1; }
-  state.draft = []; setMode("pan"); renderZoneTable(); drawOverlay(); if (state.sel != null) $("#zFel").focus(); }
+  if (state.draft.length >= 3) { const row = state.tracing; const z = { name: row ? row.name : (state.model === "platforms" ? "Platform " : "Zone ") + String.fromCharCode(65 + state.zones.length % 26), fel: row ? row.fel : null, grade: null, sides: row?.sides || "rules", note: row?.note || "", poly: state.draft.slice(), result: null };
+    if (row?.grade) { const pts = z.poly; z.grade = { p1: pts[0], z1: row.grade.z1, p2: pts[Math.floor(pts.length / 2)], z2: row.grade.z2 }; z.note = (z.note ? z.note + " · " : "") + "ramp ends assumed at first and opposite vertex: check with Set ends"; }
+    if (row) { const old = state.zones.findIndex(q => q.name === row.zone); if (old >= 0) state.zones.splice(old, 1); row.zone = z.name; }
+    state.zones.push(z); state.sel = state.zones.length - 1; state.platformResult = null; }
+  state.draft = []; state.tracing = null; setMode("pan"); renderZoneTable(); renderSchedule(); drawOverlay(); if (state.sel != null && state.zones[state.sel]?.fel == null && !state.zones[state.sel]?.grade) $("#zFel").focus(); }
 
 // ---------- zones / platforms ----------
 function renderZoneTable() {
@@ -447,14 +547,15 @@ $("#csvCells").addEventListener("click", () => { const rows = [];
   if (state.model === "platforms") { const R = state.platformResult; if (R) for (const c of R.cells) rows.push({ governing: c.tag ?? "", X: c.X.toFixed(2), Y: c.Y.toFixed(2), egl: c.egl?.toFixed(3) ?? "", design: c.fel?.toFixed(3) ?? "", depth: c.depth?.toFixed(3) ?? "", area_m2: c.area }); download(fileBase() + "_cells.csv", toCSV(rows, ["governing", "X", "Y", "egl", "design", "depth", "area_m2"]), "text/csv"); return; }
   for (const z of state.zones) if (z.result) for (const c of z.result.cells) rows.push({ zone: z.name, X: c.X.toFixed(2), Y: c.Y.toFixed(2), egl: c.egl?.toFixed(3) ?? "", fel: c.fel, depth: c.depth?.toFixed(3) ?? "", area_m2: c.area }); download(fileBase() + "_cells.csv", toCSV(rows, ["zone", "X", "Y", "egl", "fel", "depth", "area_m2"]), "text/csv"); });
 const fileBase = () => (state.topo?.name || "earthworks").replace(/\.pdf$/i, "");
-function project() { return { version: 2, model: state.model, sheet: state.topo?.name, page: state.topo?.pageNo, transform: state.T ? { mode: state.T.mode, mPerPt: state.T.mPerPt, scale: state.T.scale } : null,
+function project() { return { version: 3, model: state.model, sheet: state.topo?.name, page: state.topo?.pageNo, transform: state.T ? { mode: state.T.mode, mPerPt: state.T.mPerPt, scale: state.T.scale, points: state.T.points } : null, schedule: state.schedule,
   zones: state.zones.map(z => ({ name: z.name, fel: z.fel, grade: z.grade, sides: z.sides, note: z.note, poly: z.poly })), boundary: state.boundary, excluded: [...state.excluded].map(i => state.levels[i]).filter(Boolean).map(l => [l.px, l.py, l.value]), manual: state.manual, settings: settings(),
   platform: { eglMode: $("#eglMode").value, eglLevel: $("#eglLevel").value, rulesText: $("#rulesText").value, bermsText: $("#bermsText").value, stagesText: $("#stagesText").value, corners: $("#corners").value }, checked: state.checked }; }
-function applyProject(p) { if (p.transform && p.transform.mode !== "grid") { if (p.transform.mode === "declared") setDeclared(p.transform.scale); else { state.T = { mode: "calibrated", ...scaledTransform(p.transform.mPerPt) }; $("#scaleStat").innerHTML = `calibrated (project): <b>${p.transform.mPerPt.toFixed(5)} m/pt</b>`; } }
+function applyProject(p) { if (p.transform && !["grid", "dxf"].includes(p.transform.mode) && !state.topo?.isDxf) { if (p.transform.mode === "declared") setDeclared(p.transform.scale); else if (p.transform.mode === "georef" && p.transform.points) { const q = p.transform.points; state.georef = [q.p1, q.p2]; ["gE1", "gN1", "gE2", "gN2"].forEach((id, i) => $("#" + id).value = [q.w1.E, q.w1.N, q.w2.E, q.w2.N][i]); finishGeoref(); } else { state.T = { mode: "calibrated", ...scaledTransform(p.transform.mPerPt) }; $("#scaleStat").innerHTML = `calibrated (project): <b>${p.transform.mPerPt.toFixed(5)} m/pt</b>`; } }
+  state.schedule = p.schedule || [];
   state.zones = (p.zones || []).map(z => ({ grade: null, sides: "rules", ...z, result: null })); state.boundary = p.boundary || null; state.platformResult = null; state.manual = p.manual || []; state.excluded = new Set(); for (const [x, y, v] of p.excluded || []) { const i = state.levels.findIndex(l => Math.abs(l.px - x) < 0.5 && Math.abs(l.py - y) < 0.5 && l.value === v); if (i >= 0) state.excluded.add(i); }
   if (p.settings) { $("#surface").value = p.settings.surface; $("#kNear").value = p.settings.k; $("#radius").value = p.settings.radius; $("#cell").value = p.settings.cell; $("#sample").value = p.settings.sample; $("#batter").value = p.settings.batter; const b = p.settings.bands.join(","); if ([...$("#bands").options].some(o => o.value === b)) $("#bands").value = b; else { $("#bands").value = "custom"; $("#bandsCustom").value = b; } }
   if (p.platform) { $("#eglMode").value = p.platform.eglMode || "flat"; $("#eglLevel").value = p.platform.eglLevel ?? ""; $("#rulesText").value = p.platform.rulesText || ""; $("#bermsText").value = p.platform.bermsText || ""; $("#stagesText").value = p.platform.stagesText || ""; $("#corners").value = p.platform.corners || "mitred"; $("#eglLevel").disabled = $("#eglMode").value !== "flat"; }
-  if (p.model) setModel(p.model); state.checked = p.checked || null; readLevelsStat(); renderZoneTable(); boundaryStat(); renderResults(); drawOverlay(); status(); }
+  if (p.model) setModel(p.model); state.checked = p.checked || null; readLevelsStat(); renderZoneTable(); renderSchedule(); boundaryStat(); renderResults(); drawOverlay(); status(); }
 function saveLocal() { try { if (state.topo) localStorage.setItem("kkl_ew_" + state.topo.name, JSON.stringify(project())); } catch (e) {} }
 $("#saveProj").addEventListener("click", () => { saveLocal(); download(fileBase() + "_project.json", JSON.stringify(project(), null, 1), "application/json"); });
 $("#loadProj").addEventListener("change", async e => { const f = e.target.files[0]; if (!f) return; const p = JSON.parse(await f.text()); if (state.topo && p.sheet && p.sheet !== state.topo.name && !confirm(`Project was saved for ${p.sheet}; apply to ${state.topo.name}?`)) return; applyProject(p); e.target.value = ""; });
@@ -462,7 +563,7 @@ window.addEventListener("beforeunload", saveLocal);
 function status() { const n = state.zones.length; $("#tstat").innerHTML = state.topo ? `${esc(state.topo.name)} p${state.topo.pageNo} · ${state.T ? state.T.mode + " " + state.T.mPerPt.toFixed(5) + " m/pt" : "scale not set"} · ${state.model === "platforms" ? `${n} platform${n === 1 ? "" : "s"}` : `${n} zone${n === 1 ? "" : "s"}`}` : "no sheet loaded"; }
 
 // test and scripting hooks
-window.__ew = { state, compute, readLevels, setModel, setDeclared, summaryRows, settings, applyProject, project, platformRows,
+window.__ew = { state, compute, readLevels, setModel, setDeclared, summaryRows, settings, applyProject, project, platformRows, loadDxf, addPlatformsFromLayer, boundaryFromLayer, renderSchedule, parseScheduleCsv, finishGeoref,
   addZone: (name, fel, poly, note = "", extra = {}) => { state.zones.push({ name, fel, note, poly, result: null, grade: null, sides: "rules", ...extra }); renderZoneTable(); drawOverlay(); },
   setBoundary: poly => { state.boundary = poly; state.platformResult = null; boundaryStat(); drawOverlay(); } };
 </script>
