@@ -96,6 +96,16 @@ Singapore projects; millimetre files are converted), so there is no scale to set
 3. Slope rules, berms, stages and existing ground are entered from the sections as in Workflow B, and
    the volumes are computed the same way. Areas are exact to the drawing.
 
+## One command, no browser
+
+`node earthworks/takeoff_cli.mjs plan.pdf --loa --out takeoff.csv` (Node 18 or later; run `npm install` in
+`earthworks/` once for `pdfjs-dist`) reads the plan's title-block scale, finds the pen whose closed outlines own
+the level labels (the toe lines), takes the largest other closed outline as the boundary, adds the pre-cut
+platform, applies the slope rules, berms and stages given on the command line (defaults as read off the T5B
+sections), and prints the stage volumes, slope-face and berm areas, the material split and, with `--loa`, the
+Bill B items with the take-off adjacent. Outlines without a level inside are listed and left out, so nothing is
+measured that the sheet does not label.
+
 ## Surveyed coordinates and georeferencing
 
 A boundary schedule with surveyed coordinates (`N: 35032.442 E: 45933.837` per corner) can be pasted
