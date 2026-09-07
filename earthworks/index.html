@@ -89,7 +89,7 @@
     <div class="row"><input type="file" id="topoFile" accept=".pdf,application/pdf"><select id="topoPage" style="flex:0 0 74px" title="page"></select></div>
     <label>Design or excavation PDF (levels to read off)</label>
     <div class="row"><input type="file" id="designFile" accept=".pdf,application/pdf"><select id="designPage" style="flex:0 0 74px" title="page"></select></div>
-    <div class="row" style="margin-top:6px"><button class="tiny on" id="showTopo">Show topo</button><button class="tiny" id="showDesign" disabled>Show design</button></div>
+    <div class="row" style="margin-top:6px"><button class="tiny on" id="showTopo">Show topo</button><button class="tiny" id="showDesign" disabled>Show design</button><button class="tiny" id="loadSample" title="Load the synthetic topo and design sheets">Load sample sheets</button></div>
     <div class="stat" id="designStat"></div>
     <div class="list" id="designLevels" hidden></div>
     <p class="hint">Levels found on the design sheet are listed with their text; press “→ FEL” to use one for the selected zone.</p>
@@ -151,6 +151,7 @@ import { pageTextItems, pageGeometry } from "./pdfgeom.js";
 pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.worker.min.mjs";
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
 const RENDER_SCALE = 1.5;
+const PREVIEW = !!window.__EW_PREVIEW;
 const state = { topo: null, design: null, showing: "topo", T: null, levels: [], excluded: new Set(), manual: [], zones: [], sel: null, mode: "pan", draft: [], calib: [], zoom: 1, checked: null, vp: null };
 
 // ---------- loading ----------
@@ -159,6 +160,8 @@ $("#topoFile").addEventListener("change", async e => { const f = e.target.files[
 $("#designFile").addEventListener("change", async e => { const f = e.target.files[0]; if (!f) return; state.design = await loadPdf(f); fillPages($("#designPage"), state.design.pages); $("#showDesign").disabled = false; await scanDesign(); });
 $("#topoPage").addEventListener("change", e => loadTopoPage(+e.target.value));
 $("#designPage").addEventListener("change", () => { if (state.showing === "design") renderPage(state.design.doc, +$("#designPage").value, false); });
+async function sampleFile(name) { if (window.__EW_SAMPLES && window.__EW_SAMPLES[name]) { const bin = atob(window.__EW_SAMPLES[name]); const u8 = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i); return new File([u8], name, { type: "application/pdf" }); } const r = await fetch("./" + name); return new File([await r.arrayBuffer()], name, { type: "application/pdf" }); }
+$("#loadSample").addEventListener("click", async () => { try { state.topo = await loadPdf(await sampleFile("sample_topo.pdf")); fillPages($("#topoPage"), state.topo.pages); await loadTopoPage(1); state.design = await loadPdf(await sampleFile("sample_design.pdf")); fillPages($("#designPage"), state.design.pages); $("#showDesign").disabled = false; await scanDesign(); } catch (e) { alert("Could not load the sample sheets: " + e.message); } });
 function fillPages(sel, n) { sel.innerHTML = Array.from({ length: n }, (_, i) => `<option value="${i + 1}">p${i + 1}</option>`).join(""); }
 async function loadTopoPage(no) {
   const t = state.topo; t.pageNo = no; const page = await t.doc.getPage(no); t.page = page;
@@ -307,7 +310,9 @@ function renderResults() {
 $("#markChecked").addEventListener("click", () => { const by = $("#checker").value.trim(); if (!by) { $("#checker").focus(); return; } state.checked = { by, at: Date.now() }; renderResults(); saveLocal(); });
 
 // ---------- export and project ----------
-function download(name, content, mime) { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([content], { type: mime + ";charset=utf-8" })); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500); }
+function download(name, content, mime) {
+  if (PREVIEW) { const box = document.createElement("div"); box.style.cssText = "position:fixed;inset:8% 10%;background:var(--card);border:2px solid var(--ink);z-index:50;display:flex;flex-direction:column;padding:12px;gap:8px"; box.innerHTML = `<div class="row"><b style="flex:1">${name}</b><button class="tiny" id="cpy">Copy</button><button class="tiny" id="cls">Close</button></div><p class="hint" style="margin:0">Downloads are blocked in this preview; copy the text into a file, or use the app from GitHub Pages.</p><textarea style="flex:1;font:12px Consolas,monospace"></textarea>`; box.querySelector("textarea").value = content; document.body.appendChild(box); box.querySelector("#cls").onclick = () => box.remove(); box.querySelector("#cpy").onclick = () => navigator.clipboard.writeText(content); return; }
+  const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([content], { type: mime + ";charset=utf-8" })); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500); }
 function summaryRows() { return state.zones.filter(z => z.result).map(z => { const s = z.result.summary, st = z.result.settings; const row = { zone: z.name, fel_m: z.fel, note: z.note, area_m2: s.area.toFixed(1), avg_cut_depth_m: s.avgCutDepth.toFixed(3), max_cut_depth_m: s.maxDepth.toFixed(2), cut_m3: s.cut.toFixed(1), fill_m3: s.fill.toFixed(1) };
   for (const n of s.bands) row["cut_" + n + "_m3"] = s.byLayer[n].toFixed(1); for (const n of s.bands) row["cut_maxdepth_" + n + "_m3"] = s.byMaxDepth[n].toFixed(1);
   Object.assign(row, { batter_m3: z.result.batter.toFixed(1), method: st.surface, k: st.k, radius_m: st.radius, cell_m: st.cell, sample: st.sample, levels_used: usedPoints().length, scale_mode: state.T.mode, m_per_pt: state.T.mPerPt.toFixed(6), sheet: state.topo.name, page: state.topo.pageNo, checked_by: state.checked?.by || "", checked_at: state.checked ? new Date(state.checked.at).toISOString() : "", vertices_pt: z.poly.map(p => p.x.toFixed(1) + "/" + p.y.toFixed(1)).join(" ") }); return row; }); }
